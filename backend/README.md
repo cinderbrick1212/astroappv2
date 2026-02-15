@@ -233,9 +233,9 @@ For deployment to GCP Cloud Run:
 4. Set environment variables in Cloud Run
 5. Deploy container
 
-See [backend/DEPLOYMENT.md](backend/DEPLOYMENT.md) for step-by-step Cloud Run + Postgres + GCS setup and baseline verification.
+See [DEPLOYMENT.md](DEPLOYMENT.md) for step-by-step Cloud Run + Postgres + GCS setup and baseline verification.
 
-See `backend.md` for detailed deployment instructions.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed deployment instructions.
 
 ## 📚 Learn More
 

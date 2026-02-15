@@ -1449,7 +1449,7 @@ This section provides complete setup instructions for a developer starting from 
 **Accounts/Services**:
 
 - Firebase account (for Auth)
-- Strapi backend deployed (see backend.md)
+- Strapi backend deployed (see backend/ARCHITECTURE.md)
 - Razorpay account (test and live keys)
 
 ### 18.2 Project Initialization
@@ -1513,7 +1513,7 @@ This section provides complete setup instructions for a developer starting from 
 Create the following directory structure:
 
 ```
-mobile/
+frontend/
 ├── src/
 │   ├── api.ts                 # Axios API client
 │   ├── config.ts              # Environment config

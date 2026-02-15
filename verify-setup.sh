@@ -57,14 +57,14 @@ cd ..
 
 # Check Mobile
 echo ""
-echo "=== Mobile (React Native + Expo) ==="
-cd mobile
+echo "=== Frontend (React Native + Expo) ==="
+cd frontend
 echo -n "Checking mobile dependencies... "
 if [ -d "node_modules" ]; then
     echo -e "${GREEN}✓ Installed${NC}"
 else
     echo -e "${YELLOW}⚠ Not installed${NC}"
-    echo "  Run: cd mobile && npm install"
+    echo "  Run: cd frontend && npm install"
 fi
 
 echo -n "Checking TypeScript compilation... "
@@ -85,8 +85,8 @@ else
     echo -e "${RED}✗${NC}"
 fi
 
-echo -n "Checking mobile structure... "
-if [ -d "mobile/src" ] && [ -f "mobile/App.tsx" ]; then
+echo -n "Checking frontend structure... "
+if [ -d "frontend/src" ] && [ -f "frontend/App.tsx" ]; then
     echo -e "${GREEN}✓${NC}"
 else
     echo -e "${RED}✗${NC}"
@@ -95,7 +95,7 @@ fi
 # Check documentation
 echo ""
 echo "=== Documentation ==="
-DOCS=("README.md" "QUICKSTART.md" "CONTRIBUTING.md" "frontend.md" "backend.md" "mobile/README.md" "backend/README.md")
+DOCS=("README.md" "QUICKSTART.md" "CONTRIBUTING.md" "frontend/ARCHITECTURE.md" "backend/ARCHITECTURE.md" "frontend/README.md" "backend/README.md")
 for doc in "${DOCS[@]}"; do
     echo -n "Checking $doc... "
     if [ -f "$doc" ]; then
@@ -114,6 +114,6 @@ echo ""
 echo "Next steps:"
 echo "1. Read QUICKSTART.md for setup instructions"
 echo "2. Start backend: cd backend && npm run develop"
-echo "3. Start mobile: cd mobile && npm start"
+echo "3. Start frontend: cd frontend && npm start"
 echo ""
 echo "For more information, see README.md"

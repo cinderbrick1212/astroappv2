@@ -16,7 +16,7 @@ This is the mobile application for the Astrology App, built with React Native an
 ## Project Structure
 
 ```
-mobile/
+frontend/
 ├── src/
 │   ├── api.ts                 # Axios API client
 │   ├── config.ts              # Environment configuration
@@ -80,7 +80,7 @@ mobile/
 ### Installation
 
 ```bash
-cd mobile
+cd frontend
 npm install
 ```
 
