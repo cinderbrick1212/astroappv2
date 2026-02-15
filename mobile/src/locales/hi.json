@@ -1,0 +1,46 @@
+{
+  "common": {
+    "app_name": "ज्योतिष ऐप",
+    "loading": "लोड हो रहा है...",
+    "error": "एक त्रुटि हुई",
+    "retry": "पुनः प्रयास करें",
+    "cancel": "रद्द करें",
+    "save": "सहेजें",
+    "continue": "जारी रखें"
+  },
+  "auth": {
+    "login": "लॉगिन",
+    "signup": "साइन अप",
+    "email": "ईमेल",
+    "phone": "फोन",
+    "password": "पासवर्ड",
+    "forgot_password": "पासवर्ड भूल गए?",
+    "login_with_google": "Google के साथ जारी रखें",
+    "login_as_guest": "अतिथि के रूप में जारी रखें"
+  },
+  "tabs": {
+    "feed": "फ़ीड",
+    "tools": "टूल्स",
+    "home": "होम",
+    "profile": "प्रोफ़ाइल"
+  },
+  "feed": {
+    "title": "दैनिक फ़ीड",
+    "good_morning": "सुप्रभात",
+    "day_streak": "दिन की लकीर"
+  },
+  "tools": {
+    "title": "ज्योतिष टूल्स",
+    "kundli": "कुंडली",
+    "compatibility": "मेल",
+    "panchang": "पंचांग",
+    "lucky_factors": "भाग्यशाली कारक"
+  },
+  "profile": {
+    "title": "प्रोफ़ाइल",
+    "birth_details": "जन्म विवरण",
+    "premium_status": "प्रीमियम स्थिति",
+    "payment_history": "भुगतान इतिहास",
+    "settings": "सेटिंग्स"
+  }
+}
