@@ -7,6 +7,7 @@ export default (config, { strapi }: { strapi: Core.Strapi }) => {
     const publicRoutes = [
       '/api/feed-items',
       '/api/blog-posts',
+      '/api/health',
       '/admin',
       '/_health',
     ];
