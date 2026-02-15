@@ -1,8 +1,25 @@
+# ⚠️ DEPRECATED - Repository Archived
+
+**This repository has been archived and is no longer maintained.**
+
+The monorepo has been split into separate repositories for better organization and development:
+
+- **Backend Repository**: [cinderbrick1212/astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+- **Frontend/Mobile Repository**: [cinderbrick1212/astroappv2frontend](https://github.com/cinderbrick1212/astroappv2frontend)
+
+**Please use the new repositories for all future development.**
+
+---
+
 # Astrology App v2
 
 A modern astrology mobile application with React Native (Expo) frontend and Strapi backend, featuring client-side Vedic astrology calculations and monetization through ads and premium services.
 
 ## Project Overview
+
+> **📦 Migration Notice**: This monorepo has been split. For active development, please visit:
+> - Backend: https://github.com/cinderbrick1212/astroappv2backend
+> - Frontend/Mobile: https://github.com/cinderbrick1212/astroappv2frontend
 
 This is a complete astrology application platform consisting of:
 
@@ -87,6 +104,10 @@ astroappv2/
 - WhatsApp API (Notifications)
 
 ## Quick Start
+
+> **⚠️ This repository is archived.** Please use the new repositories:
+> - For backend setup: Visit [astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+> - For mobile/frontend setup: Visit [astroappv2frontend](https://github.com/cinderbrick1212/astroappv2frontend)
 
 ### Prerequisites
 - Node.js 20 or higher

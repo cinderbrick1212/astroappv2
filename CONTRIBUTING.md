@@ -1,3 +1,16 @@
+# ⚠️ DEPRECATED - Repository Archived
+
+**This repository has been archived and is no longer accepting contributions.**
+
+The monorepo has been split into separate repositories:
+
+- **Backend Repository**: [cinderbrick1212/astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+- **Frontend/Mobile Repository**: [cinderbrick1212/astroappv2frontend](https://github.com/cinderbrick1212/astroappv2frontend)
+
+**Please submit contributions to the appropriate new repository.**
+
+---
+
 # Contributing Guide
 
 Thank you for your interest in contributing to Astrology App v2! This guide will help you get started.
