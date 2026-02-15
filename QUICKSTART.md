@@ -1,22 +1,54 @@
-# Quick Start Guide
+# Quick Start Guide - Split Repository
 
-This guide will help you get the Astrology App v2 up and running quickly.
+This guide helps you work with the split repository structure where frontend and backend are in standalone directories.
+
+## 🎯 What's Changed
+
+The repository has been reorganized with `frontend-standalone/` and `backend-standalone/` directories that are ready to be extracted into separate repositories. Each directory is completely self-contained.
+
+## 📋 Choose Your Path
+
+### Option A: Working on Frontend Only
+
+If you're only working on the mobile app, go directly to the frontend:
+
+```bash
+cd frontend-standalone
+```
+
+Then follow the [frontend-standalone/QUICKSTART.md](frontend-standalone/QUICKSTART.md) guide.
+
+### Option B: Working on Backend Only
+
+If you're only working on the API, go directly to the backend:
+
+```bash
+cd backend-standalone
+```
+
+Then follow the [backend-standalone/QUICKSTART.md](backend-standalone/QUICKSTART.md) guide.
+
+### Option C: Working on Both (Full Stack)
+
+If you're working on both frontend and backend, follow the guide below.
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+Before you begin, ensure you have:
 
 - **Node.js 20+**: [Download](https://nodejs.org/)
 - **npm** or **yarn**: Comes with Node.js
-- **Expo CLI**: Install globally with `npm install -g expo-cli`
 - **Git**: [Download](https://git-scm.com/)
 
-For mobile development:
-- **Expo Go app**: Install on your iOS/Android device from App Store/Play Store
-- **iOS Simulator** (Mac only): Comes with Xcode
-- **Android Studio**: For Android emulator
+**For Frontend Development:**
+- **Expo CLI**: `npm install -g expo-cli`
+- **Expo Go app**: Install on your phone (App Store/Play Store)
+- **iOS Simulator** (Mac only) or **Android Studio** for emulator
 
-## Quick Setup (5 minutes)
+**For Backend Development:**
+- **PostgreSQL**: For production (optional, SQLite used in development)
+
+## Full Stack Setup (10 minutes)
 
 ### 1. Clone the Repository
 
@@ -25,10 +57,10 @@ git clone https://github.com/cinderbrick1212/astroappv2.git
 cd astroappv2
 ```
 
-### 2. Backend Setup
+### 2. Backend Setup (Terminal 1)
 
 ```bash
-cd backend
+cd backend-standalone
 npm install
 npm run develop
 ```
@@ -37,196 +69,179 @@ The Strapi admin panel will open at `http://localhost:1337/admin`
 
 **First time setup:**
 1. Create your admin account
-2. You're ready to go! (Content types will be added later)
+2. Content types are pre-configured
 
-Leave this terminal running.
+**Keep this terminal running.**
 
-### 3. Frontend App Setup
+### 3. Frontend Setup (Terminal 2)
 
-Open a new terminal:
+Open a new terminal window:
 
 ```bash
-cd frontend
+cd astroappv2/frontend-standalone
 npm install
+cp .env.example .env
+# Edit .env and set STRAPI_API_URL=http://localhost:1337/api
 npm start
 ```
 
 **To test the app:**
-- **On your phone**: Scan the QR code with Expo Go app
-- **iOS Simulator** (Mac): Press `i`
+- **On your phone**: Scan QR code with Expo Go
+- **iOS Simulator**: Press `i`
 - **Android Emulator**: Press `a`
 - **Web Browser**: Press `w`
 
 ## What You'll See
 
 ### Mobile App
-- Login screen (placeholder)
+- Login screen with Firebase authentication
 - Bottom tab navigation with 4 tabs:
-  - **Feed**: Daily content feed (placeholder)
-  - **Tools**: Astrology tools hub (placeholder)
-  - **Home**: Dashboard (placeholder)
-  - **Profile**: User profile (placeholder)
+  - **Feed**: Daily content feed
+  - **Tools**: Astrology tools hub
+  - **Home**: Dashboard
+  - **Profile**: User profile
 
 ### Backend
 - Strapi admin panel at `http://localhost:1337/admin`
-- Empty content types (ready to be configured)
+- Pre-configured content types (User, UserProfile, FeedItem, BlogPost, Payment, ServiceRequest)
 
 ## Configuration
 
-### Firebase Setup (Optional for now)
-
-To enable authentication:
+### Firebase Setup
 
 1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
 2. Enable Authentication methods (Email/Password, Google, Phone)
-3. Get your Firebase config
-4. Create `frontend/.env` from `frontend/.env.example`
-5. Fill in Firebase credentials
+3. Download service account JSON for backend
+4. Get Firebase config for frontend
+5. Update environment variables (see individual QUICKSTART guides)
 
-### Backend Database (Production)
+### Environment Variables
 
-The backend uses SQLite by default (development). For production:
+**Backend** (`backend-standalone/.env`):
+- Firebase service account key
+- Razorpay credentials
+- Database connection (if using PostgreSQL)
 
-1. Set up PostgreSQL database
-2. Update `backend/.env` with database credentials
-3. Restart Strapi
+**Frontend** (`frontend-standalone/.env`):
+- Firebase configuration
+- Strapi API URL
+- Razorpay key ID
+
+See detailed guides:
+- [backend-standalone/QUICKSTART.md](backend-standalone/QUICKSTART.md)
+- [frontend-standalone/QUICKSTART.md](frontend-standalone/QUICKSTART.md)
 
 ## Next Steps
 
-### Mobile Development
+Choose based on what you're working on:
 
-1. **Implement Firebase Authentication**
-   - Update `src/screens/LoginScreen.tsx`
-   - Wire up `useAuth` hook
-
-2. **Build Screen UIs**
-   - Feed screen with horoscope cards
-   - Tools screen with tool cards
-   - Profile screen with user info
-
-3. **Add Swiss Ephemeris**
-   - Install astrology calculation library
-   - Implement services in `src/services/`
+### Frontend Development
+📱 See [frontend-standalone/QUICKSTART.md](frontend-standalone/QUICKSTART.md) for:
+- Implementing authentication flows
+- Building screen UIs
+- Adding astrology calculations
+- Payment integration
 
 ### Backend Development
+🔧 See [backend-standalone/QUICKSTART.md](backend-standalone/QUICKSTART.md) for:
+- Content management
+- Custom API endpoints
+- Payment processing
+- Deployment to Cloud Run
 
-1. **Create Content Types**
-   - User, UserProfile, FeedItem, BlogPost
-   - Payment, ServiceRequest
-   - See `backend/README.md` for details
-
-2. **Add Custom Controllers**
-   - Payment endpoints
-   - Service request handlers
-
-3. **Configure Integrations**
-   - Razorpay for payments
-   - Email provider
-   - WhatsApp API
+### Both
+Work through both guides sequentially.
 
 ## Troubleshooting
 
-### Frontend App Won't Start
-```bash
-cd frontend
-rm -rf node_modules
-npm install
-npx expo start -c
-```
+### Frontend Issues
+See [frontend-standalone/QUICKSTART.md](frontend-standalone/QUICKSTART.md#troubleshooting)
 
-### Backend Won't Start
-```bash
-cd backend
-rm -rf node_modules
-npm install
-npm run develop
-```
+### Backend Issues
+See [backend-standalone/QUICKSTART.md](backend-standalone/QUICKSTART.md#troubleshooting)
 
-### TypeScript Errors
-```bash
-# In frontend/ or backend/
-npx tsc --noEmit
-```
+### Common Full Stack Issues
 
-### Clear All Caches
-```bash
-# Frontend
-cd frontend
-npx expo start -c
+**Frontend can't connect to backend:**
+- Ensure backend is running (`http://localhost:1337`)
+- Check `STRAPI_API_URL` in `frontend-standalone/.env`
+- Verify no firewall blocking localhost
 
-# Backend  
-cd backend
-rm -rf .cache build
-npm run develop
-```
+**Authentication not working:**
+- Verify Firebase is configured in both frontend and backend
+- Check Firebase service account in backend
+- Ensure Firebase config in frontend .env
 
 ## Development Workflow
 
-### Typical Day
+### Daily Development
 
-1. **Start backend** (one time):
-   ```bash
-   cd backend && npm run develop
-   ```
+**Backend** (Terminal 1):
+```bash
+cd backend-standalone
+npm run develop
+```
 
-2. **Start frontend app** (one time):
-   ```bash
-   cd frontend && npm start
-   ```
-
-3. **Make changes**:
-   - Edit files in `frontend/src/` or `backend/src/`
-   - Hot reload will update automatically
-
-4. **Test changes**:
-   - Mobile: Shake device or press `m` for menu
-   - Backend: Changes reflect immediately
+**Frontend** (Terminal 2):
+```bash
+cd frontend-standalone
+npm start
+```
 
 ### Git Workflow
 
 ```bash
+# Work in the appropriate directory
+cd frontend-standalone  # or backend-standalone
+
 # Create feature branch
 git checkout -b feature/my-feature
 
 # Make changes and commit
 git add .
-git commit -m "Add my feature"
+git commit -m "feat: add my feature"
 
 # Push to remote
 git push origin feature/my-feature
 ```
 
+Note: Changes in either `frontend-standalone/` or `backend-standalone/` can be committed from the repository root.
+
 ## Resources
 
-### Documentation
-- [Project README](README.md)
-- [Frontend Architecture](frontend/ARCHITECTURE.md)
-- [Backend Architecture](backend/ARCHITECTURE.md)
-- [Frontend README](frontend/README.md)
-- [Backend README](backend/README.md)
+### Repository Documentation
+- [Main README](README.md) - Repository overview and extraction guide
+- [Frontend README](frontend-standalone/README.md) - Frontend development
+- [Backend README](backend-standalone/README.md) - Backend development
+- [Frontend Architecture](frontend-standalone/ARCHITECTURE.md) - Frontend technical details
+- [Backend Architecture](backend-standalone/ARCHITECTURE.md) - Backend technical details
 
-### External Docs
+### External Documentation
 - [React Native](https://reactnative.dev/)
 - [Expo](https://docs.expo.dev/)
 - [Strapi](https://docs.strapi.io/)
+- [Firebase](https://firebase.google.com/docs)
 - [React Navigation](https://reactnavigation.org/)
 - [React Query](https://tanstack.com/query/latest)
+
+## Extracting to Separate Repositories
+
+When ready to split into separate repositories, see the [main README](README.md#-extracting-standalone-repositories) for extraction instructions.
 
 ## Support
 
 For questions or issues:
-1. Check the documentation files
-2. Search existing issues
-3. Create a new issue with details
+1. Check the relevant documentation (frontend or backend)
+2. Review the architecture documentation
+3. Search existing issues
+4. Create a new issue with details
 
 ## What's Next?
 
-The boilerplate is set up! Here's what to build next:
+The split repository structure is ready! Next steps:
 
-1. **Week 1**: Authentication flows and user profile
-2. **Week 2**: Feed screen with content from Strapi
-3. **Week 3**: Astrology tools implementation
-4. **Week 4**: Payment integration
-5. **Week 5+**: Polish, testing, and deployment
+1. **Immediate**: Continue development in `*-standalone/` directories
+2. **Soon**: Extract to separate GitHub repositories
+3. **Later**: Set up separate CI/CD pipelines for each repo
 
 Happy coding! 🚀

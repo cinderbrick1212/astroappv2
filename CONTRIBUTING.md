@@ -1,58 +1,69 @@
 # Contributing Guide
 
-Thank you for your interest in contributing to Astrology App v2! This guide will help you get started.
+Thank you for your interest in contributing to the Astrology App! This guide will help you get started with our split repository structure.
+
+## 🎯 Repository Structure
+
+This repository is organized with standalone directories for frontend and backend:
+
+```
+astroappv2/
+├── frontend-standalone/   # Mobile app (React Native + Expo)
+├── backend-standalone/    # API (Strapi)
+├── frontend/              # Original (for reference)
+└── backend/               # Original (for reference)
+```
+
+**Active development happens in the `*-standalone/` directories.**
+
+## 📍 Where to Contribute
+
+Choose the appropriate directory based on what you're working on:
+
+- **Mobile App Features**: Work in `frontend-standalone/`
+  - See [frontend-standalone/CONTRIBUTING.md](frontend-standalone/CONTRIBUTING.md)
+
+- **Backend/API Features**: Work in `backend-standalone/`
+  - See [backend-standalone/CONTRIBUTING.md](backend-standalone/CONTRIBUTING.md)
+
+- **Documentation/Repository Structure**: Work at repository root
 
 ## Development Setup
 
-See [QUICKSTART.md](QUICKSTART.md) for initial setup instructions.
+### Full Stack Development
 
-## Project Structure
+See [QUICKSTART.md](QUICKSTART.md) for initial setup of both frontend and backend.
 
-### Mobile App (`frontend/`)
-```
-src/
-├── navigation/     # App navigation logic
-├── screens/        # Full screen components
-├── components/     # Reusable UI components
-├── hooks/          # Custom React hooks
-├── services/       # Business logic (astrology calculations)
-├── utils/          # Helper functions
-├── theme/          # Design tokens (colors, spacing, typography)
-├── types/          # TypeScript type definitions
-└── locales/        # Translations (en, hi)
+### Frontend Only
+
+```bash
+cd frontend-standalone
+npm install
+# See frontend-standalone/QUICKSTART.md
 ```
 
-### Backend (`backend/`)
-```
-src/
-├── api/            # API endpoints and controllers
-├── extensions/     # Strapi extensions
-└── index.ts        # Entry point
+### Backend Only
 
-config/             # Configuration files
-types/              # Generated TypeScript types
+```bash
+cd backend-standalone
+npm install
+# See backend-standalone/QUICKSTART.md
 ```
 
 ## Code Style
 
-### TypeScript
+Each standalone directory has its own code style guide. Please refer to:
+
+- **Frontend**: [frontend-standalone/CONTRIBUTING.md](frontend-standalone/CONTRIBUTING.md#code-style)
+- **Backend**: [backend-standalone/CONTRIBUTING.md](backend-standalone/CONTRIBUTING.md#code-style)
+
+### General Principles
+
 - Use TypeScript for all new files
-- Prefer interfaces over types for objects
-- Use explicit return types for functions
-- Avoid `any` - use proper typing
-
-### React/React Native
-- Use functional components with hooks
-- Follow React hooks rules
-- Use proper prop types
-- Keep components small and focused
-
-### Naming Conventions
-- **Components**: PascalCase (e.g., `FeedItemCard.tsx`)
-- **Hooks**: camelCase with `use` prefix (e.g., `useAuth.ts`)
-- **Utils**: camelCase (e.g., `dateHelpers.ts`)
-- **Types**: PascalCase for interfaces (e.g., `User`, `FeedItem`)
-- **Constants**: UPPER_SNAKE_CASE (e.g., `API_URL`)
+- Write clear, self-documenting code
+- Add comments for complex logic
+- Follow existing patterns in the codebase
+- Keep functions focused and testable
 
 ## Git Workflow
 
@@ -100,155 +111,132 @@ Updated navigation configuration to fix the issue.
 
 ## Pull Request Process
 
-1. **Create a branch** from `main`:
+1. **Choose the right directory**:
+   - Frontend changes: Work in `frontend-standalone/`
+   - Backend changes: Work in `backend-standalone/`
+   - Documentation: Work at repository root
+
+2. **Create a branch** from `main`:
    ```bash
    git checkout -b feature/my-feature
    ```
 
-2. **Make your changes**:
+3. **Make your changes**:
+   - Follow the relevant style guide
    - Write clean, documented code
-   - Follow project conventions
    - Add tests if applicable
 
-3. **Test your changes**:
-   ```bash
-   # Frontend
-   cd frontend
-   npx tsc --noEmit
-   npm start
-   
-   # Backend
-   cd backend
-   npx tsc --noEmit
-   npm run develop
-   ```
+4. **Test your changes**:
+   - Frontend: See [frontend-standalone/CONTRIBUTING.md](frontend-standalone/CONTRIBUTING.md#testing)
+   - Backend: See [backend-standalone/CONTRIBUTING.md](backend-standalone/CONTRIBUTING.md#testing)
 
-4. **Commit your changes**:
+5. **Commit your changes**:
    ```bash
    git add .
    git commit -m "feat: add my feature"
    ```
+   Follow conventional commits format (see below)
 
-5. **Push to your branch**:
+6. **Push to your branch**:
    ```bash
    git push origin feature/my-feature
    ```
 
-6. **Create a Pull Request**:
+7. **Create a Pull Request**:
    - Fill in the PR template
    - Link related issues
    - Request review from team members
 
-7. **Address review feedback**:
+8. **Address review feedback**:
    - Make requested changes
    - Push updates to the same branch
-   - Respond to comments
 
-8. **Merge**:
+9. **Merge**:
    - PRs require approval from at least one reviewer
    - Squash and merge to keep history clean
 
 ## Testing
 
-### Frontend App
-```bash
-cd frontend
+### Frontend Testing
+See [frontend-standalone/CONTRIBUTING.md](frontend-standalone/CONTRIBUTING.md#testing)
 
-# Type checking
-npx tsc --noEmit
+### Backend Testing
+See [backend-standalone/CONTRIBUTING.md](backend-standalone/CONTRIBUTING.md#testing)
 
-# Run tests (when added)
-npm test
-
-# Manual testing on device
-npm start
-```
-
-### Backend
-```bash
-cd backend
-
-# Type checking
-npx tsc --noEmit
-
-# Test admin panel
-npm run develop
-# Visit http://localhost:1337/admin
-```
+### Integration Testing
+When testing features that span frontend and backend:
+1. Start both services
+2. Test the complete user flow
+3. Verify data flows correctly between systems
 
 ## Adding New Features
 
-### New Mobile Screen
-1. Create screen file in `src/screens/`
-2. Add to navigation in appropriate navigator
-3. Create necessary components in `src/components/`
-4. Add types to `src/types/index.ts`
-5. Test on iOS and Android
+Depending on what you're adding, refer to the appropriate guide:
 
-### New Backend Content Type
-1. Use Strapi admin to create content type
-2. Configure fields and relations
-3. Set up permissions
-4. Test CRUD operations
-5. Document in README
+### Frontend Features
+See [frontend-standalone/CONTRIBUTING.md](frontend-standalone/CONTRIBUTING.md#adding-new-features)
+- New mobile screens
+- New components
+- New hooks
 
-### New Service/Hook
-1. Create file in appropriate directory
-2. Write TypeScript interfaces
-3. Implement with proper error handling
-4. Add JSDoc comments
-5. Export from index if needed
+### Backend Features
+See [backend-standalone/CONTRIBUTING.md](backend-standalone/CONTRIBUTING.md#adding-new-features)
+- New API endpoints
+- New content types
+- New services/extensions
+
+### Full Stack Features
+For features that span both:
+1. Start with backend API changes
+2. Test API endpoints
+3. Implement frontend integration
+4. Test end-to-end
 
 ## Code Review Checklist
 
 Before submitting a PR, ensure:
 
-- [ ] Code follows project style guidelines
+- [ ] Changes are in the correct directory (`frontend-standalone/` or `backend-standalone/`)
+- [ ] Code follows the relevant style guide
 - [ ] TypeScript types are properly defined
 - [ ] No console errors or warnings
 - [ ] Code is properly formatted
 - [ ] Comments explain complex logic
-- [ ] No hardcoded values (use config)
+- [ ] No hardcoded secrets or sensitive data
 - [ ] Error handling is implemented
-- [ ] Mobile changes tested on iOS and Android
-- [ ] Backend changes tested in admin panel
+- [ ] Changes tested appropriately (frontend: iOS/Android, backend: API)
 - [ ] Documentation updated if needed
+- [ ] Commit messages follow conventional commits format
 
 ## Common Tasks
 
 ### Update Dependencies
+
 ```bash
 # Frontend
-cd frontend
+cd frontend-standalone
 npm update
 npm audit fix
 
 # Backend
-cd backend
+cd backend-standalone
 npm update
 npm audit fix
 ```
 
 ### Add New Dependency
+
 ```bash
 # Frontend
-cd frontend
+cd frontend-standalone
 npm install package-name
-# Update frontend/README.md if significant
 
 # Backend
-cd backend
+cd backend-standalone
 npm install package-name
-# Update backend/README.md if significant
 ```
 
-### Database Migration (Backend)
-```bash
-cd backend
-npm run strapi generate
-# Follow prompts
-npm run develop
-```
+Always update the relevant README if the dependency is significant.
 
 ## Environment Variables
 
@@ -286,18 +274,36 @@ When adding features, update:
 
 ## Resources
 
-### React Native
-- [React Native Docs](https://reactnative.dev/)
-- [Expo Docs](https://docs.expo.dev/)
-- [React Navigation](https://reactnavigation.org/)
+### Repository Documentation
+- [Main README](README.md) - Overview and repository structure
+- [QUICKSTART](QUICKSTART.md) - Getting started guide
+- [Frontend CONTRIBUTING](frontend-standalone/CONTRIBUTING.md) - Frontend contribution guide
+- [Backend CONTRIBUTING](backend-standalone/CONTRIBUTING.md) - Backend contribution guide
 
-### Strapi
-- [Strapi Docs](https://docs.strapi.io/)
-- [Strapi Guides](https://strapi.io/resource-center)
+### Technology Documentation
+- [React Native](https://reactnative.dev/)
+- [Expo](https://docs.expo.dev/)
+- [Strapi](https://docs.strapi.io/)
+- [TypeScript](https://www.typescriptlang.org/docs/)
+- [Firebase](https://firebase.google.com/docs)
 
-### TypeScript
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
+## Important Notes
+
+### About Standalone Directories
+
+The `frontend-standalone/` and `backend-standalone/` directories are complete, self-contained projects designed to be extracted into separate repositories. When contributing:
+
+- ✅ Make changes in `*-standalone/` directories
+- ❌ Don't modify original `frontend/` or `backend/` directories (kept for reference)
+- 📝 Update documentation in both the standalone directory AND root if needed
+
+### Working Across Multiple Directories
+
+If your feature requires changes to both frontend and backend:
+1. Make backend changes first and test them
+2. Make frontend changes second
+3. Test the integration
+4. Submit separate PRs or one PR with changes to both directories
 
 ## Questions?
 
