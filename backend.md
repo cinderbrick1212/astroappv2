@@ -38,6 +38,43 @@ Astrology calculations (horoscope, kundli, compatibility) are **client-side** in
 
 ---
 
+## 2.1) Current Implementation Status (Repo)
+
+This section reflects what is already in the repository vs what still needs to be built.
+
+### Done
+
+- Strapi v5 project scaffolded with TypeScript.
+- SQLite development database configured by default.
+- Postgres configuration supported via environment variables in [backend/config/database.ts](backend/config/database.ts).
+- GCS upload provider configured in [backend/config/plugins.ts](backend/config/plugins.ts).
+- CSP updated to allow GCS media in [backend/config/middlewares.ts](backend/config/middlewares.ts).
+- Cloud Run environment template present in [backend/cloudrun.env.yaml](backend/cloudrun.env.yaml).
+- Base admin/auth secrets wired via [backend/config/admin.ts](backend/config/admin.ts) and [backend/.env.example](backend/.env.example).
+
+### Not Done Yet
+
+- Strapi content types for User, UserProfile, FeedItem, BlogPost, Payment, ServiceRequest.
+- Firebase token verification middleware or policy.
+- Custom endpoints for Razorpay order creation and webhook verification.
+- Email and WhatsApp notification providers.
+- Cloud Run deployment automation (CI/CD, secrets management).
+- Role/permission setup for authenticated users and astrologer/admin roles.
+
+---
+
+## 2.2) Verification Checklist
+
+Use this to confirm the current repo state is working as expected.
+
+- Strapi boots locally with `npm run develop` in `backend/`.
+- Admin panel loads at `http://localhost:1337/admin`.
+- Uploads use GCS provider when env vars are set (see [backend/config/plugins.ts](backend/config/plugins.ts)).
+- CSP allows GCS assets (see [backend/config/middlewares.ts](backend/config/middlewares.ts)).
+- Postgres config activates when `DATABASE_CLIENT=postgres` is set (see [backend/config/database.ts](backend/config/database.ts)).
+
+---
+
 ## 3) Data Flow (End-to-End)
 
 ### 3.1 User Authentication Flow
@@ -153,9 +190,9 @@ Install and configure:
 
 ### 6.3 Strapi Setup (Local)
 
-1. Create a new Strapi project.
-2. Use Postgres for the database.
-3. Configure `.env` with DB connection and admin credentials.
+1. Strapi project already exists in `backend/`.
+2. Default DB is SQLite; Postgres is available via env config in [backend/config/database.ts](backend/config/database.ts).
+3. Copy [backend/.env.example](backend/.env.example) to `.env` and fill values.
 4. Run Strapi locally and create the admin user.
 5. Add content types listed in Section 4.
 6. Configure roles and permissions for authenticated users.
@@ -164,9 +201,9 @@ Install and configure:
 
 1. Create a Cloud SQL Postgres instance.
 2. Create a Cloud Storage bucket for media.
-3. Containerize Strapi with a Dockerfile.
+3. Dockerfile already exists in `backend/Dockerfile`.
 4. Deploy Strapi to Cloud Run.
-5. Configure environment variables:
+5. Configure environment variables (see [backend/cloudrun.env.yaml](backend/cloudrun.env.yaml) for a template):
    - Database URL
    - JWT secrets
    - Firebase public keys or token verification settings
@@ -175,13 +212,28 @@ Install and configure:
    - Email provider keys
    - WhatsApp API keys
 
-### 6.5 Token Verification (Firebase -> Strapi)
+### 6.5 Environment Variables (Baseline)
+
+Start from [backend/.env.example](backend/.env.example). Minimum local values:
+
+- `HOST`, `PORT`, `APP_KEYS`
+- `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `JWT_SECRET`, `ENCRYPTION_KEY`
+- `DATABASE_CLIENT` + DB connection fields (or leave defaults for SQLite)
+
+When enabling GCS uploads:
+
+- `GCS_BUCKET_NAME`
+- `GCS_BASE_PATH` (optional)
+- `GCS_BASE_URL` (optional)
+- `GCS_PUBLIC_FILES`, `GCS_UNIFORM`
+
+### 6.6 Token Verification (Firebase -> Strapi)
 
 1. Strapi should verify Firebase JWT tokens on every request.
 2. Use Firebase Admin SDK in Strapi to validate tokens.
 3. On valid token, map Firebase user to Strapi user record.
 
-### 6.6 Payments and Webhooks
+### 6.7 Payments and Webhooks
 
 1. Add Razorpay keys to Strapi.
 2. Create endpoints:
@@ -189,7 +241,7 @@ Install and configure:
    - `POST /payments/verify` or webhook handler
 3. Razorpay webhook updates payment status and user premium state.
 
-### 6.7 Email + WhatsApp Notifications
+### 6.8 Email + WhatsApp Notifications
 
 1. Add email provider (SendGrid/Mailgun) to Strapi.
 2. Add WhatsApp provider (Meta Cloud API/Twilio/Gupshup).
@@ -197,7 +249,13 @@ Install and configure:
    - Send email to user confirmation.
    - Send WhatsApp + email to astrologers with user details and service info.
 
-### 6.8 Mobile App Integration
+### 6.9 Role and Permission Setup
+
+1. Define roles for authenticated users, astrologers, and admins.
+2. Restrict content types and endpoints per role.
+3. Lock down public permissions to read-only content as needed.
+
+### 6.10 Mobile App Integration
 
 1. Use Firebase Auth for login.
 2. Store Firebase ID token.
@@ -223,12 +281,35 @@ Install and configure:
 
 ## 8) Next Steps (Implementation Roadmap)
 
-1. Initialize Strapi project with Postgres.
-2. Define content types and roles.
-3. Add Firebase token verification middleware.
-4. Implement payment and notification workflows.
-5. Wire mobile app to Strapi endpoints.
-6. Migrate existing data if needed.
+### Content Types + Roles
+
+1. Create the content types in Section 4.
+2. Add relations between User and UserProfile, Payment, ServiceRequest.
+3. Configure role permissions and default scopes.
+
+### Auth (Firebase)
+
+1. Add Firebase Admin SDK.
+2. Implement token verification middleware.
+3. Map Firebase UID to Strapi user on first request.
+
+### Payments + Notifications
+
+1. Create order and webhook endpoints for Razorpay.
+2. Update Payment and premium status on webhook verification.
+3. Add email and WhatsApp notification providers.
+
+### Deployment + Operations
+
+1. Add CI/CD for Cloud Run builds.
+2. Move secrets to a managed store (GCP Secret Manager).
+3. Verify GCS upload in production.
+
+### Mobile Integration
+
+1. Attach Firebase token to Strapi API requests.
+2. Wire feeds, profiles, payments, and service requests.
+3. Add error handling and retry logic.
 
 ---
 
