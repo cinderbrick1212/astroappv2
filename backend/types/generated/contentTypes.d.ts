@@ -430,6 +430,240 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
+  collectionName: 'blog_posts';
+  info: {
+    description: 'Blog posts and articles';
+    displayName: 'BlogPost';
+    pluralName: 'blog-posts';
+    singularName: 'blog-post';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    author: Schema.Attribute.String;
+    body: Schema.Attribute.RichText & Schema.Attribute.Required;
+    categories: Schema.Attribute.JSON;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    excerpt: Schema.Attribute.Text;
+    featured_image: Schema.Attribute.Media<'images'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::blog-post.blog-post'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'title'>;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiFeedItemFeedItem extends Struct.CollectionTypeSchema {
+  collectionName: 'feed_items';
+  info: {
+    description: 'Feed content for the mobile app';
+    displayName: 'FeedItem';
+    pluralName: 'feed-items';
+    singularName: 'feed-item';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    body: Schema.Attribute.RichText & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    is_active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    language_code: Schema.Attribute.String & Schema.Attribute.DefaultTo<'en'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::feed-item.feed-item'
+    > &
+      Schema.Attribute.Private;
+    media: Schema.Attribute.Media<'images'>;
+    priority: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    summary: Schema.Attribute.Text;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    type: Schema.Attribute.Enumeration<
+      ['daily_horoscope', 'tip', 'news', 'announcement']
+    > &
+      Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPaymentPayment extends Struct.CollectionTypeSchema {
+  collectionName: 'payments';
+  info: {
+    description: 'Payment records with Razorpay integration';
+    displayName: 'Payment';
+    pluralName: 'payments';
+    singularName: 'payment';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    amount: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    currency: Schema.Attribute.String & Schema.Attribute.DefaultTo<'INR'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::payment.payment'
+    > &
+      Schema.Attribute.Private;
+    plan_type: Schema.Attribute.Enumeration<
+      ['monthly', 'yearly', 'question', 'call', 'report']
+    > &
+      Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    razorpay_order_id: Schema.Attribute.String & Schema.Attribute.Required;
+    razorpay_payment_id: Schema.Attribute.String;
+    razorpay_signature: Schema.Attribute.String;
+    status: Schema.Attribute.Enumeration<
+      ['created', 'pending', 'captured', 'failed']
+    > &
+      Schema.Attribute.DefaultTo<'created'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<'manyToOne', 'api::user.user'>;
+  };
+}
+
+export interface ApiServiceRequestServiceRequest
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'service_requests';
+  info: {
+    description: 'Paid service requests (questions, calls, reports)';
+    displayName: 'ServiceRequest';
+    pluralName: 'service-requests';
+    singularName: 'service-request';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::service-request.service-request'
+    > &
+      Schema.Attribute.Private;
+    payment: Schema.Attribute.Relation<'oneToOne', 'api::payment.payment'>;
+    publishedAt: Schema.Attribute.DateTime;
+    response_text: Schema.Attribute.RichText;
+    service_type: Schema.Attribute.Enumeration<['question', 'call', 'report']> &
+      Schema.Attribute.Required;
+    status: Schema.Attribute.Enumeration<
+      ['pending', 'in_progress', 'completed', 'cancelled']
+    > &
+      Schema.Attribute.DefaultTo<'pending'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<'manyToOne', 'api::user.user'>;
+    user_notes: Schema.Attribute.Text;
+  };
+}
+
+export interface ApiUserProfileUserProfile extends Struct.CollectionTypeSchema {
+  collectionName: 'user_profiles';
+  info: {
+    description: 'User birth details and profile information';
+    displayName: 'UserProfile';
+    pluralName: 'user-profiles';
+    singularName: 'user-profile';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    birth_date: Schema.Attribute.Date;
+    birth_place: Schema.Attribute.String;
+    birth_time: Schema.Attribute.Time;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    gender: Schema.Attribute.Enumeration<['male', 'female', 'other']>;
+    latitude: Schema.Attribute.Decimal;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-profile.user-profile'
+    > &
+      Schema.Attribute.Private;
+    longitude: Schema.Attribute.Decimal;
+    publishedAt: Schema.Attribute.DateTime;
+    timezone: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<'oneToOne', 'api::user.user'>;
+  };
+}
+
+export interface ApiUserUser extends Struct.CollectionTypeSchema {
+  collectionName: 'users';
+  info: {
+    description: 'User account with Firebase authentication';
+    displayName: 'User';
+    pluralName: 'users';
+    singularName: 'user';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email;
+    firebase_uid: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::user.user'> &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    payments: Schema.Attribute.Relation<'oneToMany', 'api::payment.payment'>;
+    phone: Schema.Attribute.String;
+    premium_expires_at: Schema.Attribute.DateTime;
+    premium_status: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    publishedAt: Schema.Attribute.DateTime;
+    service_requests: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::service-request.service-request'
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user_profile: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::user-profile.user-profile'
+    >;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -941,6 +1175,12 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::blog-post.blog-post': ApiBlogPostBlogPost;
+      'api::feed-item.feed-item': ApiFeedItemFeedItem;
+      'api::payment.payment': ApiPaymentPayment;
+      'api::service-request.service-request': ApiServiceRequestServiceRequest;
+      'api::user-profile.user-profile': ApiUserProfileUserProfile;
+      'api::user.user': ApiUserUser;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
