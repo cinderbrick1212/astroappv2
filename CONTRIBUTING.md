@@ -1,6 +1,28 @@
-# Contributing Guide
+# ⚠️ REPOSITORY DEPRECATED
 
-Thank you for your interest in contributing to Astrology App v2! This guide will help you get started.
+> **This repository has been archived and is no longer accepting contributions.**
+> 
+> The monorepo has been split into separate repositories:
+> 
+> - **Backend**: [cinderbrick1212/astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+> - **Frontend/Mobile**: [cinderbrick1212/astroappv2frontend](https://github.com/cinderbrick1212/astroappv2frontend)
+> 
+> ## For Contributors
+> 
+> Please direct all contributions to the appropriate repository:
+> 
+> - **Backend contributions** (Strapi, API, database): Use [astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+> - **Frontend/Mobile contributions** (React Native, UI, screens): Use [astroappv2frontend](https://github.com/cinderbrick1212/astroappv2frontend)
+> 
+> Each repository has its own `CONTRIBUTING.md` with relevant setup instructions and guidelines.
+> 
+> ## Questions?
+> 
+> For questions about contributing, please open an issue in the relevant repository above.
+
+---
+
+## Original Contributing Guide (For Reference Only)
 
 ## Development Setup
 

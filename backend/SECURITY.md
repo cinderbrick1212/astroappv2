@@ -1,4 +1,14 @@
-# Security Considerations
+# ⚠️ DEPRECATED - Security Considerations
+
+> **This documentation has been migrated to the new repository.**
+> 
+> **New repository**: [cinderbrick1212/astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+> 
+> Please refer to the new repository for current security documentation.
+
+---
+
+## Original Security Documentation
 
 This document outlines important security practices and considerations for the backend.
 

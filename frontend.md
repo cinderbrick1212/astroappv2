@@ -1,4 +1,14 @@
-# Frontend Architecture and Design
+# ⚠️ DEPRECATED - Frontend Architecture and Design
+
+> **This document is for reference only. This repository has been archived.**
+> 
+> **Active development**: [cinderbrick1212/astroappv2frontend](https://github.com/cinderbrick1212/astroappv2frontend)
+> 
+> See the new repository for current architecture documentation and implementation.
+
+---
+
+## Original Frontend Architecture
 
 This document defines the frontend architecture, navigation structure, tools, screens, and data flow for the React Native mobile application. It provides verbose, step-by-step implementation guidance for both human developers and AI models.
 

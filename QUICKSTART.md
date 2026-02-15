@@ -1,6 +1,24 @@
-# Quick Start Guide
+# ⚠️ REPOSITORY DEPRECATED
 
-This guide will help you get the Astrology App v2 up and running quickly.
+> **This repository has been archived and is no longer maintained.**
+> 
+> The monorepo has been split into separate repositories:
+> 
+> - **Backend**: [cinderbrick1212/astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+> - **Frontend/Mobile**: [cinderbrick1212/astroappv2frontend](https://github.com/cinderbrick1212/astroappv2frontend)
+> 
+> ## For New Developers
+> 
+> Please use the quick start guides in the new repositories:
+> 
+> - **Backend Setup**: See [astroappv2backend/README.md](https://github.com/cinderbrick1212/astroappv2backend)
+> - **Frontend/Mobile Setup**: See [astroappv2frontend/README.md](https://github.com/cinderbrick1212/astroappv2frontend)
+> 
+> Each repository contains its own setup instructions, dependencies, and documentation.
+
+---
+
+## Original Quick Start Guide (For Reference Only)
 
 ## Prerequisites
 

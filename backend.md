@@ -1,4 +1,14 @@
-# Backend Architecture and Setup
+# ⚠️ DEPRECATED - Backend Architecture and Setup
+
+> **This document is for reference only. This repository has been archived.**
+> 
+> **Active development**: [cinderbrick1212/astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+> 
+> See the new repository for current architecture documentation and implementation.
+
+---
+
+## Original Backend Architecture
 
 This document defines the backend architecture and full data flow for the project using Firebase Auth + Strapi on GCP + GCP services. It also includes a verbose, step-by-step setup process. It is written for both human readers and an AI model that needs unambiguous implementation guidance.
 
