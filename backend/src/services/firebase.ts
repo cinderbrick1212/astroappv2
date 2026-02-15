@@ -5,9 +5,8 @@ let firebaseApp;
 
 export const initializeFirebase = () => {
   if (getApps().length === 0) {
-    // For development, Firebase Admin SDK can use Application Default Credentials
-    // or you can provide a service account key via FIREBASE_SERVICE_ACCOUNT_KEY env var
     const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+    const nodeEnv = process.env.NODE_ENV || 'development';
     
     if (serviceAccountKey) {
       try {
@@ -15,14 +14,23 @@ export const initializeFirebase = () => {
         firebaseApp = initializeApp({
           credential: cert(serviceAccount),
         });
+        console.log('Firebase Admin SDK initialized with service account credentials');
       } catch (error) {
         console.error('Error parsing Firebase service account:', error);
         throw error;
       }
+    } else if (nodeEnv === 'production') {
+      // In production, Firebase credentials are required
+      throw new Error(
+        'FIREBASE_SERVICE_ACCOUNT_KEY environment variable is required in production. ' +
+        'Please set this variable with your Firebase service account JSON.'
+      );
     } else {
-      // Use default credentials or empty initialization for development
-      // This allows the app to run without Firebase in local development
-      console.warn('FIREBASE_SERVICE_ACCOUNT_KEY not set. Firebase auth will not work.');
+      // In development, allow running without Firebase for testing
+      console.warn(
+        'FIREBASE_SERVICE_ACCOUNT_KEY not set. Running in development mode without Firebase authentication. ' +
+        'Set FIREBASE_SERVICE_ACCOUNT_KEY to enable Firebase auth.'
+      );
       firebaseApp = initializeApp();
     }
   }
