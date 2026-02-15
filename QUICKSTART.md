@@ -41,12 +41,12 @@ The Strapi admin panel will open at `http://localhost:1337/admin`
 
 Leave this terminal running.
 
-### 3. Mobile App Setup
+### 3. Frontend App Setup
 
 Open a new terminal:
 
 ```bash
-cd mobile
+cd frontend
 npm install
 npm start
 ```
@@ -80,7 +80,7 @@ To enable authentication:
 1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
 2. Enable Authentication methods (Email/Password, Google, Phone)
 3. Get your Firebase config
-4. Create `mobile/.env` from `mobile/.env.example`
+4. Create `frontend/.env` from `frontend/.env.example`
 5. Fill in Firebase credentials
 
 ### Backend Database (Production)
@@ -126,9 +126,9 @@ The backend uses SQLite by default (development). For production:
 
 ## Troubleshooting
 
-### Mobile App Won't Start
+### Frontend App Won't Start
 ```bash
-cd mobile
+cd frontend
 rm -rf node_modules
 npm install
 npx expo start -c
@@ -144,14 +144,14 @@ npm run develop
 
 ### TypeScript Errors
 ```bash
-# In mobile/ or backend/
+# In frontend/ or backend/
 npx tsc --noEmit
 ```
 
 ### Clear All Caches
 ```bash
-# Mobile
-cd mobile
+# Frontend
+cd frontend
 npx expo start -c
 
 # Backend  
@@ -169,13 +169,13 @@ npm run develop
    cd backend && npm run develop
    ```
 
-2. **Start mobile app** (one time):
+2. **Start frontend app** (one time):
    ```bash
-   cd mobile && npm start
+   cd frontend && npm start
    ```
 
 3. **Make changes**:
-   - Edit files in `mobile/src/` or `backend/src/`
+   - Edit files in `frontend/src/` or `backend/src/`
    - Hot reload will update automatically
 
 4. **Test changes**:
@@ -200,9 +200,9 @@ git push origin feature/my-feature
 
 ### Documentation
 - [Project README](README.md)
-- [Frontend Architecture](frontend.md)
-- [Backend Architecture](backend.md)
-- [Mobile README](mobile/README.md)
+- [Frontend Architecture](frontend/ARCHITECTURE.md)
+- [Backend Architecture](backend/ARCHITECTURE.md)
+- [Frontend README](frontend/README.md)
 - [Backend README](backend/README.md)
 
 ### External Docs

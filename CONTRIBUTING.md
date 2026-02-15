@@ -8,7 +8,7 @@ See [QUICKSTART.md](QUICKSTART.md) for initial setup instructions.
 
 ## Project Structure
 
-### Mobile App (`mobile/`)
+### Mobile App (`frontend/`)
 ```
 src/
 ├── navigation/     # App navigation logic
@@ -112,8 +112,8 @@ Updated navigation configuration to fix the issue.
 
 3. **Test your changes**:
    ```bash
-   # Mobile
-   cd mobile
+   # Frontend
+   cd frontend
    npx tsc --noEmit
    npm start
    
@@ -150,9 +150,9 @@ Updated navigation configuration to fix the issue.
 
 ## Testing
 
-### Mobile App
+### Frontend App
 ```bash
-cd mobile
+cd frontend
 
 # Type checking
 npx tsc --noEmit
@@ -218,8 +218,8 @@ Before submitting a PR, ensure:
 
 ### Update Dependencies
 ```bash
-# Mobile
-cd mobile
+# Frontend
+cd frontend
 npm update
 npm audit fix
 
@@ -231,10 +231,10 @@ npm audit fix
 
 ### Add New Dependency
 ```bash
-# Mobile
-cd mobile
+# Frontend
+cd frontend
 npm install package-name
-# Update mobile/README.md if significant
+# Update frontend/README.md if significant
 
 # Backend
 cd backend

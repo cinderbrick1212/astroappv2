@@ -45,15 +45,15 @@ This section reflects what is already in the repository vs what still needs to b
 
 - Strapi v5 project scaffolded with TypeScript.
 - SQLite development database configured by default.
-- Postgres configuration supported via environment variables in [backend/config/database.ts](backend/config/database.ts).
-- GCS upload provider configured in [backend/config/plugins.ts](backend/config/plugins.ts).
-- CSP updated to allow GCS media in [backend/config/middlewares.ts](backend/config/middlewares.ts).
-- Cloud Run environment template present in [backend/cloudrun.env.yaml](backend/cloudrun.env.yaml).
-- Base admin/auth secrets wired via [backend/config/admin.ts](backend/config/admin.ts) and [backend/.env.example](backend/.env.example).
+- Postgres configuration supported via environment variables in [config/database.ts](config/database.ts).
+- GCS upload provider configured in [config/plugins.ts](config/plugins.ts).
+- CSP updated to allow GCS media in [config/middlewares.ts](config/middlewares.ts).
+- Cloud Run environment template present in [cloudrun.env.yaml](cloudrun.env.yaml).
+- Base admin/auth secrets wired via [config/admin.ts](config/admin.ts) and [.env.example](.env.example).
 - Strapi content types for User, UserProfile, FeedItem, BlogPost, Payment, ServiceRequest.
-- Firebase Admin SDK setup and token verification middleware in [backend/src/services/firebase.ts](backend/src/services/firebase.ts) and [backend/src/middlewares/firebase-auth.ts](backend/src/middlewares/firebase-auth.ts).
-- Firebase auth middleware registered globally in [backend/config/middlewares.ts](backend/config/middlewares.ts).
-- Razorpay payment endpoints implemented in [backend/src/api/payment/controllers/payment.ts](backend/src/api/payment/controllers/payment.ts) and [backend/src/api/payment/routes/payment.ts](backend/src/api/payment/routes/payment.ts).
+- Firebase Admin SDK setup and token verification middleware in [src/services/firebase.ts](src/services/firebase.ts) and [src/middlewares/firebase-auth.ts](src/middlewares/firebase-auth.ts).
+- Firebase auth middleware registered globally in [config/middlewares.ts](config/middlewares.ts).
+- Razorpay payment endpoints implemented in [src/api/payment/controllers/payment.ts](src/api/payment/controllers/payment.ts) and [src/api/payment/routes/payment.ts](src/api/payment/routes/payment.ts).
 - Payments are out of scope and should remain unused.
 
 ### Not Done Yet
@@ -68,11 +68,11 @@ This section reflects what is already in the repository vs what still needs to b
 
 Use this to confirm the current repo state is working as expected.
 
-- Strapi boots locally with `npm run develop` in `backend/`.
+- Strapi boots locally with `npm run develop` locally with `npm run develop`.
 - Admin panel loads at `http://localhost:1337/admin`.
-- Uploads use GCS provider when env vars are set (see [backend/config/plugins.ts](backend/config/plugins.ts)).
-- CSP allows GCS assets (see [backend/config/middlewares.ts](backend/config/middlewares.ts)).
-- Postgres config activates when `DATABASE_CLIENT=postgres` is set (see [backend/config/database.ts](backend/config/database.ts)).
+- Uploads use GCS provider when env vars are set (see [config/plugins.ts](config/plugins.ts)).
+- CSP allows GCS assets (see [config/middlewares.ts](config/middlewares.ts)).
+- Postgres config activates when `DATABASE_CLIENT=postgres` is set (see [config/database.ts](config/database.ts)).
 
 ---
 
@@ -185,9 +185,9 @@ Install and configure:
 
 ### 6.3 Strapi Setup (Local)
 
-1. Strapi project already exists in `backend/`.
-2. Default DB is SQLite; Postgres is available via env config in [backend/config/database.ts](backend/config/database.ts).
-3. Copy [backend/.env.example](backend/.env.example) to `.env` and fill values.
+1. Strapi project already exists locally with `npm run develop`.
+2. Default DB is SQLite; Postgres is available via env config in [config/database.ts](config/database.ts).
+3. Copy [.env.example](.env.example) to `.env` and fill values.
 4. Run Strapi locally and create the admin user.
 5. Add content types listed in Section 4.
 6. Configure roles and permissions for authenticated users.
@@ -196,9 +196,9 @@ Install and configure:
 
 1. Create a Cloud SQL Postgres instance.
 2. Create a Cloud Storage bucket for media.
-3. Dockerfile already exists in `backend/Dockerfile`.
+3. Dockerfile already exists in `Dockerfile`.
 4. Deploy Strapi to Cloud Run.
-5. Configure environment variables (see [backend/cloudrun.env.yaml](backend/cloudrun.env.yaml) for a template):
+5. Configure environment variables (see [cloudrun.env.yaml](cloudrun.env.yaml) for a template):
    - Database URL
    - JWT secrets
    - Firebase public keys or token verification settings
@@ -209,7 +209,7 @@ Install and configure:
 
 ### 6.5 Environment Variables (Baseline)
 
-Start from [backend/.env.example](backend/.env.example). Minimum local values:
+Start from [.env.example](.env.example). Minimum local values:
 
 - `HOST`, `PORT`, `APP_KEYS`
 - `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `JWT_SECRET`, `ENCRYPTION_KEY`
