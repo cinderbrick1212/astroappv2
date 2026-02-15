@@ -8,12 +8,12 @@ This document defines the backend architecture and full data flow for the projec
 
 We are implementing a backend that focuses on:
 
-- Payments (Razorpay)
 - User data (profiles, premium status)
 - Feed and blog content (text + images)
-- Paid services (ask a question, call, reports) tracked and routed to astrologers
+- Orders for paid services (ask a question, call, reports) tracked and routed to astrologers
 
 Astrology calculations (horoscope, kundli, compatibility) are **client-side** inside the React Native app. The backend does **not** compute astrology outputs.
+Payments are **out of scope indefinitely** and should not be implemented in backend or frontend.
 
 ---
 
@@ -22,13 +22,12 @@ Astrology calculations (horoscope, kundli, compatibility) are **client-side** in
 ### Core Services
 
 - **Firebase Auth**: User authentication (email/phone/Google). Only authentication, not data storage.
-- **Strapi**: Content management + REST/GraphQL API for users, feed, blogs, and paid service records.
+- **Strapi**: Content management + REST/GraphQL API for users, feed, blogs, and service order records.
 - **GCP Cloud Run**: Hosts Strapi as a containerized service.
-- **Cloud SQL (Postgres)**: Strapi database (users, feed, blogs, payments, service requests).
+- **Cloud SQL (Postgres)**: Strapi database (users, feed, blogs, service orders; payments currently unused).
 - **Cloud Storage**: Media storage for blog images and assets.
-- **Razorpay**: Payment gateway with server-side verification.
-- **Email provider** (SendGrid/Mailgun): Transactional emails.
-- **WhatsApp provider** (Meta Cloud API / Twilio / Gupshup): Automatic notifications to astrologers and users.
+- **Email provider** (SendGrid/Mailgun): Optional notifications for service requests.
+- **WhatsApp provider** (Meta Cloud API / Twilio / Gupshup): Optional notifications for service requests.
 
 ### Why This Split
 
@@ -51,13 +50,15 @@ This section reflects what is already in the repository vs what still needs to b
 - CSP updated to allow GCS media in [backend/config/middlewares.ts](backend/config/middlewares.ts).
 - Cloud Run environment template present in [backend/cloudrun.env.yaml](backend/cloudrun.env.yaml).
 - Base admin/auth secrets wired via [backend/config/admin.ts](backend/config/admin.ts) and [backend/.env.example](backend/.env.example).
+- Strapi content types for User, UserProfile, FeedItem, BlogPost, Payment, ServiceRequest.
+- Firebase Admin SDK setup and token verification middleware in [backend/src/services/firebase.ts](backend/src/services/firebase.ts) and [backend/src/middlewares/firebase-auth.ts](backend/src/middlewares/firebase-auth.ts).
+- Firebase auth middleware registered globally in [backend/config/middlewares.ts](backend/config/middlewares.ts).
+- Razorpay payment endpoints implemented in [backend/src/api/payment/controllers/payment.ts](backend/src/api/payment/controllers/payment.ts) and [backend/src/api/payment/routes/payment.ts](backend/src/api/payment/routes/payment.ts).
+- Payments are out of scope and should remain unused.
 
 ### Not Done Yet
 
-- Strapi content types for User, UserProfile, FeedItem, BlogPost, Payment, ServiceRequest.
-- Firebase token verification middleware or policy.
-- Custom endpoints for Razorpay order creation and webhook verification.
-- Email and WhatsApp notification providers.
+- Email and WhatsApp notification providers (optional for service requests).
 - Cloud Run deployment automation (CI/CD, secrets management).
 - Role/permission setup for authenticated users and astrologer/admin roles.
 
@@ -101,23 +102,16 @@ Use this to confirm the current repo state is working as expected.
 
 ### 3.4 Payments and Premium Flow
 
-1. App requests payment order from Strapi.
-2. Strapi calls Razorpay to create an order.
-3. App completes payment using Razorpay SDK.
-4. Razorpay sends webhook to Strapi.
-5. Strapi verifies signature, updates payment record, and upgrades premium status.
-6. Strapi sends confirmation:
-   - Email to user.
-   - WhatsApp + email to astrologers with service details.
+Payments and premium upgrades are **out of scope indefinitely**. Do not implement payment flows.
 
-### 3.5 Paid Service Request Flow (Ask Question / Call / Reports)
+### 3.5 Order Flow (Ask Question / Call / Reports)
 
-1. User selects a paid service after payment.
-2. App creates a service request in Strapi.
-3. Strapi stores request and triggers notifications:
-   - WhatsApp message to astrologers.
-   - Email message to astrologers.
-4. Astrologer updates the request status or response in Strapi Admin.
+1. User selects a service in the app.
+2. App creates an order in Strapi.
+3. Strapi stores the order and (optionally) triggers notifications:
+  - WhatsApp message to astrologers.
+  - Email message to astrologers.
+4. Astrologer updates the order status or response in Strapi Admin.
 5. User can see updates in-app (optional).
 
 ### 3.6 Astrology Engine Flow (Client-Side Only)
@@ -150,9 +144,10 @@ Define these in Strapi as Content Types:
 - **Payment**
   - user, razorpay_order_id, razorpay_payment_id, razorpay_signature
   - amount, currency, status, plan_type, created_at
+  - currently unused (payments are out of scope)
 
-- **ServiceRequest**
-  - user, service_type (question/call/report)
+- **ServiceRequest** (used as Order)
+  - order_number, user, service_type (question/call/report)
   - status, user_notes, response_text
   - created_at, updated_at
 
@@ -235,19 +230,15 @@ When enabling GCS uploads:
 
 ### 6.7 Payments and Webhooks
 
-1. Add Razorpay keys to Strapi.
-2. Create endpoints:
-   - `POST /payments/create-order`
-   - `POST /payments/verify` or webhook handler
-3. Razorpay webhook updates payment status and user premium state.
+Payments are **out of scope indefinitely**. Do not implement Razorpay flows.
 
-### 6.8 Email + WhatsApp Notifications
+### 6.8 Email + WhatsApp Notifications (Optional)
 
 1. Add email provider (SendGrid/Mailgun) to Strapi.
 2. Add WhatsApp provider (Meta Cloud API/Twilio/Gupshup).
-3. On payment success:
-   - Send email to user confirmation.
-   - Send WhatsApp + email to astrologers with user details and service info.
+3. On order creation or updates:
+  - Send email to astrologer team.
+  - Send WhatsApp to astrologer team.
 
 ### 6.9 Role and Permission Setup
 
@@ -264,8 +255,7 @@ When enabling GCS uploads:
    - Feed
    - Blogs
    - User profiles
-   - Payments
-   - Service requests
+  - Orders (service requests)
 5. Keep astrology calculations in the app only.
 
 ---
@@ -275,7 +265,7 @@ When enabling GCS uploads:
 - Firestore is **not** used in this design; only Firebase Auth.
 - All data lives in Postgres (Cloud SQL) through Strapi.
 - Media is in Cloud Storage through Strapi upload provider.
-- Payments and notifications are handled in Strapi custom controllers or plugins.
+- Notifications (if enabled) are handled in Strapi custom controllers or plugins.
 
 ---
 
@@ -283,8 +273,8 @@ When enabling GCS uploads:
 
 ### Content Types + Roles
 
-1. Create the content types in Section 4.
-2. Add relations between User and UserProfile, Payment, ServiceRequest.
+1. Review content types in Section 4.
+2. Add relations between User and UserProfile, ServiceRequest (Order).
 3. Configure role permissions and default scopes.
 
 ### Auth (Firebase)
@@ -293,11 +283,10 @@ When enabling GCS uploads:
 2. Implement token verification middleware.
 3. Map Firebase UID to Strapi user on first request.
 
-### Payments + Notifications
+### Notifications (Optional)
 
-1. Create order and webhook endpoints for Razorpay.
-2. Update Payment and premium status on webhook verification.
-3. Add email and WhatsApp notification providers.
+1. Add email and WhatsApp notification providers.
+2. Trigger notifications on service request creation or status updates.
 
 ### Deployment + Operations
 
@@ -308,7 +297,7 @@ When enabling GCS uploads:
 ### Mobile Integration
 
 1. Attach Firebase token to Strapi API requests.
-2. Wire feeds, profiles, payments, and service requests.
+2. Wire feeds, profiles, and service requests.
 3. Add error handling and retry logic.
 
 ---
@@ -320,4 +309,4 @@ When enabling GCS uploads:
 - Treat Strapi as the single source of truth for user profiles, feed, blogs, and paid service tracking.
 - Ensure all endpoints are protected by Firebase token validation.
 - Use Postgres for storage and Cloud Storage for media.
-- Always send payment confirmation to both user and astrologer team.
+- Do not implement payments or premium upgrades in backend or frontend.

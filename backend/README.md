@@ -232,7 +232,8 @@ For deployment to GCP Cloud Run:
 3. Configure Cloud Storage bucket for media
 4. Set environment variables in Cloud Run
 5. Deploy container
-6. Configure Razorpay webhook URL
+
+See [backend/DEPLOYMENT.md](backend/DEPLOYMENT.md) for step-by-step Cloud Run + Postgres + GCS setup and baseline verification.
 
 See `backend.md` for detailed deployment instructions.
 

@@ -8,7 +8,6 @@ This guide walks you through deploying the Strapi backend to Google Cloud Platfo
 - `gcloud` CLI installed and configured
 - Docker installed locally
 - Firebase project set up
-- Razorpay account
 
 ## Step 1: Set Up GCP Resources
 
@@ -93,11 +92,6 @@ echo -n "YOUR_DB_PASSWORD" | gcloud secrets create database-password --data-file
 
 # Firebase service account (paste the JSON content)
 gcloud secrets create firebase-service-account --data-file=firebase-service-account.json
-
-# Razorpay credentials
-echo -n "YOUR_RAZORPAY_KEY_ID" | gcloud secrets create razorpay-key-id --data-file=-
-echo -n "YOUR_RAZORPAY_KEY_SECRET" | gcloud secrets create razorpay-key-secret --data-file=-
-echo -n "YOUR_RAZORPAY_WEBHOOK_SECRET" | gcloud secrets create razorpay-webhook-secret --data-file=-
 ```
 
 ### 2.2 Grant Cloud Run Access to Secrets
@@ -147,17 +141,14 @@ gcloud run deploy strapi-backend \
   --set-env-vars "GCS_BUCKET_NAME=astroapp-media" \
   --set-env-vars "GCS_PUBLIC_FILES=true" \
   --set-env-vars "HOST=0.0.0.0" \
-  --set-env-vars "PORT=1337" \
+  --set-env-vars "PORT=8080" \
   --set-secrets "APP_KEYS=app-keys:latest" \
   --set-secrets "ADMIN_JWT_SECRET=admin-jwt-secret:latest" \
   --set-secrets "JWT_SECRET=jwt-secret:latest" \
   --set-secrets "API_TOKEN_SALT=api-token-salt:latest" \
   --set-secrets "TRANSFER_TOKEN_SALT=transfer-token-salt:latest" \
   --set-secrets "DATABASE_PASSWORD=database-password:latest" \
-  --set-secrets "FIREBASE_SERVICE_ACCOUNT_KEY=firebase-service-account:latest" \
-  --set-secrets "RAZORPAY_KEY_ID=razorpay-key-id:latest" \
-  --set-secrets "RAZORPAY_KEY_SECRET=razorpay-key-secret:latest" \
-  --set-secrets "RAZORPAY_WEBHOOK_SECRET=razorpay-webhook-secret:latest"
+  --set-secrets "FIREBASE_SERVICE_ACCOUNT_KEY=firebase-service-account:latest"
 ```
 
 ## Step 4: Configure Custom Domain (Optional)
@@ -179,33 +170,12 @@ Add the DNS records shown in the output to your domain registrar.
 
 ### 5.1 Create cloudbuild.yaml
 
-```yaml
-steps:
-  # Build the container image
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/strapi-backend', '.']
-    dir: 'backend'
-  
-  # Push the container image to Container Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/strapi-backend']
-  
-  # Deploy to Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-      - 'run'
-      - 'deploy'
-      - 'strapi-backend'
-      - '--image'
-      - 'gcr.io/$PROJECT_ID/strapi-backend'
-      - '--region'
-      - 'asia-south1'
-      - '--platform'
-      - 'managed'
+Use the ready-made file at [backend/cloudbuild.yaml](backend/cloudbuild.yaml). Update the substitutions at the bottom:
 
-images:
-  - 'gcr.io/$PROJECT_ID/strapi-backend'
+```yaml
+substitutions:
+  _INSTANCE_CONNECTION_NAME: "YOUR_PROJECT_ID:YOUR_REGION:YOUR_INSTANCE_NAME"
+  _GCS_BUCKET_NAME: "your-bucket-name"
 ```
 
 ### 5.2 Connect GitHub Repository
@@ -216,6 +186,15 @@ gcloud beta builds triggers create github \
   --repo-owner=cinderbrick1212 \
   --branch-pattern="^main$" \
   --build-config=cloudbuild.yaml
+
+### 5.3 Manual One-Click Deploy
+
+If you want a single command deploy without setting up a trigger:
+
+```bash
+gcloud builds submit --config backend/cloudbuild.yaml \
+  --substitutions _INSTANCE_CONNECTION_NAME="YOUR_PROJECT_ID:YOUR_REGION:YOUR_INSTANCE_NAME",_GCS_BUCKET_NAME="your-bucket-name"
+```
 ```
 
 ## Step 6: Post-Deployment
@@ -226,14 +205,7 @@ gcloud beta builds triggers create github \
 2. Create your first admin user
 3. Log in to the admin panel
 
-### 6.2 Configure Razorpay Webhook
-
-1. Go to Razorpay Dashboard > Webhooks
-2. Add webhook URL: `https://your-domain.com/api/payments/webhook`
-3. Select events: `payment.captured`, `payment.failed`
-4. Set the webhook secret (same as RAZORPAY_WEBHOOK_SECRET)
-
-### 6.3 Set Up Monitoring
+### 6.2 Set Up Monitoring
 
 ```bash
 # Create uptime check
@@ -242,6 +214,22 @@ gcloud monitoring uptime create \
   --http-check-path="/_health" \
   --resource-type=url \
   --url="https://your-domain.com/_health"
+
+### 6.3 Verify Environment Baseline
+
+Use these checks to confirm Cloud Run, Postgres, and GCS are wired correctly:
+
+1. **Health check**
+  - Open `https://your-domain.com/_health` and verify a `200` response.
+
+2. **Admin panel**
+  - Visit `https://your-domain.com/admin` and create the first admin user.
+
+3. **Database connectivity**
+  - Create a test FeedItem or BlogPost in the admin panel; ensure it saves without errors.
+
+4. **GCS uploads**
+  - Upload a test image in the Media Library and confirm it loads from your GCS bucket URL.
 ```
 
 ## Step 7: Security Hardening

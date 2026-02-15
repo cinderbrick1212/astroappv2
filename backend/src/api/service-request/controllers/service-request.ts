@@ -1,7 +1,9 @@
+import crypto from 'crypto';
+
 export default ({ strapi }) => ({
   async create(ctx) {
     try {
-      const { service_type, user_notes, payment_id } = ctx.request.body;
+      const { service_type, user_notes } = ctx.request.body;
       const user = ctx.state.user;
 
       if (!user) {
@@ -16,14 +18,19 @@ export default ({ strapi }) => ({
         return ctx.badRequest('Invalid service_type');
       }
 
+      const orderNumber = `ORD-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${crypto
+        .randomBytes(3)
+        .toString('hex')
+        .toUpperCase()}`;
+
       // Create service request
       const serviceRequest = await strapi.db.query('api::service-request.service-request').create({
         data: {
           user: user.id,
           service_type,
+          order_number: orderNumber,
           user_notes: user_notes || '',
           status: 'pending',
-          payment: payment_id || null,
         },
       });
 
@@ -49,7 +56,6 @@ export default ({ strapi }) => ({
 
       const requests = await strapi.db.query('api::service-request.service-request').findMany({
         where: { user: user.id },
-        populate: ['payment'],
         orderBy: { createdAt: 'desc' },
       });
 
