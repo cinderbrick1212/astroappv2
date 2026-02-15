@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "payments",
+  "info": {
+    "singularName": "payment",
+    "pluralName": "payments",
+    "displayName": "Payment",
+    "description": "Payment records with Razorpay integration"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::user.user",
+      "inversedBy": "payments"
+    },
+    "razorpay_order_id": {
+      "type": "string",
+      "required": true
+    },
+    "razorpay_payment_id": {
+      "type": "string",
+      "required": false
+    },
+    "razorpay_signature": {
+      "type": "string",
+      "required": false
+    },
+    "amount": {
+      "type": "decimal",
+      "required": true
+    },
+    "currency": {
+      "type": "string",
+      "default": "INR"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["created", "pending", "captured", "failed"],
+      "default": "created"
+    },
+    "plan_type": {
+      "type": "enumeration",
+      "enum": ["monthly", "yearly", "question", "call", "report"],
+      "required": true
+    }
+  }
+}

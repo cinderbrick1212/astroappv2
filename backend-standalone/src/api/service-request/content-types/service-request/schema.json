@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "service_requests",
+  "info": {
+    "singularName": "service-request",
+    "pluralName": "service-requests",
+    "displayName": "ServiceRequest",
+    "description": "Service orders (questions, calls, reports)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::user.user",
+      "inversedBy": "service_requests"
+    },
+    "service_type": {
+      "type": "enumeration",
+      "enum": ["question", "call", "report"],
+      "required": true
+    },
+    "order_number": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["pending", "in_progress", "completed", "cancelled"],
+      "default": "pending"
+    },
+    "user_notes": {
+      "type": "text",
+      "required": false
+    },
+    "response_text": {
+      "type": "richtext",
+      "required": false
+    }
+  }
+}
