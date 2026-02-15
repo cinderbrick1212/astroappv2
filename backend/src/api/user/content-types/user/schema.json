@@ -1,0 +1,59 @@
+{
+  "kind": "collectionType",
+  "collectionName": "users",
+  "info": {
+    "singularName": "user",
+    "pluralName": "users",
+    "displayName": "User",
+    "description": "User account with Firebase authentication"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "firebase_uid": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "email": {
+      "type": "email",
+      "required": false
+    },
+    "phone": {
+      "type": "string",
+      "required": false
+    },
+    "name": {
+      "type": "string",
+      "required": false
+    },
+    "premium_status": {
+      "type": "boolean",
+      "default": false
+    },
+    "premium_expires_at": {
+      "type": "datetime",
+      "required": false
+    },
+    "user_profile": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::user-profile.user-profile",
+      "mappedBy": "user"
+    },
+    "payments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::payment.payment",
+      "mappedBy": "user"
+    },
+    "service_requests": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::service-request.service-request",
+      "mappedBy": "user"
+    }
+  }
+}
