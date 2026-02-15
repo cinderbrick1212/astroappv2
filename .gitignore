@@ -3,6 +3,14 @@
 .env.local
 .env.*.local
 
+# Secret files (NEVER commit these)
+.tmp_strapi_secrets
+.tmp_db_pass
+*.pem
+*.key
+*-key.json
+service-account*.json
+
 # Dependencies
 node_modules/
 
@@ -33,3 +41,11 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
+
+# Strapi
+backend/.tmp/
+backend/build/
+backend/.cache/
+backend/.strapi/
+backend/public/uploads/
+backend/exports/
