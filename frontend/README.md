@@ -80,7 +80,7 @@ frontend/
 ### Installation
 
 ```bash
-cd mobile
+cd frontend
 npm install
 ```
 
