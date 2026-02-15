@@ -1,0 +1,51 @@
+{
+  "kind": "collectionType",
+  "collectionName": "user_profiles",
+  "info": {
+    "singularName": "user-profile",
+    "pluralName": "user-profiles",
+    "displayName": "UserProfile",
+    "description": "User birth details and profile information"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::user.user",
+      "inversedBy": "user_profile"
+    },
+    "birth_date": {
+      "type": "date",
+      "required": false
+    },
+    "birth_time": {
+      "type": "time",
+      "required": false
+    },
+    "birth_place": {
+      "type": "string",
+      "required": false
+    },
+    "timezone": {
+      "type": "string",
+      "required": false
+    },
+    "gender": {
+      "type": "enumeration",
+      "enum": ["male", "female", "other"],
+      "required": false
+    },
+    "latitude": {
+      "type": "decimal",
+      "required": false
+    },
+    "longitude": {
+      "type": "decimal",
+      "required": false
+    }
+  }
+}
