@@ -31,12 +31,16 @@ gcloud services enable \
 ### 1.3 Create Cloud SQL Instance
 
 ```bash
+# Generate and save a secure DB password (copy the output – you'll need it below)
+DB_PASSWORD=$(openssl rand -base64 32)
+echo "DB_PASSWORD=$DB_PASSWORD"
+
 # Create PostgreSQL instance
 gcloud sql instances create astroapp-db \
   --database-version=POSTGRES_18 \
   --tier=db-f1-micro \
   --region=asia-south1 \
-  --root-password=YOUR_SECURE_PASSWORD
+  --root-password="$DB_PASSWORD"
 
 # Create database
 gcloud sql databases create strapi --instance=astroapp-db
@@ -44,7 +48,7 @@ gcloud sql databases create strapi --instance=astroapp-db
 # Create user
 gcloud sql users create strapi \
   --instance=astroapp-db \
-  --password=YOUR_SECURE_PASSWORD
+  --password="$DB_PASSWORD"
 ```
 
 ### 1.4 Create Cloud Storage Bucket
@@ -74,32 +78,62 @@ gsutil mb -l asia-south1 --uniform-bucket-level-access gs://astroapp-media
 ### 2.1 Create Secrets in Secret Manager
 
 ```bash
-# App keys (generate with: openssl rand -base64 32)
-echo -n "key1,key2" | gcloud secrets create app-keys --data-file=-
+# App keys – two independent random values joined by a comma
+APP_KEY1=$(openssl rand -base64 32)
+APP_KEY2=$(openssl rand -base64 32)
+echo -n "${APP_KEY1},${APP_KEY2}" | gcloud secrets create app-keys --data-file=-
 
-# JWT secrets
+# JWT secrets and salts – each independently random
 echo -n "$(openssl rand -base64 32)" | gcloud secrets create admin-jwt-secret --data-file=-
 echo -n "$(openssl rand -base64 32)" | gcloud secrets create jwt-secret --data-file=-
 echo -n "$(openssl rand -base64 32)" | gcloud secrets create api-token-salt --data-file=-
 echo -n "$(openssl rand -base64 32)" | gcloud secrets create transfer-token-salt --data-file=-
+echo -n "$(openssl rand -base64 32)" | gcloud secrets create encryption-key --data-file=-
 
-# Database password
-echo -n "YOUR_DB_PASSWORD" | gcloud secrets create database-password --data-file=-
+# Database password – use the same value generated in Step 1.3
+# If you are running this in a new shell session, retrieve the existing password
+# from Secret Manager (once it exists) or from Cloud SQL directly:
+#   DB_PASSWORD=$(gcloud secrets versions access latest --secret=database-password)
+echo -n "$DB_PASSWORD" | gcloud secrets create database-password --data-file=-
 
 # Firebase service account (paste the JSON content)
 gcloud secrets create firebase-service-account --data-file=firebase-service-account.json
+
+# Razorpay credentials – set variables from your Razorpay Dashboard before running
+# https://dashboard.razorpay.com/app/keys
+RAZORPAY_KEY_ID="rzp_live_XXXXXXXXXXXXXXXXXXXX"
+RAZORPAY_KEY_SECRET="YOUR_RAZORPAY_KEY_SECRET"
+RAZORPAY_WEBHOOK_SECRET="YOUR_RAZORPAY_WEBHOOK_SECRET"
+echo -n "$RAZORPAY_KEY_ID" | gcloud secrets create razorpay-key-id --data-file=-
+echo -n "$RAZORPAY_KEY_SECRET" | gcloud secrets create razorpay-key-secret --data-file=-
+echo -n "$RAZORPAY_WEBHOOK_SECRET" | gcloud secrets create razorpay-webhook-secret --data-file=-
 ```
+
+> Replace the `RAZORPAY_*` variable values above with the real keys from your [Razorpay Dashboard](https://dashboard.razorpay.com/app/keys) before running the block.
 
 ### 2.2 Grant Cloud Run Access to Secrets
 
 ```bash
 PROJECT_NUMBER=$(gcloud projects describe astroinsights-487814 --format="value(projectNumber)")
+SA="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+ROLE="roles/secretmanager.secretAccessor"
 
-gcloud secrets add-iam-policy-binding app-keys \
-  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
-  --role="roles/secretmanager.secretAccessor"
-
-# Repeat for all secrets
+for SECRET in \
+  app-keys \
+  admin-jwt-secret \
+  jwt-secret \
+  api-token-salt \
+  transfer-token-salt \
+  encryption-key \
+  database-password \
+  firebase-service-account \
+  razorpay-key-id \
+  razorpay-key-secret \
+  razorpay-webhook-secret; do
+  gcloud secrets add-iam-policy-binding "$SECRET" \
+    --member="$SA" \
+    --role="$ROLE"
+done
 ```
 
 ## Step 3: Build and Deploy
@@ -143,8 +177,12 @@ gcloud run deploy strapi-backend \
   --set-secrets "JWT_SECRET=jwt-secret:latest" \
   --set-secrets "API_TOKEN_SALT=api-token-salt:latest" \
   --set-secrets "TRANSFER_TOKEN_SALT=transfer-token-salt:latest" \
+  --set-secrets "ENCRYPTION_KEY=encryption-key:latest" \
   --set-secrets "DATABASE_PASSWORD=database-password:latest" \
-  --set-secrets "FIREBASE_SERVICE_ACCOUNT_KEY=firebase-service-account:latest"
+  --set-secrets "FIREBASE_SERVICE_ACCOUNT_KEY=firebase-service-account:latest" \
+  --set-secrets "RAZORPAY_KEY_ID=razorpay-key-id:latest" \
+  --set-secrets "RAZORPAY_KEY_SECRET=razorpay-key-secret:latest" \
+  --set-secrets "RAZORPAY_WEBHOOK_SECRET=razorpay-webhook-secret:latest"
 ```
 
 ## Step 4: Configure Custom Domain (Optional)
@@ -182,6 +220,7 @@ gcloud beta builds triggers create github \
   --repo-owner=cinderbrick1212 \
   --branch-pattern="^main$" \
   --build-config=cloudbuild.yaml
+```
 
 ### 5.3 Manual One-Click Deploy
 
@@ -190,7 +229,6 @@ If you want a single command deploy without setting up a trigger:
 ```bash
 gcloud builds submit --config backend/cloudbuild.yaml \
   --substitutions _INSTANCE_CONNECTION_NAME="astroinsights-487814:asia-south1:astroapp-db",_GCS_BUCKET_NAME="astroapp-media"
-```
 ```
 
 ## Step 6: Post-Deployment
@@ -210,6 +248,7 @@ gcloud monitoring uptime create \
   --http-check-path="/_health" \
   --resource-type=url \
   --url="https://your-domain.com/_health"
+```
 
 ### 6.3 Verify Environment Baseline
 
@@ -226,7 +265,6 @@ Use these checks to confirm Cloud Run, Postgres, and GCS are wired correctly:
 
 4. **GCS uploads**
   - Upload a test image in the Media Library and confirm it loads from your GCS bucket URL.
-```
 
 ## Step 7: Security Hardening
 
