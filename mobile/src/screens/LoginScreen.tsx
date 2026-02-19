@@ -14,6 +14,8 @@ import {
   signInWithEmailAndPassword,
   signInAnonymously,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updateProfile,
 } from 'firebase/auth';
 import { auth } from '../firebase';
 import { colors } from '../theme/colors';
@@ -26,6 +28,7 @@ const LoginScreen: React.FC = () => {
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -56,7 +59,10 @@ const LoginScreen: React.FC = () => {
       if (authMode === 'login') {
         await signInWithEmailAndPassword(auth, email, password);
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const credential = await createUserWithEmailAndPassword(auth, email, password);
+        if (displayName.trim()) {
+          await updateProfile(credential.user, { displayName: displayName.trim() });
+        }
       }
     } catch (error: any) {
       const msg =
@@ -69,6 +75,31 @@ const LoginScreen: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleForgotPassword = () => {
+    if (!validation.isValidEmail(email)) {
+      Alert.alert('Enter Email', 'Please enter your email address above, then tap Forgot Password.');
+      return;
+    }
+    Alert.alert(
+      'Reset Password',
+      `Send a password reset email to ${email}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Send',
+          onPress: async () => {
+            try {
+              await sendPasswordResetEmail(auth, email);
+              Alert.alert('Email Sent', 'Check your inbox for the password reset link.');
+            } catch (error: any) {
+              Alert.alert('Error', error?.message || 'Could not send reset email.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleGuestLogin = async () => {
@@ -115,6 +146,21 @@ const LoginScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
+        {/* Display name – register only */}
+        {authMode === 'register' && (
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Display Name (optional)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Your name"
+              placeholderTextColor={colors.textTertiary}
+              value={displayName}
+              onChangeText={setDisplayName}
+              autoComplete="name"
+            />
+          </View>
+        )}
+
         {/* Email input */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Email</Text>
@@ -133,7 +179,14 @@ const LoginScreen: React.FC = () => {
 
         {/* Password input */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Password</Text>
+          <View style={styles.passwordLabelRow}>
+            <Text style={styles.label}>Password</Text>
+            {authMode === 'login' && (
+              <TouchableOpacity onPress={handleForgotPassword}>
+                <Text style={styles.forgotPasswordLink}>Forgot Password?</Text>
+              </TouchableOpacity>
+            )}
+          </View>
           <TextInput
             style={[styles.input, passwordError ? styles.inputError : null]}
             placeholder="Enter your password"
@@ -237,6 +290,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.textPrimary,
     marginBottom: spacing.xs,
+  },
+  passwordLabelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
+  forgotPasswordLink: {
+    fontSize: 13,
+    color: colors.primary,
+    fontWeight: '500',
   },
   input: {
     backgroundColor: colors.surface,

@@ -227,21 +227,32 @@ See documentation files for detailed deployment instructions.
 ### Phase 1: MVP (Current)
 - [x] Project boilerplate setup
 - [x] Basic UI implementation
-- [x] Firebase authentication
+- [x] Firebase authentication (email/password + anonymous)
+- [x] Forgot password flow (Firebase email reset)
+- [x] Display name input on registration
 - [x] Strapi content types
 - [x] Core navigation
+- [x] Push token registration + backend sync (`PUT /api/users/me/push-token`)
+- [x] `last_login_at` tracking on User record
 
 ### Phase 2: Core Features
 - [x] Astrology engine integration (Swiss Ephemeris)
-- [x] Feed and blog content (live Strapi data)
+- [x] Feed and blog content (live Strapi data with language + category filtering)
 - [x] User profiles with birth details editing
-- [x] Service requests (ask question, book call)
+- [x] Service requests: ask question, book call
+- [x] Request a Report screen (third service type: PDF reports)
+- [x] Full Panchang screen (yoga, karana, sunrise/sunset, muhurat)
+- [x] Remedy of the Day card in daily feed
+- [x] Astrologer email + WhatsApp notifications on service request (SendGrid / Twilio)
+- [x] User notification on service request completion
 
 ### Phase 3: Advanced Features
 - [x] Push notifications
+- [x] Daily streak reminder (local push scheduled for 08:00 next day)
 - [x] Analytics tracking
 - [x] Multi-language support
 - [x] Offline mode
+- [x] Ad placeholder cards in feed (every 5 items)
 
 ### Phase 4: Production
 - [ ] Cloud deployment

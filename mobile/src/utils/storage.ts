@@ -15,6 +15,7 @@ const STORAGE_KEYS = {
   // Phase 3 keys
   PUSH_TOKEN: 'push_token',
   NOTIFICATIONS_ENABLED: 'notifications_enabled',
+  STREAK_REMINDER_ID: 'streak_reminder_id',
 };
 
 export const storage = {

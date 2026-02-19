@@ -55,6 +55,7 @@ export const analytics = {
   // Service request events
   questionSubmitted: () => track('question_submitted'),
   callBooked: () => track('call_booked'),
+  reportRequested: (reportType: string) => track('report_requested', { report_type: reportType }),
 
   // Payment events
   paymentInitiated: (planType: string, amount: number) =>

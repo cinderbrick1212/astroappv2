@@ -50,15 +50,21 @@ This section reflects what is already in the repository vs what still needs to b
 - CSP updated to allow GCS media in [backend/config/middlewares.ts](backend/config/middlewares.ts).
 - Cloud Run environment template present in [backend/cloudrun.env.yaml](backend/cloudrun.env.yaml).
 - Base admin/auth secrets wired via [backend/config/admin.ts](backend/config/admin.ts) and [backend/.env.example](backend/.env.example).
-- Strapi content types for User, UserProfile, FeedItem, BlogPost, Payment, ServiceRequest.
+- Strapi content types for User (with push_token + last_login_at), UserProfile, FeedItem, BlogPost, Payment, ServiceRequest.
 - Firebase Admin SDK setup and token verification middleware in [backend/src/services/firebase.ts](backend/src/services/firebase.ts) and [backend/src/middlewares/firebase-auth.ts](backend/src/middlewares/firebase-auth.ts).
 - Firebase auth middleware registered globally in [backend/config/middlewares.ts](backend/config/middlewares.ts).
 - Razorpay payment endpoints implemented in [backend/src/api/payment/controllers/payment.ts](backend/src/api/payment/controllers/payment.ts) and [backend/src/api/payment/routes/payment.ts](backend/src/api/payment/routes/payment.ts).
 - Payments are out of scope and should remain unused.
+- Notification service with SendGrid (email) and Twilio (WhatsApp) integration in [backend/src/services/notifications.ts](backend/src/services/notifications.ts).
+- Notifications wired into service-request create (alerts astrologers) and status update (alerts user on completion).
+- `PUT /api/users/me/push-token` endpoint for storing Expo push tokens.
+- `GET /api/service-requests/:id` endpoint for fetching a single service request.
+- Custom FeedItem controller with language + type filtering and pagination.
+- Custom BlogPost controller with category filtering and pagination.
+- `.env.example` updated with all required env vars (SendGrid, Twilio, astrologer contacts).
 
 ### Not Done Yet
 
-- Email and WhatsApp notification providers (optional for service requests).
 - Cloud Run deployment automation (CI/CD, secrets management).
 - Role/permission setup for authenticated users and astrologer/admin roles.
 

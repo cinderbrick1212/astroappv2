@@ -12,6 +12,8 @@ import FeedHeader from '../components/FeedHeader';
 import FeedItemCard from '../components/FeedItemCard';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import OfflineBanner from '../components/OfflineBanner';
+import RemedyCard from '../components/RemedyCard';
+import AdCard from '../components/AdCard';
 import { useAuth } from '../hooks/useAuth';
 import { useFeedItems } from '../hooks/useFeedItems';
 import { useStreak } from '../hooks/useStreak';
@@ -25,6 +27,9 @@ const ZODIAC_EMOJI: Record<string, string> = {
   Leo: '♌', Virgo: '♍', Libra: '♎', Scorpio: '♏',
   Sagittarius: '♐', Capricorn: '♑', Aquarius: '♒', Pisces: '♓',
 };
+
+/** Insert an ad placeholder after every nth feed item. */
+const AD_FREQUENCY = 5;
 
 const FOCUS_AREAS = [
   { label: 'Career', icon: '💼', day: 1 },
@@ -120,14 +125,20 @@ const DailyFeedScreen: React.FC = () => {
         <Text style={styles.focusMessage}>{FOCUS_MESSAGES[focus.label]}</Text>
       </View>
 
+      {/* Remedy of the Day */}
+      <RemedyCard date={today} />
+
       {/* Feed Items */}
       <View style={styles.feedSection}>
         <Text style={styles.sectionTitle}>Today's Feed</Text>
         {isLoading ? (
           <LoadingSkeleton />
         ) : feedItems.length > 0 ? (
-          feedItems.map(item => (
-            <FeedItemCard key={item.id} item={item} />
+          feedItems.map((item, index) => (
+            <React.Fragment key={item.id}>
+              <FeedItemCard item={item} />
+              {(index + 1) % AD_FREQUENCY === 0 && <AdCard />}
+            </React.Fragment>
           ))
         ) : (
           <View style={styles.emptyFeed}>
