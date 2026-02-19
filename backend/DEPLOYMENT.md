@@ -50,27 +50,24 @@ gcloud sql users create strapi \
 ### 1.4 Create Cloud Storage Bucket
 
 ```bash
-# Create bucket for media uploads
-gsutil mb -l asia-south1 gs://astroapp-media
-
-# Make bucket publicly readable
-gsutil iam ch allUsers:objectViewer gs://astroapp-media
-
-# Set CORS configuration (create cors.json first)
-gsutil cors set cors.json gs://astroapp-media
+# Create bucket for media uploads with Uniform Bucket-Level Access (no public access)
+gsutil mb -l asia-south1 --uniform-bucket-level-access gs://astroapp-media
 ```
 
-**cors.json:**
-```json
-[
-  {
-    "origin": ["*"],
-    "method": ["GET", "HEAD", "DELETE"],
-    "responseHeader": ["Content-Type"],
-    "maxAgeSeconds": 3600
-  }
-]
-```
+> **Public access is prevented.** The bucket uses Uniform Bucket-Level Access so all
+> object ACLs are disabled. Media files are served via short-lived signed URLs generated
+> by the Strapi upload provider using the Cloud Run service account. No `allUsers`
+> IAM binding is set on this bucket.
+>
+> The Cloud Run service account must have the **Storage Object Admin**
+> (`roles/storage.objectAdmin`) role on the bucket so it can read, write, and sign URLs:
+>
+> ```bash
+> PROJECT_NUMBER=$(gcloud projects describe astroinsights-487814 --format="value(projectNumber)")
+> gsutil iam ch \
+>   serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com:roles/storage.objectAdmin \
+>   gs://astroapp-media
+> ```
 
 ## Step 2: Set Up Secrets
 
