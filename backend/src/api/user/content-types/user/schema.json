@@ -37,6 +37,14 @@
       "type": "datetime",
       "required": false
     },
+    "push_token": {
+      "type": "string",
+      "required": false
+    },
+    "last_login_at": {
+      "type": "datetime",
+      "required": false
+    },
     "user_profile": {
       "type": "relation",
       "relation": "oneToOne",

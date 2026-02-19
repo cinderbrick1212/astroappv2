@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,18 +11,25 @@ import { spacing } from '../theme/spacing';
 import FeedHeader from '../components/FeedHeader';
 import FeedItemCard from '../components/FeedItemCard';
 import LoadingSkeleton from '../components/LoadingSkeleton';
+import OfflineBanner from '../components/OfflineBanner';
+import RemedyCard from '../components/RemedyCard';
+import AdCard from '../components/AdCard';
 import { useAuth } from '../hooks/useAuth';
 import { useFeedItems } from '../hooks/useFeedItems';
 import { useStreak } from '../hooks/useStreak';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { horoscopeService } from '../services/horoscope';
 import { astrologyEngine } from '../services/astrologyEngine';
+import { analytics } from '../services/analytics';
 
 const ZODIAC_EMOJI: Record<string, string> = {
   Aries: '♈', Taurus: '♉', Gemini: '♊', Cancer: '♋',
   Leo: '♌', Virgo: '♍', Libra: '♎', Scorpio: '♏',
   Sagittarius: '♐', Capricorn: '♑', Aquarius: '♒', Pisces: '♓',
 };
+
+/** Insert an ad placeholder after every nth feed item. */
+const AD_FREQUENCY = 5;
 
 const FOCUS_AREAS = [
   { label: 'Career', icon: '💼', day: 1 },
@@ -51,6 +58,10 @@ const DailyFeedScreen: React.FC = () => {
   const { streak } = useStreak();
   const [refreshing, setRefreshing] = React.useState(false);
 
+  useEffect(() => {
+    analytics.screenView('DailyFeed');
+  }, []);
+
   const today = new Date();
   const dayOfWeek = today.getDay();
   const focus = FOCUS_AREAS.find(f => f.day === dayOfWeek) || FOCUS_AREAS[0];
@@ -73,12 +84,14 @@ const DailyFeedScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
-      }
-    >
+    <>
+      <OfflineBanner />
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+        }
+      >
       {/* Header */}
       <FeedHeader date={today} userName={userName} streak={streak} />
 
@@ -112,14 +125,20 @@ const DailyFeedScreen: React.FC = () => {
         <Text style={styles.focusMessage}>{FOCUS_MESSAGES[focus.label]}</Text>
       </View>
 
+      {/* Remedy of the Day */}
+      <RemedyCard date={today} />
+
       {/* Feed Items */}
       <View style={styles.feedSection}>
         <Text style={styles.sectionTitle}>Today's Feed</Text>
         {isLoading ? (
           <LoadingSkeleton />
         ) : feedItems.length > 0 ? (
-          feedItems.map(item => (
-            <FeedItemCard key={item.id} item={item} />
+          feedItems.map((item, index) => (
+            <React.Fragment key={item.id}>
+              <FeedItemCard item={item} />
+              {(index + 1) % AD_FREQUENCY === 0 && <AdCard />}
+            </React.Fragment>
           ))
         ) : (
           <View style={styles.emptyFeed}>
@@ -127,7 +146,8 @@ const DailyFeedScreen: React.FC = () => {
           </View>
         )}
       </View>
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 };
 

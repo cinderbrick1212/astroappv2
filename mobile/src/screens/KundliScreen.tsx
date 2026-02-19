@@ -5,12 +5,17 @@ import { spacing } from '../theme/spacing';
 import { useUserProfile } from '../hooks/useUserProfile';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { kundliService, KundliData } from '../services/kundli';
+import { analytics } from '../services/analytics';
 
 const KundliScreen: React.FC = () => {
   const { profile, isLoading } = useUserProfile();
   const [kundli, setKundli] = useState<KundliData | null>(null);
   const [calculating, setCalculating] = useState(false);
   const [calcError, setCalcError] = useState(false);
+
+  useEffect(() => {
+    analytics.kundliViewed();
+  }, []);
 
   useEffect(() => {
     if (!profile?.birth_date || !profile?.birth_time || !profile?.birth_place) return;

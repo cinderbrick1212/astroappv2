@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { useAuth } from '../hooks/useAuth';
 import { AppStackParamList } from '../types';
+import { analytics } from '../services/analytics';
 
 type Nav = NativeStackNavigationProp<AppStackParamList>;
 
@@ -52,6 +53,10 @@ const QUICK_ACTIONS = [
 const HomeScreen: React.FC = () => {
   const { user } = useAuth();
   const navigation = useNavigation<Nav>();
+
+  useEffect(() => {
+    analytics.screenView('Home');
+  }, []);
 
   const today = new Date();
   const dayOfWeek = today.getDay();

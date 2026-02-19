@@ -41,6 +41,8 @@
     "birth_details": "Birth Details",
     "premium_status": "Premium Status",
     "payment_history": "Payment History",
-    "settings": "Settings"
+    "settings": "Settings",
+    "language": "Language",
+    "notifications": "Notifications"
   }
 }

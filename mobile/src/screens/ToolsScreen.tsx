@@ -47,13 +47,17 @@ const ToolsScreen: React.FC = () => {
         <Text style={styles.sectionTitle}>Daily Tools</Text>
 
         {/* Panchang Card */}
-        <View style={styles.toolCard}>
+        <TouchableOpacity
+          style={styles.toolCard}
+          onPress={() => navigation.navigate('Panchang')}
+        >
           <View style={styles.toolCardHeader}>
             <Text style={styles.toolIcon}>📆</Text>
             <View style={styles.toolCardMeta}>
               <Text style={styles.toolCardTitle}>Daily Panchang</Text>
               <Text style={styles.toolCardSubtitle}>Hindu calendar essentials</Text>
             </View>
+            <Text style={styles.arrowIcon}>›</Text>
           </View>
           <View style={styles.panchangRow}>
             <View style={styles.panchangItem}>
@@ -71,7 +75,8 @@ const ToolsScreen: React.FC = () => {
               {panchang.rahuKaal.start} – {panchang.rahuKaal.end}
             </Text>
           </View>
-        </View>
+          <Text style={styles.ctaText}>Tap for full Panchang details</Text>
+        </TouchableOpacity>
 
         {/* Lucky Factors Card */}
         <View style={styles.toolCard}>
@@ -152,6 +157,13 @@ const ToolsScreen: React.FC = () => {
             subtitle: 'Live consultation with an astrologer',
             price: '₹999',
             screen: 'BookCall' as const,
+          },
+          {
+            icon: '📋',
+            label: 'Request a Report',
+            subtitle: 'Detailed PDF report from an astrologer',
+            price: '₹299',
+            screen: 'RequestReport' as const,
           },
         ].map(service => (
           <TouchableOpacity

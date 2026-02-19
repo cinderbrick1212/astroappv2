@@ -1,99 +1,111 @@
 // Notification service for sending emails and WhatsApp messages
-// This is a basic structure - actual providers (SendGrid, Twilio, etc.) can be integrated later
 
 export default ({ strapi }) => ({
   /**
-   * Send email notification
-   * @param {string} to - Email address
-   * @param {string} subject - Email subject
-   * @param {string} text - Plain text content
-   * @param {string} html - HTML content (optional)
+   * Send email notification via SendGrid (when SENDGRID_API_KEY is set) or log.
    */
   async sendEmail(to: string, subject: string, text: string, html?: string) {
-    console.log('📧 Email notification:', { to, subject, text });
-    
-    // TODO: Integrate with SendGrid or Mailgun
-    // Example with SendGrid:
-    // const sgMail = require('@sendgrid/mail');
-    // sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    // await sgMail.send({ to, from: 'noreply@yourdomain.com', subject, text, html });
-    
-    return { success: true, message: 'Email sent (simulated)' };
+    const apiKey = process.env.SENDGRID_API_KEY;
+
+    if (apiKey) {
+      try {
+        // Dynamic import so the package is optional — install @sendgrid/mail to enable
+        let sgMail;
+        try {
+          sgMail = require('@sendgrid/mail');
+        } catch {
+          console.warn('SendGrid package not installed. Run: npm install @sendgrid/mail');
+          return { success: false, error: 'SendGrid package not installed' };
+        }
+        sgMail.setApiKey(apiKey);
+        await sgMail.send({
+          to,
+          from: process.env.SENDGRID_FROM_EMAIL || 'noreply@astroapp.in',
+          subject,
+          text,
+          html: html || text,
+        });
+        console.log(`📧 Email sent to ${to}: ${subject}`);
+        return { success: true };
+      } catch (err) {
+        console.error('SendGrid email error:', err);
+        return { success: false, error: err };
+      }
+    }
+
+    // Fallback: log (dev / staging without email configured)
+    console.log('📧 Email notification (no provider):', { to, subject, text });
+    return { success: true, message: 'Email logged (no provider configured)' };
   },
 
   /**
-   * Send WhatsApp message
-   * @param {string} to - Phone number with country code
-   * @param {string} message - Message content
+   * Send WhatsApp message via Twilio (when TWILIO_* vars are set) or log.
    */
   async sendWhatsApp(to: string, message: string) {
-    console.log('📱 WhatsApp notification:', { to, message });
-    
-    // TODO: Integrate with WhatsApp provider (Meta Cloud API, Twilio, Gupshup)
-    // Example with Twilio:
-    // const client = require('twilio')(accountSid, authToken);
-    // await client.messages.create({
-    //   from: 'whatsapp:+14155238886',
-    //   to: `whatsapp:${to}`,
-    //   body: message,
-    // });
-    
-    return { success: true, message: 'WhatsApp sent (simulated)' };
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const fromNumber = process.env.TWILIO_WHATSAPP_FROM;
+
+    if (accountSid && authToken && fromNumber) {
+      try {
+        // Dynamic import so the package is optional — install twilio to enable
+        let twilio;
+        try {
+          twilio = require('twilio');
+        } catch {
+          console.warn('Twilio package not installed. Run: npm install twilio');
+          return { success: false, error: 'Twilio package not installed' };
+        }
+        const client = twilio(accountSid, authToken);
+        await client.messages.create({
+          from: `whatsapp:${fromNumber}`,
+          to: `whatsapp:${to}`,
+          body: message,
+        });
+        console.log(`📱 WhatsApp sent to ${to}`);
+        return { success: true };
+      } catch (err) {
+        console.error('Twilio WhatsApp error:', err);
+        return { success: false, error: err };
+      }
+    }
+
+    // Fallback: log
+    console.log('📱 WhatsApp notification (no provider):', { to, message });
+    return { success: true, message: 'WhatsApp logged (no provider configured)' };
   },
 
   /**
-   * Send payment confirmation to user
-   */
-  async sendPaymentConfirmation(user: any, payment: any) {
-    const subject = 'Payment Confirmation - Astro App';
-    const text = `Dear ${user.name || 'User'},\n\nYour payment of ₹${payment.amount} has been confirmed.\n\nThank you for your purchase!`;
-    
-    if (user.email) {
-      await this.sendEmail(user.email, subject, text);
-    }
-    
-    if (user.phone) {
-      await this.sendWhatsApp(user.phone, text);
-    }
-  },
-
-  /**
-   * Notify astrologers about new service request
+   * Notify astrologers about a new service request.
    */
   async notifyAstrologersNewRequest(user: any, serviceRequest: any) {
     const astrologerEmails = process.env.ASTROLOGER_EMAILS?.split(',') || [];
     const astrologerPhones = process.env.ASTROLOGER_PHONES?.split(',') || [];
-    
-    const subject = `New Service Request - ${serviceRequest.service_type}`;
-    const message = `New ${serviceRequest.service_type} request from ${user.name || user.email}.\n\nUser notes: ${serviceRequest.user_notes || 'None'}`;
-    
-    // Send to all astrologers
+
+    const subject = `New ${serviceRequest.service_type} Request – ${serviceRequest.order_number}`;
+    const message =
+      `New ${serviceRequest.service_type} request from ${user.name || user.email || 'a user'}.\n` +
+      `Order: ${serviceRequest.order_number}\n` +
+      `Notes: ${serviceRequest.user_notes || 'None'}`;
+
     for (const email of astrologerEmails) {
-      if (email.trim()) {
-        await this.sendEmail(email.trim(), subject, message);
-      }
+      if (email.trim()) await this.sendEmail(email.trim(), subject, message);
     }
-    
     for (const phone of astrologerPhones) {
-      if (phone.trim()) {
-        await this.sendWhatsApp(phone.trim(), message);
-      }
+      if (phone.trim()) await this.sendWhatsApp(phone.trim(), message);
     }
   },
 
   /**
-   * Notify user about service request completion
+   * Notify user when their service request is completed.
    */
   async notifyUserRequestCompleted(user: any, serviceRequest: any) {
-    const subject = 'Your Service Request is Complete';
-    const message = `Your ${serviceRequest.service_type} request has been completed.\n\nPlease check the app for details.`;
-    
-    if (user.email) {
-      await this.sendEmail(user.email, subject, message);
-    }
-    
-    if (user.phone) {
-      await this.sendWhatsApp(user.phone, message);
-    }
+    const subject = 'Your Request is Complete';
+    const message =
+      `Your ${serviceRequest.service_type} request (${serviceRequest.order_number}) has been completed.\n` +
+      `Please check the app for your response.`;
+
+    if (user.email) await this.sendEmail(user.email, subject, message);
+    if (user.phone) await this.sendWhatsApp(user.phone, message);
   },
 });

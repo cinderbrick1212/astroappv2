@@ -90,7 +90,9 @@ export type AppStackParamList = {
   Main: undefined;
   Kundli: undefined;
   Compatibility: undefined;
+  Panchang: undefined;
   AskQuestion: undefined;
+  RequestReport: undefined;
   BlogList: { category?: string };
   BlogPost: { id: string };
   BookCall: undefined;

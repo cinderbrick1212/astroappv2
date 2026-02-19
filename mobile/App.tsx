@@ -5,6 +5,8 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RootNavigator from './src/navigation/RootNavigator';
+import './src/i18n'; // initialise i18next before any components render
+import { useNotifications } from './src/hooks/useNotifications';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,14 +23,23 @@ const asyncStoragePersister = createAsyncStoragePersister({
   key: 'REACT_QUERY_CACHE',
 });
 
+function AppContent() {
+  useNotifications();
+  return (
+    <>
+      <RootNavigator />
+      <StatusBar style="auto" />
+    </>
+  );
+}
+
 export default function App() {
   return (
     <PersistQueryClientProvider
       client={queryClient}
       persistOptions={{ persister: asyncStoragePersister }}
     >
-      <RootNavigator />
-      <StatusBar style="auto" />
+      <AppContent />
     </PersistQueryClientProvider>
   );
 }

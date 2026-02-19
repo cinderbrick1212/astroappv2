@@ -12,6 +12,10 @@ const STORAGE_KEYS = {
   STREAK_DATA: 'streak_data',
   THEME_PREFERENCE: 'theme_preference',
   LANGUAGE_PREFERENCE: 'language_preference',
+  // Phase 3 keys
+  PUSH_TOKEN: 'push_token',
+  NOTIFICATIONS_ENABLED: 'notifications_enabled',
+  STREAK_REMINDER_ID: 'streak_reminder_id',
 };
 
 export const storage = {

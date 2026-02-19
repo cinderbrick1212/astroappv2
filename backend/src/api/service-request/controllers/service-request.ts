@@ -34,7 +34,15 @@ export default ({ strapi }) => ({
         },
       });
 
-      // TODO: Send notification to astrologers via email and WhatsApp
+      // Notify astrologers about the new request
+      try {
+        await (strapi.service('global::notifications') as any).notifyAstrologersNewRequest(
+          user,
+          serviceRequest
+        );
+      } catch (notifyError) {
+        console.error('Notification error (non-fatal):', notifyError);
+      }
 
       ctx.body = {
         data: serviceRequest,
@@ -43,6 +51,30 @@ export default ({ strapi }) => ({
     } catch (error) {
       console.error('Error creating service request:', error);
       ctx.throw(500, 'Failed to create service request');
+    }
+  },
+
+  async findOne(ctx) {
+    try {
+      const { id } = ctx.params;
+      const user = ctx.state.user;
+
+      if (!user) {
+        return ctx.unauthorized('User not authenticated');
+      }
+
+      const serviceRequest = await strapi.db.query('api::service-request.service-request').findOne({
+        where: { id, user: user.id },
+      });
+
+      if (!serviceRequest) {
+        return ctx.notFound('Service request not found');
+      }
+
+      ctx.body = { data: serviceRequest };
+    } catch (error) {
+      console.error('Error fetching service request:', error);
+      ctx.throw(500, 'Failed to fetch service request');
     }
   },
 
@@ -83,6 +115,7 @@ export default ({ strapi }) => ({
 
       const serviceRequest = await strapi.db.query('api::service-request.service-request').findOne({
         where: { id },
+        populate: ['user'],
       });
 
       if (!serviceRequest) {
@@ -98,7 +131,17 @@ export default ({ strapi }) => ({
         },
       });
 
-      // TODO: Send notification to user if status changed to completed
+      // Notify user when their request is completed
+      if (status === 'completed' && serviceRequest.user) {
+        try {
+          await (strapi.service('global::notifications') as any).notifyUserRequestCompleted(
+            serviceRequest.user,
+            serviceRequest
+          );
+        } catch (notifyError) {
+          console.error('Notification error (non-fatal):', notifyError);
+        }
+      }
 
       ctx.body = {
         data: updated,

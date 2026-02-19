@@ -37,6 +37,15 @@ export default {
       },
     },
     {
+      method: 'GET',
+      path: '/service-requests/:id',
+      handler: 'service-request.findOne',
+      config: {
+        policies: [],
+        middlewares: [],
+      },
+    },
+    {
       method: 'PUT',
       path: '/service-requests/:id/status',
       handler: 'service-request.updateStatus',
