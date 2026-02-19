@@ -93,15 +93,14 @@ cp .env.example .env
 
 2. Fill in your environment variables:
 ```env
-FIREBASE_API_KEY=your-firebase-api-key
-FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-FIREBASE_PROJECT_ID=your-project-id
-FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-FIREBASE_MESSAGING_SENDER_ID=123456789
-FIREBASE_APP_ID=1:123456789:web:abcdef
+EXPO_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
+EXPO_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abcdef
 
-STRAPI_API_URL=http://localhost:1337/api
-RAZORPAY_KEY_ID=rzp_test_xxxxx
+EXPO_PUBLIC_STRAPI_API_URL=http://localhost:1337/api
 EXPO_PUBLIC_ENV=development
 ```
 
