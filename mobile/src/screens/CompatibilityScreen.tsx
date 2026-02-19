@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { compatibilityService, CompatibilityResult } from '../services/compatibi
 import { validation } from '../utils/validation';
 import { storage } from '../utils/storage';
 import { useUserProfile } from '../hooks/useUserProfile';
+import { analytics } from '../services/analytics';
 
 interface CompatibilityHistoryEntry {
   partnerName: string;
@@ -36,6 +37,10 @@ const CompatibilityScreen: React.FC = () => {
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [dateError, setDateError] = useState('');
 
+  useEffect(() => {
+    analytics.screenView('Compatibility');
+  }, []);
+
   const handleCheck = () => {
     setDateError('');
     if (!profile?.birth_date) {
@@ -54,6 +59,7 @@ const CompatibilityScreen: React.FC = () => {
     const res = compatibilityService.calculateCompatibility(userBirthDate, partnerBirthDate);
     setResult(res);
     setShowBreakdown(false);
+    analytics.compatibilityChecked();
   };
 
   const handleSave = async () => {

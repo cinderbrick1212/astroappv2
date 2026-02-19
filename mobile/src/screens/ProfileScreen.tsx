@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,16 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Switch,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { useAuth } from '../hooks/useAuth';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { kundliService } from '../services/kundli';
+import { analytics } from '../services/analytics';
+import { storage } from '../utils/storage';
 
 const GENDERS: Array<'male' | 'female' | 'other'> = ['male', 'female', 'other'];
 
@@ -30,7 +34,9 @@ interface EditForm {
 const ProfileScreen: React.FC = () => {
   const { user, signOut } = useAuth();
   const { profile, isLoading, updateProfile, isUpdating } = useUserProfile();
+  const { t, i18n } = useTranslation();
   const [editVisible, setEditVisible] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [form, setForm] = useState<EditForm>({
     birth_date: '',
     birth_time: '',
@@ -38,6 +44,25 @@ const ProfileScreen: React.FC = () => {
     timezone: 'Asia/Kolkata',
     gender: 'other',
   });
+
+  // Load persisted notification preference
+  useEffect(() => {
+    storage.get<boolean>(storage.keys.NOTIFICATIONS_ENABLED).then(val => {
+      if (val !== null) setNotificationsEnabled(val);
+    });
+  }, []);
+
+  const handleNotificationsToggle = async (value: boolean) => {
+    setNotificationsEnabled(value);
+    await storage.set(storage.keys.NOTIFICATIONS_ENABLED, value);
+  };
+
+  const handleLanguageToggle = async () => {
+    const newLang = i18n.language === 'en' ? 'hi' : 'en';
+    await i18n.changeLanguage(newLang);
+    await storage.set(storage.keys.LANGUAGE_PREFERENCE, newLang);
+    analytics.languageChanged(newLang);
+  };
 
   const displayName =
     user?.displayName ||
@@ -89,6 +114,7 @@ const ProfileScreen: React.FC = () => {
       {
         onSuccess: async () => {
           await kundliService.clearCache();
+          analytics.birthDetailsUpdated();
           setEditVisible(false);
           Alert.alert('Saved', 'Birth details updated successfully.');
         },
@@ -165,11 +191,33 @@ const ProfileScreen: React.FC = () => {
 
         {/* Settings Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Settings</Text>
+          <Text style={styles.sectionTitle}>{t('profile.settings')}</Text>
           <View style={styles.card}>
+            {/* Language toggle */}
+            <TouchableOpacity style={styles.settingRow} onPress={handleLanguageToggle}>
+              <Text style={styles.settingIcon}>🌐</Text>
+              <Text style={styles.settingLabel}>{t('profile.language')}</Text>
+              <View style={styles.settingRight}>
+                <Text style={styles.settingValue}>
+                  {i18n.language === 'hi' ? 'हिंदी' : 'English'}
+                </Text>
+                <Text style={styles.settingArrow}>›</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Notifications toggle */}
+            <View style={[styles.settingRow, { borderBottomWidth: 1, borderBottomColor: colors.divider }]}>
+              <Text style={styles.settingIcon}>🔔</Text>
+              <Text style={styles.settingLabel}>{t('profile.notifications')}</Text>
+              <Switch
+                value={notificationsEnabled}
+                onValueChange={handleNotificationsToggle}
+                trackColor={{ false: colors.disabled, true: colors.primaryLight }}
+                thumbColor={notificationsEnabled ? colors.primary : colors.surface}
+              />
+            </View>
+
             {[
-              { label: 'Language', value: 'English', icon: '🌐' },
-              { label: 'Notifications', value: 'On', icon: '🔔' },
               { label: 'Privacy Policy', value: '', icon: '🔒' },
               { label: 'Terms of Service', value: '', icon: '📄' },
             ].map((item, idx, arr) => (
@@ -183,9 +231,6 @@ const ProfileScreen: React.FC = () => {
                 <Text style={styles.settingIcon}>{item.icon}</Text>
                 <Text style={styles.settingLabel}>{item.label}</Text>
                 <View style={styles.settingRight}>
-                  {item.value ? (
-                    <Text style={styles.settingValue}>{item.value}</Text>
-                  ) : null}
                   <Text style={styles.settingArrow}>›</Text>
                 </View>
               </TouchableOpacity>

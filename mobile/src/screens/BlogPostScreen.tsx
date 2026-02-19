@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { useBlogPost } from '../hooks/useBlogPost';
 import { AppStackParamList } from '../types';
+import { analytics } from '../services/analytics';
 
 type BlogPostRoute = RouteProp<AppStackParamList, 'BlogPost'>;
 
@@ -18,6 +19,10 @@ const BlogPostScreen: React.FC = () => {
   const route = useRoute<BlogPostRoute>();
   const { id } = route.params;
   const { blogPost, isLoading, error } = useBlogPost(id);
+
+  useEffect(() => {
+    analytics.blogPostViewed(id);
+  }, [id]);
 
   if (isLoading) {
     return (
