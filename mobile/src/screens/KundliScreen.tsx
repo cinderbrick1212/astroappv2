@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { useUserProfile } from '../hooks/useUserProfile';
@@ -37,6 +37,8 @@ const KundliScreen: React.FC = () => {
     profile.timezone ?? 'Asia/Kolkata'
   );
 
+  const dasha = kundliService.getCurrentDasha(new Date(profile.birth_date));
+
   return (
     <ScrollView style={styles.container}>
       {/* Key Insights */}
@@ -58,7 +60,7 @@ const KundliScreen: React.FC = () => {
         </View>
       </View>
 
-      {/* Insights */}
+      {/* Planetary Insights */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Planetary Insights</Text>
         {kundli.insights.map((insight, i) => (
@@ -69,11 +71,34 @@ const KundliScreen: React.FC = () => {
         ))}
       </View>
 
-      {/* Note about full implementation */}
+      {/* Current Dasha */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Current Dasha Period</Text>
+        <View style={styles.card}>
+          <View style={styles.insightRow}>
+            <Text style={styles.insightLabel}>Mahadasha Planet</Text>
+            <Text style={styles.insightValue}>{dasha.planet}</Text>
+          </View>
+          <View style={styles.insightRow}>
+            <Text style={styles.insightLabel}>Start</Text>
+            <Text style={styles.insightValue}>
+              {dasha.startDate.getFullYear()}
+            </Text>
+          </View>
+          <View style={styles.insightRow}>
+            <Text style={styles.insightLabel}>End</Text>
+            <Text style={styles.insightValue}>
+              {dasha.endDate.getFullYear()}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Disclaimer */}
       <View style={styles.section}>
         <View style={styles.noteCard}>
           <Text style={styles.noteText}>
-            Full Kundli with house placements and Dasha timeline will be available once the astrology engine is integrated.
+            Calculations use simplified astronomical approximations. Full precision requires Swiss Ephemeris data integration.
           </Text>
         </View>
       </View>

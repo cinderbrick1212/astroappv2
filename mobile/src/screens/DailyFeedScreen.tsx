@@ -14,12 +14,9 @@ import LoadingSkeleton from '../components/LoadingSkeleton';
 import { useAuth } from '../hooks/useAuth';
 import { useFeedItems } from '../hooks/useFeedItems';
 import { useStreak } from '../hooks/useStreak';
+import { useUserProfile } from '../hooks/useUserProfile';
 import { horoscopeService } from '../services/horoscope';
-
-const ZODIAC_SIGNS = [
-  'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
-  'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',
-];
+import { astrologyEngine } from '../services/astrologyEngine';
 
 const ZODIAC_EMOJI: Record<string, string> = {
   Aries: '♈', Taurus: '♉', Gemini: '♊', Cancer: '♋',
@@ -51,14 +48,17 @@ const DailyFeedScreen: React.FC = () => {
   const { user } = useAuth();
   const { feedItems, isLoading, refetch } = useFeedItems();
   const { streak } = useStreak();
+  const { profile } = useUserProfile();
   const [refreshing, setRefreshing] = React.useState(false);
 
   const today = new Date();
   const dayOfWeek = today.getDay();
   const focus = FOCUS_AREAS.find(f => f.day === dayOfWeek) || FOCUS_AREAS[0];
 
-  // Default rashi for guest users
-  const rashi = ZODIAC_SIGNS[today.getMonth() % 12];
+  // Use profile rashi if birth_date is available, otherwise derive from today
+  const rashi = profile?.birth_date
+    ? astrologyEngine.getRashiFromDate(new Date(profile.birth_date))
+    : astrologyEngine.getRashiFromDate(today);
   const horoscope = horoscopeService.getDailyHoroscope(rashi, today);
 
   const userName =
