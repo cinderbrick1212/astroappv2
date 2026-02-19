@@ -14,6 +14,7 @@ import LoadingSkeleton from '../components/LoadingSkeleton';
 import { useAuth } from '../hooks/useAuth';
 import { useFeedItems } from '../hooks/useFeedItems';
 import { useStreak } from '../hooks/useStreak';
+import { useUserProfile } from '../hooks/useUserProfile';
 import { horoscopeService } from '../services/horoscope';
 
 const ZODIAC_SIGNS = [
@@ -49,6 +50,7 @@ const FOCUS_MESSAGES: Record<string, string> = {
 
 const DailyFeedScreen: React.FC = () => {
   const { user } = useAuth();
+  const { profile } = useUserProfile();
   const { feedItems, isLoading, refetch } = useFeedItems();
   const { streak } = useStreak();
   const [refreshing, setRefreshing] = React.useState(false);
@@ -57,8 +59,11 @@ const DailyFeedScreen: React.FC = () => {
   const dayOfWeek = today.getDay();
   const focus = FOCUS_AREAS.find(f => f.day === dayOfWeek) || FOCUS_AREAS[0];
 
-  // Default rashi for guest users
-  const rashi = ZODIAC_SIGNS[today.getMonth() % 12];
+  // Use moon sign from profile if birth_date available, else fall back to month-based
+  const rashi = profile?.birth_date
+    ? horoscopeService.getRashiFromBirthDate(new Date(profile.birth_date))
+    : ZODIAC_SIGNS[today.getMonth() % 12];
+
   const horoscope = horoscopeService.getDailyHoroscope(rashi, today);
 
   const userName =

@@ -11,14 +11,30 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { panchangService } from '../services/panchang';
+import { horoscopeService } from '../services/horoscope';
+import { astrologyEngine } from '../services/astrologyEngine';
+import { useUserProfile } from '../hooks/useUserProfile';
 import { AppStackParamList } from '../types';
 
 type Nav = NativeStackNavigationProp<AppStackParamList>;
 
 const ToolsScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
+  const { profile } = useUserProfile();
   const today = new Date();
   const panchang = panchangService.calculatePanchang(today, 28.6, 77.2);
+
+  const nakshatra = React.useMemo(() => {
+    if (!profile?.birth_date) return 'Pushya';
+    const jd = astrologyEngine.toJulianDay(new Date(profile.birth_date));
+    const moonVedic = astrologyEngine.tropicalToVedic(
+      astrologyEngine.calcMoonLongitude(jd),
+      jd
+    );
+    return astrologyEngine.getNakshatra(moonVedic);
+  }, [profile?.birth_date]);
+
+  const lucky = horoscopeService.getLuckyFactors(nakshatra, today);
 
   return (
     <ScrollView style={styles.container}>
@@ -69,15 +85,15 @@ const ToolsScreen: React.FC = () => {
           <View style={styles.panchangRow}>
             <View style={styles.panchangItem}>
               <Text style={styles.panchangLabel}>Number</Text>
-              <Text style={styles.luckyNumber}>7</Text>
+              <Text style={styles.luckyNumber}>{lucky.number}</Text>
             </View>
             <View style={styles.panchangItem}>
               <Text style={styles.panchangLabel}>Color</Text>
-              <Text style={styles.panchangValue}>Green</Text>
+              <Text style={styles.panchangValue}>{lucky.color}</Text>
             </View>
             <View style={styles.panchangItem}>
               <Text style={styles.panchangLabel}>Time</Text>
-              <Text style={styles.panchangValue}>2–4 PM</Text>
+              <Text style={styles.panchangValue}>{lucky.time}</Text>
             </View>
           </View>
         </View>

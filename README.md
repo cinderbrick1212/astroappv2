@@ -232,10 +232,10 @@ See documentation files for detailed deployment instructions.
 - [x] Core navigation
 
 ### Phase 2: Core Features
-- [ ] Astrology engine integration (Swiss Ephemeris)
-- [ ] Feed and blog content (live Strapi data)
-- [ ] User profiles with birth details editing
-- [ ] Service requests (ask question, book call)
+- [x] Astrology engine integration (Swiss Ephemeris)
+- [x] Feed and blog content (live Strapi data)
+- [x] User profiles with birth details editing
+- [x] Service requests (ask question, book call)
 
 ### Phase 3: Advanced Features
 - [ ] Push notifications

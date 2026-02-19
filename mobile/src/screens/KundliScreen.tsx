@@ -1,16 +1,50 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { useUserProfile } from '../hooks/useUserProfile';
 import LoadingSkeleton from '../components/LoadingSkeleton';
-import { kundliService } from '../services/kundli';
+import { kundliService, KundliData } from '../services/kundli';
 
 const KundliScreen: React.FC = () => {
   const { profile, isLoading } = useUserProfile();
+  const [kundli, setKundli] = useState<KundliData | null>(null);
+  const [calculating, setCalculating] = useState(false);
+  const [calcError, setCalcError] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!profile?.birth_date || !profile?.birth_time || !profile?.birth_place) return;
+    setCalculating(true);
+    setCalcError(false);
+    kundliService
+      .calculateKundliAsync(
+        new Date(profile.birth_date),
+        profile.birth_time,
+        {
+          latitude: profile.latitude ?? 28.6,
+          longitude: profile.longitude ?? 77.2,
+        },
+        profile.timezone ?? 'Asia/Kolkata'
+      )
+      .then(setKundli)
+      .catch(() => setCalcError(true))
+      .finally(() => setCalculating(false));
+  }, [profile?.birth_date, profile?.birth_time, profile?.birth_place]);
+
+  if (isLoading || calculating) {
     return <LoadingSkeleton />;
+  }
+
+  if (calcError) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyIcon}>⚠️</Text>
+        <Text style={styles.emptyTitle}>Calculation Error</Text>
+        <Text style={styles.emptyText}>
+          Could not calculate your Kundli. Please check your birth details and try again.
+        </Text>
+      </View>
+    );
   }
 
   const hasBirthDetails = !!(profile?.birth_date && profile?.birth_time && profile?.birth_place);
@@ -27,21 +61,13 @@ const KundliScreen: React.FC = () => {
     );
   }
 
-  const kundli = kundliService.calculateKundli(
-    new Date(profile.birth_date),
-    profile.birth_time,
-    {
-      latitude: profile.latitude ?? 28.6,
-      longitude: profile.longitude ?? 77.2,
-    },
-    profile.timezone ?? 'Asia/Kolkata'
-  );
+  if (!kundli) return null;
 
   return (
     <ScrollView style={styles.container}>
       {/* Key Insights */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Key Insights</Text>
+        <Text style={styles.sectionTitle}>Key Placements</Text>
         <View style={styles.card}>
           <View style={styles.insightRow}>
             <Text style={styles.insightLabel}>Lagna (Ascendant)</Text>
@@ -52,8 +78,24 @@ const KundliScreen: React.FC = () => {
             <Text style={styles.insightValue}>{kundli.rashi}</Text>
           </View>
           <View style={styles.insightRow}>
+            <Text style={styles.insightLabel}>Sun Sign</Text>
+            <Text style={styles.insightValue}>{kundli.sunSign}</Text>
+          </View>
+          <View style={[styles.insightRow, { borderBottomWidth: 0 }]}>
             <Text style={styles.insightLabel}>Nakshatra</Text>
             <Text style={styles.insightValue}>{kundli.nakshatra}</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Current Dasha */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Current Mahadasha</Text>
+        <View style={styles.dashaCard}>
+          <Text style={styles.dashaIcon}>🪐</Text>
+          <View style={styles.dashaMeta}>
+            <Text style={styles.dashaPlanet}>{kundli.dasha.planet} Dasha</Text>
+            <Text style={styles.dashaEnds}>Ends approx. {kundli.dasha.endYear}</Text>
           </View>
         </View>
       </View>
@@ -69,14 +111,28 @@ const KundliScreen: React.FC = () => {
         ))}
       </View>
 
-      {/* Note about full implementation */}
-      <View style={styles.section}>
-        <View style={styles.noteCard}>
-          <Text style={styles.noteText}>
-            Full Kundli with house placements and Dasha timeline will be available once the astrology engine is integrated.
-          </Text>
+      {/* Planet positions */}
+      {kundli.chartData.planets.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Planet Positions</Text>
+          <View style={styles.card}>
+            {kundli.chartData.planets.map((p, i) => (
+              <View
+                key={p.planet}
+                style={[
+                  styles.insightRow,
+                  i === kundli.chartData.planets.length - 1 && { borderBottomWidth: 0 },
+                ]}
+              >
+                <Text style={styles.insightLabel}>{p.planet}</Text>
+                <Text style={styles.insightValue}>
+                  {p.sign} · House {p.house}
+                </Text>
+              </View>
+            ))}
+          </View>
         </View>
-      </View>
+      )}
     </ScrollView>
   );
 };
@@ -146,6 +202,32 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.primary,
   },
+  dashaCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  dashaIcon: {
+    fontSize: 32,
+    marginRight: spacing.md,
+  },
+  dashaMeta: {
+    flex: 1,
+  },
+  dashaPlanet: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.primary,
+  },
+  dashaEnds: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
   insightCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -167,18 +249,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textPrimary,
     lineHeight: 20,
-  },
-  noteCard: {
-    backgroundColor: colors.surfaceVariant,
-    borderRadius: 10,
-    padding: spacing.md,
-    marginBottom: spacing.xl,
-  },
-  noteText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    fontStyle: 'italic',
-    lineHeight: 18,
   },
 });
 
