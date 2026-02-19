@@ -6,9 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { useAuth } from '../hooks/useAuth';
+import { AppStackParamList } from '../types';
+
+type Nav = NativeStackNavigationProp<AppStackParamList>;
 
 const getGreeting = (): string => {
   const hour = new Date().getHours();
@@ -38,14 +43,15 @@ const FOCUS_MESSAGES: Record<string, string> = {
 };
 
 const QUICK_ACTIONS = [
-  { label: 'Kundli', icon: '🔯', description: 'Birth chart' },
-  { label: 'Compatibility', icon: '💞', description: 'Relationship match' },
-  { label: 'Panchang', icon: '📆', description: "Today's calendar" },
-  { label: 'Lucky Factors', icon: '🍀', description: 'Numbers & colors' },
+  { label: 'Kundli', icon: '🔯', description: 'Birth chart', screen: 'Kundli' as const },
+  { label: 'Compatibility', icon: '💞', description: 'Relationship match', screen: 'Compatibility' as const },
+  { label: 'Ask Question', icon: '❓', description: 'Expert advice', screen: 'AskQuestion' as const },
+  { label: 'Book Call', icon: '📞', description: 'Live consultation', screen: 'BookCall' as const },
 ];
 
 const HomeScreen: React.FC = () => {
   const { user } = useAuth();
+  const navigation = useNavigation<Nav>();
 
   const today = new Date();
   const dayOfWeek = today.getDay();
@@ -87,7 +93,11 @@ const HomeScreen: React.FC = () => {
         <Text style={styles.sectionTitle}>Quick Tools</Text>
         <View style={styles.quickActionsGrid}>
           {QUICK_ACTIONS.map(action => (
-            <TouchableOpacity key={action.label} style={styles.quickActionCard}>
+            <TouchableOpacity
+              key={action.label}
+              style={styles.quickActionCard}
+              onPress={() => navigation.navigate(action.screen)}
+            >
               <Text style={styles.quickActionIcon}>{action.icon}</Text>
               <Text style={styles.quickActionLabel}>{action.label}</Text>
               <Text style={styles.quickActionDescription}>{action.description}</Text>
@@ -100,11 +110,14 @@ const HomeScreen: React.FC = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Premium Services</Text>
         {[
-          { label: 'Ask a Question', icon: '❓', price: '₹49' },
-          { label: 'Detailed Report', icon: '📋', price: '₹499' },
-          { label: 'Book a Call', icon: '📞', price: '₹999' },
+          { label: 'Ask a Question', icon: '❓', price: '₹49', screen: 'AskQuestion' as const },
+          { label: 'Book a Call', icon: '📞', price: '₹999', screen: 'BookCall' as const },
         ].map(service => (
-          <TouchableOpacity key={service.label} style={styles.serviceCard}>
+          <TouchableOpacity
+            key={service.label}
+            style={styles.serviceCard}
+            onPress={() => navigation.navigate(service.screen)}
+          >
             <Text style={styles.serviceIcon}>{service.icon}</Text>
             <View style={styles.serviceInfo}>
               <Text style={styles.serviceLabel}>{service.label}</Text>

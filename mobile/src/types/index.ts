@@ -16,6 +16,8 @@ export interface UserProfile {
   birth_place: string;
   timezone: string;
   gender: 'male' | 'female' | 'other';
+  latitude?: number;
+  longitude?: number;
 }
 
 // Feed types
@@ -77,11 +79,21 @@ export interface ServiceRequest {
 // Navigation types
 export type RootStackParamList = {
   Auth: undefined;
-  Main: undefined;
+  App: undefined;
 };
 
 export type AuthStackParamList = {
   Login: undefined;
+};
+
+export type AppStackParamList = {
+  Main: undefined;
+  Kundli: undefined;
+  Compatibility: undefined;
+  AskQuestion: undefined;
+  BlogList: { category?: string };
+  BlogPost: { id: string };
+  BookCall: undefined;
 };
 
 export type MainTabParamList = {
@@ -91,6 +103,7 @@ export type MainTabParamList = {
   Profile: undefined;
 };
 
+/** @deprecated Use AppStackParamList for modal screens */
 export type ModalStackParamList = {
   Kundli: undefined;
   Compatibility: undefined;

@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
-  TouchableOpacity,
 } from 'react-native';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
@@ -14,6 +13,7 @@ import FeedItemCard from '../components/FeedItemCard';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { useAuth } from '../hooks/useAuth';
 import { useFeedItems } from '../hooks/useFeedItems';
+import { useStreak } from '../hooks/useStreak';
 import { horoscopeService } from '../services/horoscope';
 
 const ZODIAC_SIGNS = [
@@ -50,6 +50,7 @@ const FOCUS_MESSAGES: Record<string, string> = {
 const DailyFeedScreen: React.FC = () => {
   const { user } = useAuth();
   const { feedItems, isLoading, refetch } = useFeedItems();
+  const { streak } = useStreak();
   const [refreshing, setRefreshing] = React.useState(false);
 
   const today = new Date();
@@ -78,7 +79,7 @@ const DailyFeedScreen: React.FC = () => {
       }
     >
       {/* Header */}
-      <FeedHeader date={today} userName={userName} />
+      <FeedHeader date={today} userName={userName} streak={streak} />
 
       {/* Daily Horoscope Card */}
       <View style={styles.card}>

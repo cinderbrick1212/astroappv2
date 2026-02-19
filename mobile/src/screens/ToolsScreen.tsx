@@ -6,11 +6,17 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { panchangService } from '../services/panchang';
+import { AppStackParamList } from '../types';
+
+type Nav = NativeStackNavigationProp<AppStackParamList>;
 
 const ToolsScreen: React.FC = () => {
+  const navigation = useNavigation<Nav>();
   const today = new Date();
   const panchang = panchangService.calculatePanchang(today, 28.6, 77.2);
 
@@ -81,7 +87,10 @@ const ToolsScreen: React.FC = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Personal Tools</Text>
 
-        <TouchableOpacity style={styles.toolCard}>
+        <TouchableOpacity
+          style={styles.toolCard}
+          onPress={() => navigation.navigate('Kundli')}
+        >
           <View style={styles.toolCardHeader}>
             <Text style={styles.toolIcon}>🔯</Text>
             <View style={styles.toolCardMeta}>
@@ -90,10 +99,13 @@ const ToolsScreen: React.FC = () => {
             </View>
             <Text style={styles.arrowIcon}>›</Text>
           </View>
-          <Text style={styles.ctaText}>Add birth details in Profile to view your Kundli</Text>
+          <Text style={styles.ctaText}>Tap to view your birth chart</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.toolCard}>
+        <TouchableOpacity
+          style={styles.toolCard}
+          onPress={() => navigation.navigate('Compatibility')}
+        >
           <View style={styles.toolCardHeader}>
             <Text style={styles.toolIcon}>💞</Text>
             <View style={styles.toolCardMeta}>
@@ -116,21 +128,21 @@ const ToolsScreen: React.FC = () => {
             label: 'Ask a Question',
             subtitle: 'Get a personalized answer from an astrologer',
             price: '₹49',
-          },
-          {
-            icon: '📋',
-            label: 'Detailed Report',
-            subtitle: 'In-depth birth chart analysis PDF',
-            price: '₹499',
+            screen: 'AskQuestion' as const,
           },
           {
             icon: '📞',
             label: 'Book a Call',
             subtitle: 'Live consultation with an astrologer',
             price: '₹999',
+            screen: 'BookCall' as const,
           },
         ].map(service => (
-          <TouchableOpacity key={service.label} style={styles.serviceCard}>
+          <TouchableOpacity
+            key={service.label}
+            style={styles.serviceCard}
+            onPress={() => navigation.navigate(service.screen)}
+          >
             <Text style={styles.serviceIcon}>{service.icon}</Text>
             <View style={styles.serviceInfo}>
               <Text style={styles.serviceLabel}>{service.label}</Text>

@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import AuthNavigator from './AuthNavigator';
-import MainNavigator from './MainNavigator';
+import AppNavigator from './AppNavigator';
 import { useAuth } from '../hooks/useAuth';
 import { colors } from '../theme/colors';
 
@@ -27,7 +27,7 @@ const RootNavigator: React.FC = () => {
         {!isAuthenticated ? (
           <Stack.Screen name="Auth" component={AuthNavigator} />
         ) : (
-          <Stack.Screen name="Main" component={MainNavigator} />
+          <Stack.Screen name="App" component={AppNavigator} />
         )}
       </Stack.Navigator>
     </NavigationContainer>
