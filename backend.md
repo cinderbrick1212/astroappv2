@@ -62,11 +62,13 @@ This section reflects what is already in the repository vs what still needs to b
 - Custom FeedItem controller with language + type filtering and pagination.
 - Custom BlogPost controller with category filtering and pagination.
 - `.env.example` updated with all required env vars (SendGrid, Twilio, astrologer contacts).
+- GitHub Actions CI/CD pipeline in [.github/workflows/deploy.yml](.github/workflows/deploy.yml) that triggers Cloud Build → Cloud Run on push to `main`.
+- "Astrologer" Strapi admin role bootstrapped automatically on startup via [backend/src/index.ts](backend/src/index.ts) — assign content-manager permissions to the role via the Strapi admin panel after first boot.
 
 ### Not Done Yet
 
-- Cloud Run deployment automation (CI/CD, secrets management).
-- Role/permission setup for authenticated users and astrologer/admin roles.
+- Role/permission assignment for the "Astrologer" admin role (role creation is done; permissions must be configured via Settings → Roles in the Strapi admin panel).
+- Role/permission setup for authenticated users and astrologer/admin roles in the Strapi users-permissions plugin (public/authenticated API roles).
 
 ---
 
