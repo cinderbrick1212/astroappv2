@@ -9,16 +9,16 @@ export const useUserProfile = () => {
   const { data: profile, isLoading, error } = useQuery<UserProfile>({
     queryKey: ['userProfile'],
     queryFn: async () => {
-      const response = await api.get('/user-profiles/me');
-      return response.data;
+      const response = await api.get('/user-profile/me');
+      return response.data.data;
     },
   });
 
-  // Update user profile
+  // Create or update user profile
   const updateProfile = useMutation({
     mutationFn: async (data: Partial<UserProfile>) => {
-      const response = await api.put('/user-profiles/me', data);
-      return response.data;
+      const response = await api.put('/user-profile', data);
+      return response.data.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });

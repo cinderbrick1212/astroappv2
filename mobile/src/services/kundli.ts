@@ -127,6 +127,22 @@ interface KundliCacheEntry {
   data: KundliData;
 }
 
+// Traditional insights keyed by rashi
+const RASHI_INSIGHTS: Record<string, string[]> = {
+  Aries:       ['Strong Mars bestows natural leadership and courage.', 'First house placement amplifies your drive for success.'],
+  Taurus:      ['Venus blesses you with artistic sensibility and steadiness.', 'Earth sign stability supports long-term wealth accumulation.'],
+  Gemini:      ['Mercury sharpens your intellect and communication skills.', 'Dual nature grants versatility in career and relationships.'],
+  Cancer:      ['The Moon governs deep intuition and emotional intelligence.', 'Nurturing instincts make you a pillar of family strength.'],
+  Leo:         ['Sun in your chart radiates confidence and natural authority.', 'Creative talents are a source of recognition and joy.'],
+  Virgo:       ['Mercury in an earthy sign sharpens analytical precision.', 'Service orientation leads to meaningful professional fulfillment.'],
+  Libra:       ['Venus blesses relationships with harmony and beauty.', 'Diplomatic gifts help you resolve conflict with grace.'],
+  Scorpio:     ['Mars and Ketu grant transformative depth and resilience.', 'Hidden strengths emerge under pressure — trust the process.'],
+  Sagittarius: ['Jupiter bestows wisdom, optimism, and expansive vision.', 'Philosophy and travel are natural paths of growth for you.'],
+  Capricorn:   ['Saturn rewards disciplined effort with enduring success.', 'Ambition and patience together build lasting achievements.'],
+  Aquarius:    ['Saturn and Rahu spark original thinking and innovation.', 'Humanitarian ideals guide your most important decisions.'],
+  Pisces:      ['Jupiter and Neptune deepen spirituality and compassion.', 'Intuitive gifts and artistic vision set you apart.'],
+};
+
 export const kundliService = {
   /**
    * Calculate Kundli from birth details.

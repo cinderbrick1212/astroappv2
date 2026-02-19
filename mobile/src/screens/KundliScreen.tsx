@@ -63,6 +63,8 @@ const KundliScreen: React.FC = () => {
 
   if (!kundli) return null;
 
+  const dasha = kundliService.getCurrentDasha(new Date(profile.birth_date));
+
   return (
     <ScrollView style={styles.container}>
       {/* Key Insights */}

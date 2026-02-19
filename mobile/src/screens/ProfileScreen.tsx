@@ -371,6 +371,9 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     overflow: 'hidden',
   },
+  loadingIndicator: {
+    marginVertical: spacing.lg,
+  },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -397,6 +400,7 @@ const styles = StyleSheet.create({
   detailValueEmpty: {
     color: colors.textSecondary,
     fontStyle: 'italic',
+    fontWeight: 'normal',
   },
   editButton: {
     margin: spacing.md,
