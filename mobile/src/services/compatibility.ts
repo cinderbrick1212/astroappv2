@@ -243,23 +243,5 @@ export const compatibilityService = {
       advice: getAdvice(score),
       breakdown,
     };
-
-    const score = Object.values(breakdown).reduce((a, b) => a + b, 0);
-
-    // Pick strengths/cautions deterministically from the rashi pair
-    const seed = (r1 * 12 + r2) % STRENGTH_POOL.length;
-    const strengths = STRENGTH_POOL[seed];
-    const caution = CAUTION_POOL[(r1 + r2) % CAUTION_POOL.length];
-
-    let advice: string;
-    if (score >= 28) {
-      advice = 'This is an excellent match. Nurture it with gratitude.';
-    } else if (score >= 19) {
-      advice = 'A solid foundation—focus on open communication to deepen the bond.';
-    } else {
-      advice = 'Patience, mutual respect, and conscious effort can bridge differences.';
-    }
-
-    return { score, maxScore: 36, strengths, cautions: [caution], advice, breakdown };
   },
 };

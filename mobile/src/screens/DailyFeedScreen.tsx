@@ -49,17 +49,16 @@ const DailyFeedScreen: React.FC = () => {
   const { profile } = useUserProfile();
   const { feedItems, isLoading, refetch } = useFeedItems();
   const { streak } = useStreak();
-  const { profile } = useUserProfile();
   const [refreshing, setRefreshing] = React.useState(false);
 
   const today = new Date();
   const dayOfWeek = today.getDay();
   const focus = FOCUS_AREAS.find(f => f.day === dayOfWeek) || FOCUS_AREAS[0];
 
-  // Use moon sign from profile if birth_date available, else fall back to month-based
+  // Use moon sign from profile if birth_date available, else fall back to current sun sign
   const rashi = profile?.birth_date
     ? horoscopeService.getRashiFromBirthDate(new Date(profile.birth_date))
-    : ZODIAC_SIGNS[today.getMonth() % 12];
+    : astrologyEngine.getSunSign(new Date());
 
   const horoscope = horoscopeService.getDailyHoroscope(rashi, today);
 
