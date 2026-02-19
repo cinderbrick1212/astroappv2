@@ -11,11 +11,10 @@ This guide walks you through deploying the Strapi backend to Google Cloud Platfo
 
 ## Step 1: Set Up GCP Resources
 
-### 1.1 Create a GCP Project
+### 1.1 Select the GCP Project
 
 ```bash
-gcloud projects create astroapp-prod --name="Astro App Production"
-gcloud config set project astroapp-prod
+gcloud config set project astroinsights-487814
 ```
 
 ### 1.2 Enable Required APIs
@@ -97,7 +96,7 @@ gcloud secrets create firebase-service-account --data-file=firebase-service-acco
 ### 2.2 Grant Cloud Run Access to Secrets
 
 ```bash
-PROJECT_NUMBER=$(gcloud projects describe astroapp-prod --format="value(projectNumber)")
+PROJECT_NUMBER=$(gcloud projects describe astroinsights-487814 --format="value(projectNumber)")
 
 gcloud secrets add-iam-policy-binding app-keys \
   --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
@@ -114,7 +113,7 @@ gcloud secrets add-iam-policy-binding app-keys \
 cd backend
 
 # Build the image
-gcloud builds submit --tag gcr.io/astroapp-prod/strapi-backend
+gcloud builds submit --tag gcr.io/astroinsights-487814/strapi-backend
 ```
 
 ### 3.2 Deploy to Cloud Run
@@ -125,7 +124,7 @@ INSTANCE_CONNECTION_NAME=$(gcloud sql instances describe astroapp-db --format="v
 
 # Deploy to Cloud Run
 gcloud run deploy strapi-backend \
-  --image gcr.io/astroapp-prod/strapi-backend \
+  --image gcr.io/astroinsights-487814/strapi-backend \
   --platform managed \
   --region asia-south1 \
   --allow-unauthenticated \
@@ -174,8 +173,8 @@ Use the ready-made file at [backend/cloudbuild.yaml](backend/cloudbuild.yaml). U
 
 ```yaml
 substitutions:
-  _INSTANCE_CONNECTION_NAME: "YOUR_PROJECT_ID:YOUR_REGION:YOUR_INSTANCE_NAME"
-  _GCS_BUCKET_NAME: "your-bucket-name"
+  _INSTANCE_CONNECTION_NAME: "astroinsights-487814:asia-south1:astroapp-db"
+  _GCS_BUCKET_NAME: "astroapp-media"
 ```
 
 ### 5.2 Connect GitHub Repository
@@ -193,7 +192,7 @@ If you want a single command deploy without setting up a trigger:
 
 ```bash
 gcloud builds submit --config backend/cloudbuild.yaml \
-  --substitutions _INSTANCE_CONNECTION_NAME="YOUR_PROJECT_ID:YOUR_REGION:YOUR_INSTANCE_NAME",_GCS_BUCKET_NAME="your-bucket-name"
+  --substitutions _INSTANCE_CONNECTION_NAME="astroinsights-487814:asia-south1:astroapp-db",_GCS_BUCKET_NAME="astroapp-media"
 ```
 ```
 
@@ -327,8 +326,8 @@ gcloud run services describe strapi-backend --region asia-south1
 ### Rebuild and Redeploy
 
 ```bash
-gcloud builds submit --tag gcr.io/astroapp-prod/strapi-backend
-gcloud run deploy strapi-backend --image gcr.io/astroapp-prod/strapi-backend --region asia-south1
+gcloud builds submit --tag gcr.io/astroinsights-487814/strapi-backend
+gcloud run deploy strapi-backend --image gcr.io/astroinsights-487814/strapi-backend --region asia-south1
 ```
 
 ## Environment Variables Reference
