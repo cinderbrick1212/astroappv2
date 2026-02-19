@@ -33,7 +33,7 @@ gcloud services enable \
 ```bash
 # Create PostgreSQL instance
 gcloud sql instances create astroapp-db \
-  --database-version=POSTGRES_15 \
+  --database-version=POSTGRES_18 \
   --tier=db-f1-micro \
   --region=asia-south1 \
   --root-password=YOUR_SECURE_PASSWORD
