@@ -6,19 +6,25 @@ export const useUserProfile = () => {
   const queryClient = useQueryClient();
 
   // Fetch user profile
-  const { data: profile, isLoading, error } = useQuery<UserProfile>({
+  const { data: profile, isLoading, error } = useQuery<UserProfile | null>({
     queryKey: ['userProfile'],
     queryFn: async () => {
-      const response = await api.get('/user-profiles/me');
-      return response.data;
+      try {
+        const response = await api.get('/user-profile/me');
+        return response.data.data;
+      } catch (err: any) {
+        // 404 means the user has no profile yet — treat as null rather than error
+        if (err?.response?.status === 404) return null;
+        throw err;
+      }
     },
   });
 
-  // Update user profile
+  // Create or update user profile
   const updateProfile = useMutation({
     mutationFn: async (data: Partial<UserProfile>) => {
-      const response = await api.put('/user-profiles/me', data);
-      return response.data;
+      const response = await api.put('/user-profile', data);
+      return response.data.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });

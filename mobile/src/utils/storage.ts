@@ -6,6 +6,12 @@ const STORAGE_KEYS = {
   USER_PROFILE: 'user_profile',
   FEED_CACHE: 'feed_cache',
   LAST_SYNC: 'last_sync',
+  // Phase 2 keys
+  KUNDLI_CACHE: 'kundli_cache',
+  COMPATIBILITY_HISTORY: 'compatibility_history',
+  STREAK_DATA: 'streak_data',
+  THEME_PREFERENCE: 'theme_preference',
+  LANGUAGE_PREFERENCE: 'language_preference',
 };
 
 export const storage = {
