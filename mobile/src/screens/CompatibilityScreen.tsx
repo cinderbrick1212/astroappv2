@@ -13,6 +13,7 @@ import { spacing } from '../theme/spacing';
 import { compatibilityService, CompatibilityResult } from '../services/compatibility';
 import { validation } from '../utils/validation';
 import { storage } from '../utils/storage';
+import { useUserProfile } from '../hooks/useUserProfile';
 
 interface CompatibilityHistoryEntry {
   partnerName: string;
@@ -28,6 +29,7 @@ const getRatingLabel = (score: number): { label: string; color: string } => {
 };
 
 const CompatibilityScreen: React.FC = () => {
+  const { profile } = useUserProfile();
   const [partnerName, setPartnerName] = useState('');
   const [partnerDate, setPartnerDate] = useState('');
   const [result, setResult] = useState<CompatibilityResult | null>(null);
@@ -36,12 +38,19 @@ const CompatibilityScreen: React.FC = () => {
 
   const handleCheck = () => {
     setDateError('');
+    if (!profile?.birth_date) {
+      Alert.alert(
+        'Birth Date Required',
+        'Please add your date of birth in the Profile tab before checking compatibility.',
+      );
+      return;
+    }
     if (!validation.isValidDate(partnerDate)) {
       setDateError('Please enter a valid date (YYYY-MM-DD)');
       return;
     }
     const partnerBirthDate = new Date(partnerDate);
-    const userBirthDate = new Date();
+    const userBirthDate = new Date(profile.birth_date);
     const res = compatibilityService.calculateCompatibility(userBirthDate, partnerBirthDate);
     setResult(res);
     setShowBreakdown(false);
@@ -79,6 +88,13 @@ const CompatibilityScreen: React.FC = () => {
       {/* Input Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Enter Partner Details</Text>
+        {!profile?.birth_date && (
+          <View style={styles.infoBanner}>
+            <Text style={styles.infoBannerText}>
+              ℹ️ Your birth date is required for compatibility calculations. Please add it in your Profile.
+            </Text>
+          </View>
+        )}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Partner's Name (optional)</Text>
           <TextInput
@@ -189,6 +205,19 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     marginBottom: spacing.sm,
+  },
+  infoBanner: {
+    backgroundColor: colors.surfaceVariant,
+    borderRadius: 8,
+    padding: spacing.sm,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  infoBannerText: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    lineHeight: 18,
   },
   inputGroup: {
     marginBottom: spacing.md,

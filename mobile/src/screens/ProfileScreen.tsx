@@ -371,9 +371,6 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     overflow: 'hidden',
   },
-  loadingIndicator: {
-    marginVertical: spacing.lg,
-  },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',

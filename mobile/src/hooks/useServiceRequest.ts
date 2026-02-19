@@ -10,7 +10,7 @@ export const useServiceRequest = () => {
       service_type: ServiceRequest['service_type'];
       user_notes?: string;
     }) => {
-      const response = await api.post('/service-requests', { data });
+      const response = await api.post('/service-requests', data);
       return response.data.data as ServiceRequest;
     },
     onSuccess: () => {

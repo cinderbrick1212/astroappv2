@@ -60,7 +60,7 @@ export interface Payment {
   razorpay_signature?: string;
   amount: number;
   currency: string;
-  status: 'created' | 'pending' | 'success' | 'failed';
+  status: 'created' | 'pending' | 'captured' | 'success' | 'failed';
   plan_type: string;
   created_at: string;
 }

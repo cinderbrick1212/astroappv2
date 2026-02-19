@@ -6,11 +6,17 @@ export const useUserProfile = () => {
   const queryClient = useQueryClient();
 
   // Fetch user profile
-  const { data: profile, isLoading, error } = useQuery<UserProfile>({
+  const { data: profile, isLoading, error } = useQuery<UserProfile | null>({
     queryKey: ['userProfile'],
     queryFn: async () => {
-      const response = await api.get('/user-profile/me');
-      return response.data.data;
+      try {
+        const response = await api.get('/user-profile/me');
+        return response.data.data;
+      } catch (err: any) {
+        // 404 means the user has no profile yet — treat as null rather than error
+        if (err?.response?.status === 404) return null;
+        throw err;
+      }
     },
   });
 

@@ -9,6 +9,13 @@ interface FeedHeaderProps {
   streak?: number;
 }
 
+const getGreeting = (): string => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+};
+
 const FeedHeader: React.FC<FeedHeaderProps> = ({ date, userName, streak }) => {
   return (
     <View style={styles.container}>
@@ -21,7 +28,7 @@ const FeedHeader: React.FC<FeedHeaderProps> = ({ date, userName, streak }) => {
         })}
       </Text>
       {userName && (
-        <Text style={styles.greeting}>Good morning, {userName}</Text>
+        <Text style={styles.greeting}>{getGreeting()}, {userName}</Text>
       )}
       {streak && streak > 0 && (
         <Text style={styles.streak}>🔥 {streak} day streak</Text>
