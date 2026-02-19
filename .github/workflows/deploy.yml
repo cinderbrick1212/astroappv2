@@ -1,0 +1,54 @@
+name: Deploy Backend to Cloud Run
+
+# Triggers on every push to main that touches backend code or this workflow file.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy.yml"
+
+env:
+  REGION: asia-south1
+
+jobs:
+  deploy:
+    name: Build and Deploy to Cloud Run
+    runs-on: ubuntu-latest
+
+    # Needed for Workload Identity Federation token exchange (optional — see note below).
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # Authenticate with GCP.
+      #
+      # Option A (recommended for production) — Workload Identity Federation:
+      #   Replace the `credentials_json` line with:
+      #     workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+      #     service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      #
+      # Option B (simpler) — Service Account key JSON stored as GCP_SA_KEY secret:
+      # -----------------------------------------------------------------------
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      # Submit the Cloud Build job defined in backend/cloudbuild.yaml.
+      # The substitution variables are stored as GitHub repository secrets:
+      #   CLOUD_SQL_CONNECTION_NAME  — e.g. my-project:asia-south1:my-instance
+      #   GCS_BUCKET_NAME            — e.g. astroapp-media
+      - name: Submit Cloud Build (build → push → deploy)
+        run: |
+          gcloud builds submit \
+            --config backend/cloudbuild.yaml \
+            --substitutions _INSTANCE_CONNECTION_NAME="${{ secrets.CLOUD_SQL_CONNECTION_NAME }}",_GCS_BUCKET_NAME="${{ secrets.GCS_BUCKET_NAME }}"
