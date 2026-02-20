@@ -233,11 +233,81 @@ gcloud builds submit --config backend/cloudbuild.yaml \
 
 ## Step 6: Post-Deployment
 
-### 6.1 Create Admin User
+### 6.1 Create Admin User via Command Line
 
-1. Visit `https://your-domain.com/admin`
-2. Create your first admin user
-3. Log in to the admin panel
+Strapi v5 ships with an `admin:create-user` CLI command that lets you create the first
+admin account without opening a browser. On Cloud Run you run it as a one-off **Cloud Run
+Job** that reuses the same container image, Cloud SQL connection, and secrets as the main
+service.
+
+```bash
+# ── Step 1: Generate a strong admin password and store it in Secret Manager ──
+ADMIN_EMAIL="admin@yourdomain.com"     # change to your address
+ADMIN_PASSWORD="$(openssl rand -base64 16)"
+echo "Save this password now: $ADMIN_PASSWORD"
+
+echo -n "$ADMIN_PASSWORD" | gcloud secrets create strapi-admin-password --data-file=-
+
+# Grant the Cloud Run service account access to the new secret
+PROJECT_NUMBER=$(gcloud projects describe astroinsights-487814 \
+  --format="value(projectNumber)")
+SA="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+gcloud secrets add-iam-policy-binding strapi-admin-password \
+  --member="$SA" \
+  --role="roles/secretmanager.secretAccessor"
+
+# ── Step 2: Create the one-off Cloud Run Job ──
+INSTANCE_CONNECTION_NAME=$(gcloud sql instances describe astroapp-db \
+  --format="value(connectionName)")
+
+gcloud run jobs create strapi-create-admin \
+  --image gcr.io/astroinsights-487814/strapi-backend \
+  --region asia-south1 \
+  --add-cloudsql-instances "$INSTANCE_CONNECTION_NAME" \
+  --set-env-vars "DATABASE_CLIENT=postgres,DATABASE_HOST=/cloudsql/${INSTANCE_CONNECTION_NAME},DATABASE_NAME=strapi,DATABASE_USERNAME=strapi,HOST=0.0.0.0,PORT=8080,ADMIN_EMAIL=${ADMIN_EMAIL}" \
+  --set-secrets "APP_KEYS=app-keys:latest,ADMIN_JWT_SECRET=admin-jwt-secret:latest,JWT_SECRET=jwt-secret:latest,API_TOKEN_SALT=api-token-salt:latest,TRANSFER_TOKEN_SALT=transfer-token-salt:latest,ENCRYPTION_KEY=encryption-key:latest,DATABASE_PASSWORD=database-password:latest,FIREBASE_SERVICE_ACCOUNT_KEY=firebase-service-account:latest,ADMIN_CREATE_PASSWORD=strapi-admin-password:latest" \
+  --command "/bin/sh" \
+  --args "-c,node_modules/.bin/strapi admin:create-user --firstname=Admin --lastname=User --email=\$ADMIN_EMAIL --password=\$ADMIN_CREATE_PASSWORD"
+
+# ── Step 3: Execute the job and wait for it to finish ──
+gcloud run jobs execute strapi-create-admin \
+  --region asia-south1 \
+  --wait
+
+# ── Step 4: Verify the job succeeded ──
+gcloud run jobs executions list \
+  --job strapi-create-admin \
+  --region asia-south1
+```
+
+After the job completes you can log in to `https://your-domain.com/admin` with the email
+and password you set above.
+
+> **Cleanup (optional):** The job only needs to run once. Remove it and the temporary
+> secret once the admin account is confirmed:
+>
+> ```bash
+> gcloud run jobs delete strapi-create-admin --region asia-south1
+> gcloud secrets delete strapi-admin-password
+> ```
+
+#### Alternative: exec into the running service (gcloud beta)
+
+If the Cloud Run service is already deployed and you prefer a single command, you can
+exec directly into a running container instance:
+
+```bash
+gcloud beta run services exec strapi-backend \
+  --region asia-south1 \
+  -- node_modules/.bin/strapi admin:create-user \
+       --firstname=Admin \
+       --lastname=User \
+       --email=admin@yourdomain.com \
+       --password="YourSecurePassword123!"
+```
+
+> This requires the `beta` gcloud component (`gcloud components install beta`) and the
+> **Cloud Run Developer** IAM role on the service.
 
 ### 6.2 Set Up Monitoring
 
