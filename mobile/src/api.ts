@@ -1,6 +1,5 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth } from './firebase';
+import { storage } from './utils/storage';
 import { config } from './config';
 
 const api = axios.create({
@@ -11,15 +10,14 @@ const api = axios.create({
   },
 });
 
-// Request interceptor: Attach Firebase ID token
+// Request interceptor: Attach Strapi JWT from local storage
 api.interceptors.request.use(
-  async (config) => {
-    const user = auth.currentUser;
-    if (user) {
-      const token = await user.getIdToken();
-      config.headers.Authorization = `Bearer ${token}`;
+  async (requestConfig) => {
+    const token = await storage.get<string>(storage.keys.AUTH_TOKEN);
+    if (token) {
+      requestConfig.headers.Authorization = `Bearer ${token}`;
     }
-    return config;
+    return requestConfig;
   },
   (error) => {
     return Promise.reject(error);
@@ -31,13 +29,9 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // Token expired, refresh and retry
-      const user = auth.currentUser;
-      if (user) {
-        const token = await user.getIdToken(true);
-        error.config.headers.Authorization = `Bearer ${token}`;
-        return api.request(error.config);
-      }
+      // Clear stored credentials on unauthorized response
+      await storage.remove(storage.keys.AUTH_TOKEN);
+      await storage.remove(storage.keys.USER_DATA);
     }
     return Promise.reject(error);
   }

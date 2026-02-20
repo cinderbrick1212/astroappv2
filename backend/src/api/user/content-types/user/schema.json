@@ -14,8 +14,7 @@
   "attributes": {
     "firebase_uid": {
       "type": "string",
-      "required": true,
-      "unique": true
+      "required": false
     },
     "email": {
       "type": "email",

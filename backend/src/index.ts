@@ -1,5 +1,4 @@
 import type { Core } from '@strapi/strapi';
-import { initializeFirebase } from './services/firebase';
 
 /**
  * Create the "Astrologer" Strapi admin role on first boot if it does not exist.
@@ -37,9 +36,8 @@ async function bootstrapRoles(strapi: Core.Strapi) {
  *
  * Public role  – read-only access to feed items and blog posts.
  * Authenticated role – full access to user, user-profile, and
- *   service-request endpoints.  Firebase Auth is the real authentication
- *   gate; Strapi's users-permissions layer must not block requests that
- *   have already been validated by the firebase-auth global middleware.
+ *   service-request endpoints.  Strapi's native JWT auth is the real
+ *   authentication gate via the strapi-auth global middleware.
  */
 async function bootstrapPermissions(strapi: Core.Strapi) {
   try {
@@ -70,11 +68,9 @@ async function bootstrapPermissions(strapi: Core.Strapi) {
     ];
 
     /**
-     * Actions that require a Firebase-authenticated user.
-     * Because the firebase-auth global middleware is the real authentication
-     * gate (not Strapi's own JWT system), these actions are enabled for the
-     * `authenticated` role.  The firebase-auth middleware validates every
-     * inbound Firebase ID token before any route handler is reached.
+     * Actions that require a Strapi-authenticated user.
+     * The strapi-auth global middleware validates the Strapi JWT and maps
+     * it to the custom api::user.user before any route handler is reached.
      */
     const authenticatedActions: string[] = [
       // User endpoints
@@ -162,15 +158,6 @@ export default {
    * run jobs, or perform some special logic.
    */
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
-    try {
-      // Initialize Firebase Admin SDK
-      initializeFirebase();
-      console.log('Firebase Admin SDK initialized successfully');
-    } catch (error) {
-      console.error('Failed to initialize Firebase Admin SDK:', error);
-      // Allow app to start even if Firebase fails (for local development)
-    }
-
     // Bootstrap admin roles (idempotent — safe to run on every startup)
     await bootstrapRoles(strapi);
 

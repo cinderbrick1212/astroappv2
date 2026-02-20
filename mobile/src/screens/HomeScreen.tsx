@@ -63,8 +63,8 @@ const HomeScreen: React.FC = () => {
   const focus = FOCUS_AREAS.find(f => f.day === dayOfWeek) || FOCUS_AREAS[0];
 
   const userName =
-    user?.displayName ||
-    (user?.isAnonymous ? 'Guest' : user?.email?.split('@')[0] || 'there');
+    user?.username ||
+    user?.email?.split('@')[0] || 'there';
 
   return (
     <ScrollView style={styles.container}>

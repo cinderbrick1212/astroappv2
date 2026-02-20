@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import RootNavigator from './src/navigation/RootNavigator';
 import './src/i18n'; // initialise i18next before any components render
 import { useNotifications } from './src/hooks/useNotifications';
+import { AuthProvider } from './src/context/AuthContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,7 +40,9 @@ export default function App() {
       client={queryClient}
       persistOptions={{ persister: asyncStoragePersister }}
     >
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </PersistQueryClientProvider>
   );
 }

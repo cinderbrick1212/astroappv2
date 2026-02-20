@@ -10,14 +10,8 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import {
-  signInWithEmailAndPassword,
-  signInAnonymously,
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-  updateProfile,
-} from 'firebase/auth';
-import { auth } from '../firebase';
+import api from '../api';
+import { useAuth } from '../hooks/useAuth';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { validation } from '../utils/validation';
@@ -25,6 +19,7 @@ import { validation } from '../utils/validation';
 type AuthMode = 'login' | 'register';
 
 const LoginScreen: React.FC = () => {
+  const { login } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -57,20 +52,24 @@ const LoginScreen: React.FC = () => {
     setLoading(true);
     try {
       if (authMode === 'login') {
-        await signInWithEmailAndPassword(auth, email, password);
+        const response = await api.post('/auth/local', {
+          identifier: email,
+          password,
+        });
+        await login(response.data.jwt, response.data.user);
       } else {
-        const credential = await createUserWithEmailAndPassword(auth, email, password);
-        if (displayName.trim()) {
-          await updateProfile(credential.user, { displayName: displayName.trim() });
-        }
+        const response = await api.post('/auth/local/register', {
+          username: displayName.trim() || email.split('@')[0],
+          email,
+          password,
+        });
+        await login(response.data.jwt, response.data.user);
       }
     } catch (error: any) {
       const msg =
-        error?.code === 'auth/user-not-found' || error?.code === 'auth/wrong-password'
-          ? 'Invalid email or password'
-          : error?.code === 'auth/email-already-in-use'
-          ? 'Email is already registered'
-          : error?.message || 'Authentication failed. Please try again.';
+        error?.response?.data?.error?.message ||
+        error?.message ||
+        'Authentication failed. Please try again.';
       Alert.alert('Error', msg);
     } finally {
       setLoading(false);
@@ -91,26 +90,15 @@ const LoginScreen: React.FC = () => {
           text: 'Send',
           onPress: async () => {
             try {
-              await sendPasswordResetEmail(auth, email);
+              await api.post('/auth/forgot-password', { email });
               Alert.alert('Email Sent', 'Check your inbox for the password reset link.');
             } catch (error: any) {
-              Alert.alert('Error', error?.message || 'Could not send reset email.');
+              Alert.alert('Error', error?.response?.data?.error?.message || 'Could not send reset email.');
             }
           },
         },
       ]
     );
-  };
-
-  const handleGuestLogin = async () => {
-    setLoading(true);
-    try {
-      await signInAnonymously(auth);
-    } catch (error: any) {
-      Alert.alert('Error', 'Could not sign in as guest. Please try again.');
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -208,22 +196,6 @@ const LoginScreen: React.FC = () => {
           <Text style={styles.primaryButtonText}>
             {loading ? 'Please wait...' : authMode === 'login' ? 'Login' : 'Create Account'}
           </Text>
-        </TouchableOpacity>
-
-        {/* Divider */}
-        <View style={styles.divider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>or</Text>
-          <View style={styles.dividerLine} />
-        </View>
-
-        {/* Guest login */}
-        <TouchableOpacity
-          style={[styles.secondaryButton, loading && styles.buttonDisabled]}
-          onPress={handleGuestLogin}
-          disabled={loading}
-        >
-          <Text style={styles.secondaryButtonText}>Continue as Guest</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -361,6 +333,12 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 16,
     fontWeight: '600',
+  },
+  forgotPasswordStandalone: {
+    fontSize: 14,
+    color: colors.primary,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });
 
