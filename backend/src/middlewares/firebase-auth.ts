@@ -3,20 +3,21 @@ import { verifyFirebaseToken } from '../services/firebase';
 
 export default (config, { strapi }: { strapi: Core.Strapi }) => {
   return async (ctx, next) => {
-    // Skip authentication for Strapi admin panel routes (use Strapi's own auth)
-    if (ctx.request.url === '/admin' || ctx.request.url.startsWith('/admin/')) {
+    // Firebase authentication only applies to /api/* routes.
+    // All other paths (Strapi admin, content-manager, upload, and other
+    // built-in plugin routes) use Strapi's own authentication system.
+    if (!ctx.path.startsWith('/api/')) {
       return await next();
     }
 
-    // Skip authentication for public routes
+    // Public /api/ routes that do not require Firebase authentication
     const publicRoutes = [
       '/api/feed-items',
       '/api/blog-posts',
       '/api/health',
-      '/_health',
     ];
 
-    const isPublicRoute = publicRoutes.some(route => ctx.request.url.startsWith(route));
+    const isPublicRoute = publicRoutes.some(route => ctx.path.startsWith(route));
     
     if (isPublicRoute && ctx.request.method === 'GET') {
       return await next();
