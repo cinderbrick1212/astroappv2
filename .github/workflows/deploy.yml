@@ -51,4 +51,4 @@ jobs:
         run: |
           gcloud builds submit \
             --config backend/cloudbuild.yaml \
-            --substitutions _INSTANCE_CONNECTION_NAME="${{ secrets.CLOUD_SQL_CONNECTION_NAME }}",_GCS_BUCKET_NAME="${{ secrets.GCS_BUCKET_NAME }}"
+            --substitutions _INSTANCE_CONNECTION_NAME="${{ secrets.CLOUD_SQL_CONNECTION_NAME }}",_GCS_BUCKET_NAME="${{ secrets.GCS_BUCKET_NAME }}",_SERVICE_URL="${{ secrets.CLOUD_RUN_SERVICE_URL }}"
