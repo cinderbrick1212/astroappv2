@@ -1,4 +1,14 @@
-# API Documentation
+# ⚠️ DEPRECATED - API Documentation
+
+> **This documentation has been migrated to the new repository.**
+> 
+> **New repository**: [cinderbrick1212/astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+> 
+> Please refer to the new repository for current API documentation.
+
+---
+
+## Original API Documentation
 
 This document provides detailed information about all available API endpoints.
 

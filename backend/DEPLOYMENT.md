@@ -1,4 +1,14 @@
-# Deployment Guide - GCP Cloud Run
+# ⚠️ DEPRECATED - Deployment Guide - GCP Cloud Run
+
+> **This documentation has been migrated to the new repository.**
+> 
+> **New repository**: [cinderbrick1212/astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+> 
+> Please refer to the new repository for current deployment instructions.
+
+---
+
+## Original Deployment Guide
 
 This guide walks you through deploying the Strapi backend to Google Cloud Platform using Cloud Run.
 

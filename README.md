@@ -1,4 +1,17 @@
-# Astrology App v2
+# ⚠️ DEPRECATED - Astrology App v2
+
+> **This repository has been archived and is no longer maintained.**
+> 
+> The monorepo has been split into separate repositories for better maintainability:
+> 
+> - **Backend**: [cinderbrick1212/astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+> - **Frontend/Mobile**: [cinderbrick1212/astroappv2frontend](https://github.com/cinderbrick1212/astroappv2frontend)
+> 
+> Please use the new repositories for all future development, issues, and pull requests.
+
+---
+
+## Original Description
 
 A modern astrology mobile application with React Native (Expo) frontend and Strapi backend, featuring client-side Vedic astrology calculations and monetization through ads and premium services.
 
@@ -260,9 +273,33 @@ See documentation files for detailed deployment instructions.
 - [ ] Marketing and analytics
 - [ ] User feedback iteration
 
-## Contributing
+## Migration Status
 
-This is a private project. For questions or support, contact the development team.
+This repository has been successfully migrated to:
+
+- **Backend Repository**: All Strapi backend code, configurations, and documentation → [astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+- **Frontend/Mobile Repository**: All React Native mobile app code, screens, and components → [astroappv2frontend](https://github.com/cinderbrick1212/astroappv2frontend)
+
+### For Contributors
+
+If you were working on this repository, please:
+1. Clone the appropriate new repository (backend or frontend)
+2. Update your local git remotes
+3. Submit new issues and pull requests to the relevant repository
+
+### For Users
+
+Please refer to the new repositories for:
+- Latest code and documentation
+- Setup and installation instructions
+- Reporting issues
+- Contributing guidelines
+
+## Archive Notice
+
+This repository is now **archived** and **read-only**. No further changes will be accepted.
+
+All development, issues, and pull requests should be directed to the new repositories listed above.
 
 ## License
 

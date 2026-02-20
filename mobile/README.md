@@ -1,4 +1,14 @@
-# Mobile App - React Native (Expo)
+# ⚠️ DEPRECATED - Mobile App - React Native (Expo)
+
+> **This code has been migrated to a separate repository.**
+> 
+> **New repository**: [cinderbrick1212/astroappv2frontend](https://github.com/cinderbrick1212/astroappv2frontend)
+> 
+> Please use the new repository for all mobile app development.
+
+---
+
+## Original Mobile App Documentation
 
 This is the mobile application for the Astrology App, built with React Native and Expo.
 

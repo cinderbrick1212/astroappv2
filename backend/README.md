@@ -1,4 +1,14 @@
-# Backend - Strapi CMS
+# ⚠️ DEPRECATED - Backend - Strapi CMS
+
+> **This code has been migrated to a separate repository.**
+> 
+> **New repository**: [cinderbrick1212/astroappv2backend](https://github.com/cinderbrick1212/astroappv2backend)
+> 
+> Please use the new repository for all backend development.
+
+---
+
+## Original Backend Documentation
 
 This is the backend service for the Astrology App, built with Strapi v5.
 
