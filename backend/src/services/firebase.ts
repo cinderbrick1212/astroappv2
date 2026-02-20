@@ -43,7 +43,7 @@ export const verifyFirebaseToken = async (idToken: string) => {
     return decodedToken;
   } catch (error) {
     console.error('Error verifying Firebase token:', error);
-    throw new Error('Invalid Firebase token');
+    throw error;
   }
 };
 
