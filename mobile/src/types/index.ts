@@ -1,7 +1,7 @@
 // User types
 export interface User {
   id: string;
-  firebase_uid: string;
+  firebase_uid?: string;
   email?: string;
   phone?: string;
   name?: string;

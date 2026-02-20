@@ -50,7 +50,7 @@ const config: Core.Config.Middlewares = [
   },
   'strapi::favicon',
   'strapi::public',
-  'global::firebase-auth',
+  'global::strapi-auth',
 ];
 
 export default config;

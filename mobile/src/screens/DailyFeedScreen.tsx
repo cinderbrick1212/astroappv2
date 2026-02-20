@@ -74,8 +74,8 @@ const DailyFeedScreen: React.FC = () => {
   const horoscope = horoscopeService.getDailyHoroscope(rashi, today);
 
   const userName =
-    user?.displayName ||
-    (user?.isAnonymous ? undefined : user?.email?.split('@')[0]);
+    user?.username ||
+    user?.email?.split('@')[0];
 
   const onRefresh = async () => {
     setRefreshing(true);

@@ -65,8 +65,8 @@ const ProfileScreen: React.FC = () => {
   };
 
   const displayName =
-    user?.displayName ||
-    (user?.isAnonymous ? 'Guest User' : user?.email?.split('@')[0] || 'User');
+    user?.username ||
+    user?.email?.split('@')[0] || 'User';
   const initials = displayName
     .split(' ')
     .map((n: string) => n[0])
@@ -153,14 +153,6 @@ const ProfileScreen: React.FC = () => {
           </View>
           <Text style={styles.displayName}>{displayName}</Text>
           {user?.email && <Text style={styles.contactInfo}>{user.email}</Text>}
-          {user?.phoneNumber && (
-            <Text style={styles.contactInfo}>{user.phoneNumber}</Text>
-          )}
-          {user?.isAnonymous && (
-            <View style={styles.guestBadge}>
-              <Text style={styles.guestBadgeText}>Guest</Text>
-            </View>
-          )}
         </View>
 
         {/* Birth Details Section */}
