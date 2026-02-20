@@ -3,12 +3,16 @@ import { verifyFirebaseToken } from '../services/firebase';
 
 export default (config, { strapi }: { strapi: Core.Strapi }) => {
   return async (ctx, next) => {
+    // Skip authentication for Strapi admin panel routes (use Strapi's own auth)
+    if (ctx.request.url === '/admin' || ctx.request.url.startsWith('/admin/')) {
+      return await next();
+    }
+
     // Skip authentication for public routes
     const publicRoutes = [
       '/api/feed-items',
       '/api/blog-posts',
       '/api/health',
-      '/admin',
       '/_health',
     ];
 
