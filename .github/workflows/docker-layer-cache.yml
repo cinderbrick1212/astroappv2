@@ -1,0 +1,52 @@
+name: Docker Layer Pre-Cache
+
+# Pre-warms the Docker BuildKit layer cache stored in GitHub Actions Cache.
+# Subsequent runs of any workflow that builds the backend image can then
+# read from this cache with `cache-from: type=gha`, skipping layers that
+# haven't changed (base image pull, npm ci, etc.) and cutting build time
+# significantly.
+#
+# The cache is refreshed:
+#   • Weekly (Sunday 02:00 UTC) so the node:20-slim base layer stays current.
+#   • On every push to main that touches the Dockerfile or its dependencies.
+#   • On demand via workflow_dispatch.
+on:
+  schedule:
+    - cron: "0 2 * * 0" # Every Sunday at 02:00 UTC
+  push:
+    branches: [main]
+    paths:
+      - "backend/Dockerfile"
+      - "backend/.dockerignore"
+      - "backend/package*.json"
+      - ".github/workflows/docker-layer-cache.yml"
+  workflow_dispatch:
+
+jobs:
+  warm-cache:
+    name: Build and cache Docker layers
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Build the image using BuildKit's GitHub Actions cache backend.
+      # mode=max caches every layer (including intermediate build-stage layers),
+      # not just the final stage, so the `npm ci` layer in the build stage is
+      # also cached.  The image is not pushed to any registry — the only output
+      # is the populated cache.
+      - name: Build image (cache-only, no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          file: backend/Dockerfile
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
