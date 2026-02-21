@@ -1,0 +1,47 @@
+name: Mobile Build (EAS)
+
+# Build a release APK via EAS whenever mobile code lands on main.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mobile/**"
+      - ".github/workflows/mobile-build.yml"
+  # Allow a manual trigger from the GitHub Actions UI.
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: EAS Build — Android MVP APK
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up Expo / EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      # EAS cloud builds are configured via eas.json profiles.
+      # Firebase and Strapi credentials should be stored as EAS secrets
+      # (run `eas secret:create` once, or set them in the Expo dashboard).
+      # EXPO_PUBLIC_ENV=production is already set in the "mvp" eas.json profile.
+      - name: Build Android APK (mvp profile)
+        run: eas build --platform android --profile mvp --non-interactive
