@@ -24,11 +24,11 @@ echo "▶ Building ${VARIANT} APK with Gradle …"
 cd android
 
 if [ "${VARIANT}" = "debug" ]; then
-  ./gradlew assembleDebug
+  ./gradlew assembleDebug --build-cache --parallel
   APK_SRC="app/build/outputs/apk/debug/app-debug.apk"
   APK_DEST="${APK_OUTPUT_DIR}/astroapp-mvp-debug.apk"
 else
-  ./gradlew assembleRelease
+  ./gradlew assembleRelease --build-cache --parallel
   APK_SRC="app/build/outputs/apk/release/app-release.apk"
   APK_DEST="${APK_OUTPUT_DIR}/astroapp-mvp-release.apk"
 fi

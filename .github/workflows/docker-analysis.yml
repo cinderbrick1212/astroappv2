@@ -1,0 +1,33 @@
+name: Docker Analysis
+
+# Lint the backend Dockerfile on every push and pull-request that touches
+# Docker-related files, mirroring what mobile-ci.yml does for TypeScript.
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "backend/Dockerfile"
+      - "backend/.dockerignore"
+      - ".github/workflows/docker-analysis.yml"
+  pull_request:
+    paths:
+      - "backend/Dockerfile"
+      - "backend/.dockerignore"
+      - ".github/workflows/docker-analysis.yml"
+
+jobs:
+  hadolint:
+    name: Dockerfile lint (Hadolint)
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Lint Dockerfile with Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: backend/Dockerfile

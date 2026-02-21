@@ -1,0 +1,91 @@
+name: Gradle Cache Pre-Warm (Android)
+
+# Pre-warms the Gradle dependency and wrapper caches stored in GitHub Actions
+# Cache so that the "Mobile Build (Gradle)" workflow always starts with a
+# warm cache, skipping the slow Gradle bootstrap and dependency-download
+# phases entirely.
+#
+# How it works:
+#   1. Checks out the repo and sets up the same Node 20 + Java 17 toolchain
+#      used by mobile-build.yml.
+#   2. Runs `expo prebuild` to generate the android/ Gradle project.
+#   3. Runs `./gradlew dependencies` — this resolves and downloads every
+#      declared Gradle dependency into ~/.gradle/caches WITHOUT performing a
+#      full compilation, so the cache-warm step completes far faster than a
+#      real build while still pre-populating exactly the files the real build
+#      needs.
+#   4. actions/setup-java's built-in post-step saves ~/.gradle/caches and
+#      ~/.gradle/wrapper back to the GHA cache under the same key used by
+#      mobile-build.yml, so the next build restores a fully warm cache.
+#
+# The cache is refreshed:
+#   • Weekly (Saturday 01:00 UTC) — keeps Gradle wrapper and deps current.
+#   • On every push to main that touches npm deps or the Expo config — a
+#     package change invalidates the Gradle dependency graph, so we re-warm
+#     immediately rather than waiting until the next build discovers a miss.
+#   • On demand via workflow_dispatch.
+on:
+  schedule:
+    - cron: "0 1 * * 6" # Every Saturday at 01:00 UTC
+  push:
+    branches: [main]
+    paths:
+      - "mobile/package.json"
+      - "mobile/package-lock.json"
+      - "mobile/app.json"
+      - ".github/workflows/gradle-cache-warmup.yml"
+  workflow_dispatch:
+
+jobs:
+  warm-gradle-cache:
+    name: Warm Gradle dependency cache
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: "gradle"
+
+      - name: Configure Gradle properties
+        run: |
+          mkdir -p ~/.gradle
+          cat >> ~/.gradle/gradle.properties <<'EOF'
+          org.gradle.daemon=true
+          org.gradle.parallel=true
+          org.gradle.caching=true
+          org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError
+          EOF
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Generate Android project (expo prebuild)
+        run: npx expo prebuild --platform android --clean
+
+      # Resolve and download all Gradle dependencies into ~/.gradle/caches
+      # without compiling anything.  This is the key step: it is much faster
+      # than assembleRelease but populates the exact same dependency cache
+      # entries that the real build consumes.
+      - name: Download Gradle dependencies
+        working-directory: mobile/android
+        run: ./gradlew dependencies --quiet
