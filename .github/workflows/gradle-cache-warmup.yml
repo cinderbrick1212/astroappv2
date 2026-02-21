@@ -79,7 +79,7 @@ jobs:
           org.gradle.daemon=true
           org.gradle.parallel=true
           org.gradle.caching=true
-          org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError
+          org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError
           EOF
 
       - name: Download Gradle dependencies
