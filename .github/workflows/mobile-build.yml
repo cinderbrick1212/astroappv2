@@ -35,6 +35,17 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
+          cache: "gradle"
+
+      - name: Configure Gradle properties
+        run: |
+          mkdir -p ~/.gradle
+          cat >> ~/.gradle/gradle.properties <<'EOF'
+          org.gradle.daemon=true
+          org.gradle.parallel=true
+          org.gradle.caching=true
+          org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError
+          EOF
 
       - name: Install dependencies
         run: npm ci
