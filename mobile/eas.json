@@ -23,9 +23,20 @@
         "EXPO_PUBLIC_ENV": "production"
       }
     },
+    "local": {
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
+      },
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_ENV": "production"
+      }
+    },
     "production": {
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "gradleCommand": ":app:bundleRelease"
       },
       "autoIncrement": true
     }
