@@ -1,6 +1,6 @@
-name: Mobile Build (EAS)
+name: Mobile Build (Gradle)
 
-# Build a release APK via EAS whenever mobile code lands on main.
+# Build a release APK with Gradle whenever mobile code lands on main.
 on:
   push:
     branches: [main]
@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    name: EAS Build — Android MVP APK
+    name: Gradle Build — Android MVP APK
     runs-on: ubuntu-latest
 
     defaults:
@@ -30,18 +30,22 @@ jobs:
           cache: "npm"
           cache-dependency-path: mobile/package-lock.json
 
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
       - name: Install dependencies
         run: npm ci
 
-      - name: Set up Expo / EAS CLI
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Build release APK with Gradle
+        run: bash scripts/build-gradle.sh release
 
-      # EAS cloud builds are configured via eas.json profiles.
-      # Firebase and Strapi credentials should be stored as EAS secrets
-      # (run `eas secret:create` once, or set them in the Expo dashboard).
-      # EXPO_PUBLIC_ENV=production is already set in the "mvp" eas.json profile.
-      - name: Build Android APK (mvp profile)
-        run: eas build --platform android --profile mvp --non-interactive
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: astroapp-mvp-release
+          path: mobile/apk-output/astroapp-mvp-release.apk
+          retention-days: 14
+
