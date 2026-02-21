@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Astrology App",
-    "slug": "astrology-app",
+    "slug": "astropp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -41,8 +41,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "replace-with-your-eas-project-id-run-eas-init"
+        "projectId": "45414511-5dbe-4c59-8d7d-5e2f8ce643e3"
       }
-    }
+    },
+    "owner": "cinderbricks-organization"
   }
 }
