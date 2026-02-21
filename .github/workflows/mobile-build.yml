@@ -30,6 +30,12 @@ jobs:
           cache: "npm"
           cache-dependency-path: mobile/package-lock.json
 
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Android project (expo prebuild)
+        run: npx expo prebuild --platform android --clean
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
@@ -46,9 +52,6 @@ jobs:
           org.gradle.caching=true
           org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError
           EOF
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Build release APK with Gradle
         run: bash scripts/build-gradle.sh release
