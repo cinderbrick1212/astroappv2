@@ -5,6 +5,7 @@ export interface StrapiUser {
   id: number;
   username: string;
   email: string;
+  isGuest?: boolean;
 }
 
 interface AuthContextType {
@@ -12,6 +13,7 @@ interface AuthContextType {
   loading: boolean;
   isAuthenticated: boolean;
   login: (jwt: string, user: StrapiUser) => Promise<void>;
+  loginAsGuest: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -26,7 +28,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         const token = await storage.get<string>(storage.keys.AUTH_TOKEN);
         const userData = await storage.get<StrapiUser>(storage.keys.USER_DATA);
-        if (token && userData) {
+        const isRestoredGuest = userData?.isGuest === true && userData.id === -1 && !token;
+        if (userData && (token || isRestoredGuest)) {
           setUser(userData);
         }
       } catch {
@@ -44,6 +47,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(userData);
   };
 
+  const loginAsGuest = async () => {
+    const guestUser: StrapiUser = { id: -1, username: 'Guest', email: '', isGuest: true };
+    await storage.set(storage.keys.USER_DATA, guestUser);
+    setUser(guestUser);
+  };
+
   const signOut = async () => {
     await storage.remove(storage.keys.AUTH_TOKEN);
     await storage.remove(storage.keys.USER_DATA);
@@ -51,7 +60,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAuthenticated: !!user, login, signOut }}>
+    <AuthContext.Provider value={{ user, loading, isAuthenticated: !!user, login, loginAsGuest, signOut }}>
       {children}
     </AuthContext.Provider>
   );

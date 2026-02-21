@@ -19,7 +19,7 @@ import { validation } from '../utils/validation';
 type AuthMode = 'login' | 'register';
 
 const LoginScreen: React.FC = () => {
-  const { login } = useAuth();
+  const { login, loginAsGuest } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -196,6 +196,22 @@ const LoginScreen: React.FC = () => {
           <Text style={styles.primaryButtonText}>
             {loading ? 'Please wait...' : authMode === 'login' ? 'Login' : 'Create Account'}
           </Text>
+        </TouchableOpacity>
+
+        {/* Divider */}
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>or</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        {/* Guest login button */}
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={loginAsGuest}
+          disabled={loading}
+        >
+          <Text style={styles.secondaryButtonText}>Continue as Guest</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
