@@ -40,3 +40,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# APK build artifacts (keep apk-output/ folder tracked, ignore binaries)
+apk-output/*.apk
+apk-output/*.aab
