@@ -1,0 +1,51 @@
+name: Mobile Build (Gradle)
+
+# Build a release APK with Gradle whenever mobile code lands on main.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mobile/**"
+      - ".github/workflows/mobile-build.yml"
+  # Allow a manual trigger from the GitHub Actions UI.
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Gradle Build — Android MVP APK
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build release APK with Gradle
+        run: bash scripts/build-gradle.sh release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: astroapp-mvp-release
+          path: mobile/apk-output/astroapp-mvp-release.apk
+          retention-days: 14
+

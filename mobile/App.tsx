@@ -14,7 +14,8 @@ const queryClient = new QueryClient({
     queries: {
       retry: 2,
       staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 30 * 60 * 1000,   // 30 minutes
+      gcTime: 24 * 60 * 60 * 1000, // 24 hours – keep cache alive offline
+      networkMode: 'offlineFirst',
     },
   },
 });
