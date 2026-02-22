@@ -13,6 +13,8 @@ import {
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { storage } from '../utils/storage';
+import DatePickerModal from '../components/DatePickerModal';
+import TimePickerModal from '../components/TimePickerModal';
 
 const { width } = Dimensions.get('window');
 
@@ -69,6 +71,8 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
     timezone: 'Asia/Kolkata',
   });
   const [error, setError] = useState('');
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [timePickerVisible, setTimePickerVisible] = useState(false);
 
   const next = () => {
     setError('');
@@ -79,18 +83,12 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
       }
     }
     if (step === 2) {
-      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!data.birth_date || !dateRegex.test(data.birth_date) || isNaN(new Date(data.birth_date).getTime())) {
-        setError('Please enter a valid date (YYYY-MM-DD)');
+      if (!data.birth_date) {
+        setError('Please select your date of birth');
         return;
       }
       if (!data.birth_time) {
-        setError('Please enter your birth time');
-        return;
-      }
-      const timeRegex = /^\d{1,2}:\d{2}$/;
-      if (!timeRegex.test(data.birth_time)) {
-        setError('Please enter time in HH:MM format');
+        setError('Please select your birth time');
         return;
       }
     }
@@ -180,25 +178,39 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
             </Text>
             <View style={styles.formGroup}>
               <Text style={styles.formLabel}>Date of Birth</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="YYYY-MM-DD (e.g. 1990-05-15)"
-                placeholderTextColor={colors.textTertiary}
-                value={data.birth_date}
-                onChangeText={v => setData(d => ({ ...d, birth_date: v }))}
-                keyboardType="numbers-and-punctuation"
-              />
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setDatePickerVisible(true)}
+              >
+                <Text style={styles.pickerButtonIcon}>🗓️</Text>
+                <Text
+                  style={[
+                    styles.pickerButtonText,
+                    !data.birth_date && styles.pickerButtonPlaceholder,
+                  ]}
+                >
+                  {data.birth_date || 'Select date of birth'}
+                </Text>
+                <Text style={styles.pickerButtonArrow}>›</Text>
+              </TouchableOpacity>
             </View>
             <View style={styles.formGroup}>
               <Text style={styles.formLabel}>Time of Birth (24hr)</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="HH:MM (e.g. 14:30)"
-                placeholderTextColor={colors.textTertiary}
-                value={data.birth_time}
-                onChangeText={v => setData(d => ({ ...d, birth_time: v }))}
-                keyboardType="numbers-and-punctuation"
-              />
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setTimePickerVisible(true)}
+              >
+                <Text style={styles.pickerButtonIcon}>🕐</Text>
+                <Text
+                  style={[
+                    styles.pickerButtonText,
+                    !data.birth_time && styles.pickerButtonPlaceholder,
+                  ]}
+                >
+                  {data.birth_time || 'Select time of birth'}
+                </Text>
+                <Text style={styles.pickerButtonArrow}>›</Text>
+              </TouchableOpacity>
             </View>
             <View style={styles.formGroup}>
               <Text style={styles.formLabel}>Gender</Text>
@@ -329,6 +341,27 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
           </TouchableOpacity>
         )}
       </View>
+
+      <DatePickerModal
+        visible={datePickerVisible}
+        value={data.birth_date}
+        onConfirm={date => {
+          setData(d => ({ ...d, birth_date: date }));
+          setDatePickerVisible(false);
+          setError('');
+        }}
+        onCancel={() => setDatePickerVisible(false)}
+      />
+      <TimePickerModal
+        visible={timePickerVisible}
+        value={data.birth_time}
+        onConfirm={time => {
+          setData(d => ({ ...d, birth_time: time }));
+          setTimePickerVisible(false);
+          setError('');
+        }}
+        onCancel={() => setTimePickerVisible(false)}
+      />
     </KeyboardAvoidingView>
   );
 };
@@ -440,6 +473,33 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     fontSize: 16,
     color: colors.textPrimary,
+  },
+  pickerButton: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    padding: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pickerButtonIcon: {
+    fontSize: 18,
+    marginRight: spacing.sm,
+  },
+  pickerButtonText: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.textPrimary,
+  },
+  pickerButtonPlaceholder: {
+    color: colors.textTertiary,
+  },
+  pickerButtonArrow: {
+    fontSize: 20,
+    color: colors.textTertiary,
   },
   genderRow: {
     flexDirection: 'row',
