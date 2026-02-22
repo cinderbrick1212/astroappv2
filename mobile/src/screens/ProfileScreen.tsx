@@ -48,7 +48,9 @@ const ProfileScreen: React.FC = () => {
   // Load persisted notification preference
   useEffect(() => {
     storage.get<boolean>(storage.keys.NOTIFICATIONS_ENABLED).then(val => {
-      if (val !== null) setNotificationsEnabled(val);
+      // Guard against non-boolean values from storage to prevent
+      // native "String cannot be cast to Boolean" crash on the Switch component
+      if (typeof val === 'boolean') setNotificationsEnabled(val);
     });
   }, []);
 
