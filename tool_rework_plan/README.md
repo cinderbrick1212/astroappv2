@@ -65,7 +65,23 @@ Once the frontend rework is complete, apply the tool prompts in dependency order
 
 ---
 
-## Execution Order
+## Content Layer
+
+All display text (interpretations, predictions, remedies, descriptions) is driven by
+**DOB + birth time + name** — not hardcoded. See [`CONTENT_LAYER_PLAN.md`](CONTENT_LAYER_PLAN.md)
+for the full architecture.
+
+The key principle: every string a user reads is assembled by `ContentService` from
+structured data files, keyed to the user's computed chart. Screens receive
+`PersonalizedContent` objects and render — they contain zero inline text.
+
+```
+name + DOB + birth time + place  →  astrologyEngine  →  ContentService  →  PersonalizedContent  →  Screen
+```
+
+---
+
+
 
 | # | Folder | Tool Screen | Vedic Name | Depends On |
 |---|--------|-------------|-----------|-----------|

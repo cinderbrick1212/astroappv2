@@ -36,7 +36,20 @@ Each prompt is designed to be executable by GitHub Copilot (or any capable LLM-b
 | 15 | `prompt-15-blog-screens.md` | Rewrite `BlogListScreen.tsx` + `BlogPostScreen.tsx` |
 | 16 | `prompt-16-service-screens.md` | Rewrite `AskQuestionScreen`, `BookCallScreen`, `RequestReportScreen` |
 
-## How to use with GitHub Copilot
+## Vedic / Jyotish Note
+
+This frontend rework operates within the app's Vedic/Jyotish foundation:
+
+- **Sidereal zodiac (Lahiri ayanamsa)** is the default everywhere — no tropical references in UI labels
+- **Hindi / Devanagari** labels are shown alongside English on all tool screens
+- **Panchang** (Tithi, Nakshatra, Yoga, Karana) is a first-class feature — not an afterthought
+- All colors come from `useTheme().colors.*` — the MD3 theme (`md3Theme.ts` created in Prompt 01) uses warm, earthy tones appropriate for a Vedic spiritual app
+
+After completing all 16 prompts in this folder, apply the **Tool Rework Plan** (`tool_rework_plan/`) which adds the full suite of 16 Jyotish tools on top of this MD3 foundation.
+
+---
+
+
 
 1. Open the relevant source file in VS Code.
 2. Open the corresponding prompt file.

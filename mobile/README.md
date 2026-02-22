@@ -203,15 +203,20 @@ Full Vedic / Jyotish tool suite (see `tool_rework_plan/` for implementation prom
 
 ### Services
 
-All astrology calculations are performed **client-side**:
+All Jyotish calculations run **client-side** using Swiss Ephemeris (sidereal / Lahiri ayanamsa):
 
-- **Kundli**: Birth chart calculations
-- **Compatibility**: Ashtakoot Milan algorithm
-- **Panchang**: Hindu calendar data
-- **Horoscope**: Daily predictions
-- **Lucky Factors**: Personalized lucky elements
+| Service | Purpose |
+|---------|---------|
+| `astrologyEngine.ts` | Swiss Ephemeris wrapper — all sidereal planetary calculations |
+| `kundli.ts` | Janma Kundli, Varga charts, Yogas, Ashtakavarga |
+| `compatibility.ts` | Ashtakoot Guna Milan (36-point scoring), Mangal Dosha |
+| `panchang.ts` | Tithi, Vara, Nakshatra, Yoga, Karana, Rahu Kaal, Muhurta windows |
+| `dasha.ts` | Vimshottari Dasha calculator — Mahadasha / Antardasha / Pratyantardasha |
+| `horoscope.ts` | Dainik Rashifal generator (uses `mobile/src/data/` content library) |
 
-*Note: Service implementations are placeholders and require Swiss Ephemeris integration.*
+**Content layer** (`mobile/src/data/`): All display text (interpretations, predictions,
+remedies) lives in structured data files — see `tool_rework_plan/CONTENT_LAYER_PLAN.md`.
+No screen or service file contains hardcoded user-facing strings.
 
 ## State Management
 
@@ -302,16 +307,11 @@ npm test
 
 ## Next Steps
 
-1. Implement Swiss Ephemeris integration for astrology calculations
-2. Add Firebase authentication flows
-3. Implement Razorpay payment integration
-4. Add push notifications
-5. Implement offline support
-6. Add analytics tracking
-7. Create UI/UX designs for all screens
-8. Add comprehensive error handling
-9. Implement accessibility features
-10. Add unit and integration tests
+See the planning documents for what to build next:
+
+1. **[extensive_frontend_rework/](extensive_frontend_rework/README.md)** — Apply all 16 MD3 frontend rework prompts first (#34)
+2. **[tool_rework_plan/](tool_rework_plan/README.md)** — Apply all 16 Vedic tool prompts after the frontend rework
+3. **[tool_rework_plan/CONTENT_LAYER_PLAN.md](tool_rework_plan/CONTENT_LAYER_PLAN.md)** — Build the `mobile/src/data/` content layer alongside the tool screens
 
 ## Documentation
 
