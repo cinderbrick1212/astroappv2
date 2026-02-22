@@ -54,7 +54,7 @@ interface Props {
   onComplete: () => void;
 }
 
-const TOTAL_STEPS = 4;
+const LAST_STEP = 4;
 
 const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
   const [step, setStep] = useState(0);
@@ -100,7 +100,7 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
         return;
       }
     }
-    if (step < TOTAL_STEPS) {
+    if (step < LAST_STEP) {
       setStep(step + 1);
     }
   };
@@ -296,7 +296,7 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
     >
       {/* Progress Bar */}
       <View style={styles.progressBarContainer}>
-        <View style={[styles.progressBar, { width: `${((step) / TOTAL_STEPS) * 100}%` }]} />
+        <View style={[styles.progressBar, { width: `${(step / LAST_STEP) * 100}%` }]} />
       </View>
 
       <ScrollView
@@ -310,14 +310,14 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
 
       {/* Navigation Buttons */}
       <View style={styles.footer}>
-        {step > 0 && step < TOTAL_STEPS + 1 ? (
+        {step > 0 && step <= LAST_STEP ? (
           <TouchableOpacity style={styles.backButton} onPress={back}>
             <Text style={styles.backButtonText}>Back</Text>
           </TouchableOpacity>
         ) : (
           <View />
         )}
-        {step < TOTAL_STEPS ? (
+        {step < LAST_STEP ? (
           <TouchableOpacity style={styles.nextButton} onPress={next}>
             <Text style={styles.nextButtonText}>
               {step === 0 ? "Let's Begin" : 'Next'}

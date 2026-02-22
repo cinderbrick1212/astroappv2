@@ -22,12 +22,21 @@ const getTimezoneOffset = (timezone: string): number => {
     'Australia/Sydney': 11, 'Pacific/Auckland': 13,
   };
   if (TIMEZONE_OFFSETS[timezone] !== undefined) return TIMEZONE_OFFSETS[timezone];
-  // Fallback: try to compute offset using Intl
+  // Fallback: try to compute offset using Intl (may be imprecise in some JS runtimes)
   try {
-    const now = new Date();
-    const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
-    const tzStr = now.toLocaleString('en-US', { timeZone: timezone });
-    return (new Date(tzStr).getTime() - new Date(utcStr).getTime()) / 3600000;
+    const jan = new Date(2000, 0, 1, 12, 0, 0);
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone, hour: 'numeric', hour12: false, minute: 'numeric',
+    });
+    const parts = formatter.formatToParts(jan);
+    const h = Number(parts.find(p => p.type === 'hour')?.value ?? 12);
+    const m = Number(parts.find(p => p.type === 'minute')?.value ?? 0);
+    const localMinutes = h * 60 + m;
+    const utcMinutes = jan.getUTCHours() * 60 + jan.getUTCMinutes();
+    let diff = localMinutes - utcMinutes;
+    if (diff > 720) diff -= 1440;
+    if (diff < -720) diff += 1440;
+    return diff / 60;
   } catch {
     return 5.5; // default to IST
   }
@@ -212,7 +221,15 @@ export const kundliService = {
     // Convert local birth time to UTC by subtracting timezone offset
     const tzOffsetHours = getTimezoneOffset(timezone);
     const totalMinutesLocal = validHours * 60 + validMinutes;
-    const totalMinutesUTC = totalMinutesLocal - tzOffsetHours * 60;
+    let totalMinutesUTC = totalMinutesLocal - tzOffsetHours * 60;
+    // Handle day boundary: if UTC time is negative, wrap to previous day
+    if (totalMinutesUTC < 0) {
+      totalMinutesUTC += 1440;
+      combinedDate.setUTCDate(combinedDate.getUTCDate() - 1);
+    } else if (totalMinutesUTC >= 1440) {
+      totalMinutesUTC -= 1440;
+      combinedDate.setUTCDate(combinedDate.getUTCDate() + 1);
+    }
     const utcHours = Math.floor(totalMinutesUTC / 60);
     const utcMinutes = Math.round(totalMinutesUTC % 60);
     combinedDate.setUTCHours(utcHours, utcMinutes, 0, 0);
