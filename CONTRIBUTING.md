@@ -35,6 +35,16 @@ types/              # Generated TypeScript types
 
 ## Code Style
 
+### Material Design (Strict Rule)
+
+All UI components **must** follow [Material Design 3 (M3)](https://m3.material.io/) guidelines:
+
+- Use `react-native-paper` components instead of bare React Native primitives wherever a Material equivalent exists (e.g. `Button`, `TextInput`, `Dialog`, `Surface`).
+- Use `react-native-paper-dates` for **all** date and time pickers — custom scroll-wheel or plain `TextInput` date/time fields are not permitted.
+- Respect the project's Material Design theme tokens defined in `src/theme/` (colors, spacing, typography).
+- Follow Material Design spacing, elevation, and typography scales.
+- Do not introduce alternative UI kits or custom picker/dialog implementations.
+
 ### TypeScript
 - Use TypeScript for all new files
 - Prefer interfaces over types for objects

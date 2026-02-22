@@ -196,6 +196,7 @@ See documentation files for detailed deployment instructions.
 ## Design Principles
 
 ### UI/UX
+- **Material Design 3**: All UI components follow Material Design 3 guidelines using `react-native-paper` and `react-native-paper-dates` — no custom pickers or alternative UI kits
 - **Clean & Uncluttered**: Max 3 primary cards per screen
 - **Progressive Disclosure**: Summary first, details on tap
 - **Warm & Grounded**: Calm guidance, modern spiritual aesthetic
