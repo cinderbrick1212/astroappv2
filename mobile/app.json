@@ -29,7 +29,7 @@
         "backgroundColor": "#4a148c"
       },
       "package": "com.yourcompany.astrologyapp",
-      "edgeToEdgeEnabled": true,
+      "edgeToEdgeEnabled": false,
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.ACCESS_NETWORK_STATE",
