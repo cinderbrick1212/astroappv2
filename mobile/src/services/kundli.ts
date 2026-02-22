@@ -6,6 +6,33 @@
 import { astrologyEngine, ChartData } from './astrologyEngine';
 import { storage } from '../utils/storage';
 
+/** Return UTC offset in hours for a timezone name (e.g. 'Asia/Kolkata' → 5.5) */
+const getTimezoneOffset = (timezone: string): number => {
+  const TIMEZONE_OFFSETS: Record<string, number> = {
+    'Asia/Kolkata': 5.5, 'Asia/Calcutta': 5.5,
+    'Asia/Mumbai': 5.5, 'Asia/Chennai': 5.5,
+    'Asia/Colombo': 5.5, 'Asia/Kathmandu': 5.75,
+    'Asia/Dhaka': 6, 'Asia/Karachi': 5,
+    'Asia/Dubai': 4, 'Asia/Singapore': 8,
+    'Asia/Shanghai': 8, 'Asia/Tokyo': 9,
+    'Asia/Bangkok': 7, 'Asia/Jakarta': 7,
+    'Europe/London': 0, 'UTC': 0,
+    'America/New_York': -5, 'America/Chicago': -6,
+    'America/Denver': -7, 'America/Los_Angeles': -8,
+    'Australia/Sydney': 11, 'Pacific/Auckland': 13,
+  };
+  if (TIMEZONE_OFFSETS[timezone] !== undefined) return TIMEZONE_OFFSETS[timezone];
+  // Fallback: try to compute offset using Intl
+  try {
+    const now = new Date();
+    const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
+    const tzStr = now.toLocaleString('en-US', { timeZone: timezone });
+    return (new Date(tzStr).getTime() - new Date(utcStr).getTime()) / 3600000;
+  } catch {
+    return 5.5; // default to IST
+  }
+};
+
 export interface KundliData {
   lagna: string;
   rashi: string;
@@ -173,7 +200,7 @@ export const kundliService = {
     birthPlace: { latitude: number; longitude: number },
     timezone: string
   ): KundliData {
-    // Parse birth time and build a UTC date
+    // Parse local birth time and convert to UTC using timezone offset
     const [hours, minutes] = birthTime.split(':').map(Number);
     const validHours = !isNaN(hours) ? hours : 6;
     const validMinutes = !isNaN(minutes) ? minutes : 0;
@@ -181,7 +208,14 @@ export const kundliService = {
       console.warn('kundliService: invalid birthTime "' + birthTime + '", defaulting to 06:00');
     }
     const combinedDate = new Date(birthDate);
-    combinedDate.setUTCHours(validHours, validMinutes, 0, 0);
+
+    // Convert local birth time to UTC by subtracting timezone offset
+    const tzOffsetHours = getTimezoneOffset(timezone);
+    const totalMinutesLocal = validHours * 60 + validMinutes;
+    const totalMinutesUTC = totalMinutesLocal - tzOffsetHours * 60;
+    const utcHours = Math.floor(totalMinutesUTC / 60);
+    const utcMinutes = Math.round(totalMinutesUTC % 60);
+    combinedDate.setUTCHours(utcHours, utcMinutes, 0, 0);
 
     const chartData = astrologyEngine.calculateChart(
       combinedDate,

@@ -16,6 +16,9 @@ const STORAGE_KEYS = {
   PUSH_TOKEN: 'push_token',
   NOTIFICATIONS_ENABLED: 'notifications_enabled',
   STREAK_REMINDER_ID: 'streak_reminder_id',
+  // Onboarding
+  ONBOARDING_COMPLETE: 'onboarding_complete',
+  ONBOARDING_PROFILE: 'onboarding_profile',
 };
 
 export const storage = {
