@@ -69,7 +69,7 @@ const BlogListScreen: React.FC = () => {
                 <Text style={styles.blogTitle} numberOfLines={2}>{item.title}</Text>
                 <Text style={styles.blogExcerpt} numberOfLines={2}>{item.excerpt}</Text>
                 <View style={styles.blogMeta}>
-                  {item.author && <Text style={styles.blogAuthor}>{item.author}</Text>}
+                  {item.author ? <Text style={styles.blogAuthor}>{item.author}</Text> : null}
                   <Text style={styles.blogDate}>
                     {new Date(item.published_at).toLocaleDateString('en-US', {
                       month: 'short',

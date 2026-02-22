@@ -48,9 +48,9 @@ const BlogPostScreen: React.FC = () => {
 
         {/* Meta */}
         <View style={styles.metaRow}>
-          {blogPost.author && (
+          {blogPost.author ? (
             <Text style={styles.author}>By {blogPost.author}</Text>
-          )}
+          ) : null}
           <Text style={styles.date}>
             {new Date(blogPost.published_at).toLocaleDateString('en-US', {
               year: 'numeric',
