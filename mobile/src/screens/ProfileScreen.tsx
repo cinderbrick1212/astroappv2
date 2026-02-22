@@ -154,7 +154,7 @@ const ProfileScreen: React.FC = () => {
             <Text style={styles.avatarText}>{initials}</Text>
           </View>
           <Text style={styles.displayName}>{displayName}</Text>
-          {user?.email && <Text style={styles.contactInfo}>{user.email}</Text>}
+          {user?.email ? <Text style={styles.contactInfo}>{user.email}</Text> : null}
         </View>
 
         {/* Birth Details Section */}

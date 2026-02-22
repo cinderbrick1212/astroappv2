@@ -27,12 +27,12 @@ const FeedHeader: React.FC<FeedHeaderProps> = ({ date, userName, streak }) => {
           year: 'numeric',
         })}
       </Text>
-      {userName && (
+      {userName ? (
         <Text style={styles.greeting}>{getGreeting()}, {userName}</Text>
-      )}
-      {streak && streak > 0 && (
+      ) : null}
+      {streak > 0 ? (
         <Text style={styles.streak}>🔥 {streak} day streak</Text>
-      )}
+      ) : null}
     </View>
   );
 };
