@@ -48,4 +48,4 @@ backend/build/
 backend/.cache/
 backend/.strapi/
 backend/public/uploads/
-backend/exports/
+backend/exports
