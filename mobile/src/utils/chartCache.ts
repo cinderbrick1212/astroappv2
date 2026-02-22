@@ -91,7 +91,9 @@ export async function clearUserCache(userId: string): Promise<void> {
 export async function clearAllCaches(): Promise<void> {
   const storage = getPlatformStorage();
   const allKeys = await storage.getAllKeys();
-  const cacheKeys = allKeys.filter((key) => key.includes(':'));
+  const cacheKeys = allKeys.filter((key) =>
+    Object.values(StorageKey).some((storageKey) => key.endsWith(`:${storageKey}`))
+  );
   if (cacheKeys.length > 0) {
     await storage.multiRemove(cacheKeys);
   }

@@ -169,6 +169,11 @@ const getCacheUserId = async (): Promise<string> => {
   return 'guest';
 };
 
+interface KundliCacheEntry {
+  birthKey: string;
+  data: KundliData;
+}
+
 // Traditional insights keyed by rashi
 const RASHI_INSIGHTS: Record<string, string[]> = {
   Aries:       ['Strong Mars bestows natural leadership and courage.', 'First house placement amplifies your drive for success.'],
@@ -196,11 +201,12 @@ export const kundliService = {
     birthPlace: { latitude: number; longitude: number },
     timezone: string
   ): Promise<KundliData> {
+    const birthKey = `${birthDate.toISOString()}_${birthTime}_${birthPlace.latitude}_${birthPlace.longitude}_${timezone}`;
     const userId = await getCacheUserId();
-    const cached = await getCachedChart<KundliData>(userId, StorageKey.KUNDLI_CACHE, TTL.KUNDLI);
-    if (cached) return cached;
+    const cached = await getCachedChart<KundliCacheEntry>(userId, StorageKey.KUNDLI_CACHE, TTL.KUNDLI);
+    if (cached && cached.birthKey === birthKey) return cached.data;
     const data = this.calculateKundli(birthDate, birthTime, birthPlace, timezone);
-    await setCachedChart(userId, StorageKey.KUNDLI_CACHE, data);
+    await setCachedChart(userId, StorageKey.KUNDLI_CACHE, { birthKey, data });
     return data;
   },
 
