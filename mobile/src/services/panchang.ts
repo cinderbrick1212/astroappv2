@@ -51,11 +51,14 @@ const KARANA_NAMES = [
 // Each slot is 1/8th of the day's length, not a fixed 1.5h period
 const RAHU_KAAL_SLOTS = [8, 2, 7, 5, 6, 4, 3];
 
-/** Format minutes-past-midnight as HH:MM */
+/** Format minutes-past-midnight as h:MM AM/PM */
 const fmtTime = (minutesPastMidnight: number): string => {
-  const h = Math.floor(minutesPastMidnight / 60) % 24;
-  const m = minutesPastMidnight % 60;
-  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  const totalMinutes = Math.round(minutesPastMidnight) % 1440;
+  const h24 = Math.floor(totalMinutes / 60) % 24;
+  const m = totalMinutes % 60;
+  const ampm = h24 >= 12 ? 'PM' : 'AM';
+  const h12 = h24 % 12 || 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
 };
 
 /** Approximate sunrise/sunset in minutes-past-midnight for a latitude */

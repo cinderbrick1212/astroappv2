@@ -7,11 +7,20 @@ export const dateHelpers = {
     return `${year}-${month}-${day}`;
   },
 
-  // Format time to HH:MM
+  // Format time to h:MM AM/PM
   formatTime(date: Date): string {
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${hours}:${minutes}`;
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  },
+
+  // Format HH:MM or H:MM (24hr) string to h:MM AM/PM for display
+  formatTimeAmPm(hhmm: string): string {
+    if (!hhmm || !/^\d{1,2}:\d{2}$/.test(hhmm)) return hhmm;
+    const parts = hhmm.split(':');
+    const h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h % 12 || 12;
+    return `${hour12}:${String(m).padStart(2, '0')} ${ampm}`;
   },
 
   // Format date to readable string

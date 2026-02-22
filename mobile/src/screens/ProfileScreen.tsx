@@ -20,6 +20,7 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import { kundliService } from '../services/kundli';
 import { analytics } from '../services/analytics';
 import { storage } from '../utils/storage';
+import { dateHelpers } from '../utils/dateHelpers';
 import DatePickerModal from '../components/DatePickerModal';
 import TimePickerModal from '../components/TimePickerModal';
 
@@ -133,7 +134,7 @@ const ProfileScreen: React.FC = () => {
     },
     {
       label: 'Time of Birth',
-      value: profile?.birth_time ?? 'Not set',
+      value: profile?.birth_time ? dateHelpers.formatTimeAmPm(profile.birth_time) : 'Not set',
       icon: '🕐',
     },
     {
@@ -294,7 +295,7 @@ const ProfileScreen: React.FC = () => {
                     !form.birth_time && styles.pickerButtonPlaceholder,
                   ]}
                 >
-                  {form.birth_time || 'Select time of birth'}
+                  {form.birth_time ? dateHelpers.formatTimeAmPm(form.birth_time) : 'Select time of birth'}
                 </Text>
                 <Text style={styles.pickerButtonArrow}>›</Text>
               </TouchableOpacity>
