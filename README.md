@@ -1,47 +1,50 @@
-# Astrology App v2
+# AstroAppV2 — Vedic Jyotish Platform
 
-A modern astrology mobile application with React Native (Expo) frontend and Strapi backend, featuring client-side Vedic astrology calculations and monetization through ads and premium services.
+A modern **Vedic / Jyotish astrology** application built on React Native (Expo) for **Web, iOS, and Android**, with a Strapi backend. The app is rooted in Indian divinatory astrology — sidereal zodiac (Lahiri ayanamsa), Whole Sign houses, Vimshottari Dasha, Nakshatras, Panchang, and Graha Shanti remedies — and monetises through premium consultations and in-app ads.
+
+> **Tradition:** Vedic / Jyotish — all calculations use the sidereal zodiac (Lahiri ayanamsa) and Whole Sign houses by default. Western tropical mode is available as an optional toggle on select screens.
 
 ## Project Overview
 
-This is a complete astrology application platform consisting of:
+This is a complete Jyotish application platform consisting of:
 
-- **Mobile App** (React Native + Expo): Cross-platform iOS/Android app with offline astrology calculations
-- **Backend** (Strapi v5): Headless CMS for content management and API
+- **Mobile / Web App** (React Native + Expo): Cross-platform Web, iOS, and Android app with offline Vedic astrology calculations
+- **Backend** (Strapi v5): Headless CMS for content management, user data, and service requests
 - **Architecture**: Firebase Auth + Strapi + GCP deployment
 
 ## Key Features
 
-### Mobile App
-- 📱 Daily personalized feed with horoscopes and tips
-- ✨ Client-side astrology tools (Kundli, Compatibility, Panchang)
+### Mobile / Web App
+- 📱 Daily personalized feed — Dainik Rashifal, Panchang, tips, and remedies
+- 🔮 Full Jyotish tool suite — Janma Kundli, Kundli Milan, Vimshottari Dasha, Gochar, Panchang Vishesh, Muhurta, Navamsa, Ashtakavarga, Prashna, Hora, and more
+- 🪬 Graha Shanti remedies — gemstone, mantra, yantra, and donation recommendations woven into every chart screen
 - 🔐 Firebase authentication (Email, Phone, Google OAuth)
-- 💰 Premium services (Ask Question, Call, Reports)
-- 🌍 Multi-language support (English, Hindi)
-- 📊 Streak tracking and habit formation
-- 🎨 Clean, modern UI with progressive disclosure
+- 💰 Premium services — Ask a Question, Book a Call, Detailed Reports (via Razorpay)
+- 🌍 Multi-language support (English, Hindi / Devanagari)
+- 📊 Streak tracking and daily ritual habit formation
+- 🎨 Material Design 3 UI (`react-native-paper`) — adaptive for web and mobile
 
 ### Backend
-- 🎯 Content management for feed, blogs, and user data
+- 🎯 Content management for Rashifal feed, blog articles, and user data
 - 💳 Payment processing with Razorpay
-- 📧 Email and WhatsApp notifications
+- 📧 Email and WhatsApp notifications to astrologers and users
 - 🔒 Firebase token verification
-- 📊 User profiles and premium status tracking
+- 📊 User profiles with birth details and premium status tracking
 - 🖼️ Media management with Cloud Storage
 
 ## Project Structure
 
 ```
 astroappv2/
-├── mobile/               # React Native Expo app
+├── mobile/               # React Native Expo app (Web + iOS + Android)
 │   ├── src/
 │   │   ├── navigation/   # App navigation
-│   │   ├── screens/      # UI screens
-│   │   ├── components/   # Reusable components
-│   │   ├── services/     # Astrology calculations
+│   │   ├── screens/      # UI screens (Vedic tool screens)
+│   │   ├── components/   # Reusable components (KundliWheel, etc.)
+│   │   ├── services/     # Jyotish calculations (astrologyEngine, kundli, panchang…)
 │   │   ├── hooks/        # Custom React hooks
 │   │   ├── utils/        # Utility functions
-│   │   ├── theme/        # Design tokens
+│   │   ├── theme/        # MD3 design tokens
 │   │   └── types/        # TypeScript types
 │   └── README.md
 │
@@ -51,9 +54,13 @@ astroappv2/
 │   │   └── config/       # Configuration
 │   └── README.md
 │
+├── tool_rework_plan/     # 16 Vedic tool Copilot prompts (this plan)
+├── extensive_frontend_rework/  # MD3 frontend Copilot prompts (#34)
+├── tool_analysis/        # Deep-dive analysis of all 16 Jyotish tools
+├── market_analysis/      # Indian + global competitor research
 ├── frontend.md           # Frontend architecture documentation
 ├── backend.md            # Backend architecture documentation
-└── README.md            # This file
+└── README.md             # This file
 ```
 
 ## Tech Stack
@@ -129,7 +136,7 @@ See [mobile/README.md](mobile/README.md) for detailed instructions.
 5. User session established
 
 ### Data Flow
-- **Client-side**: All astrology calculations (Kundli, Horoscope, Compatibility)
+- **Client-side**: All Jyotish calculations (Janma Kundli, Kundli Milan, Vimshottari Dasha, Gochar, Panchang, Muhurta, Prashna, Hora, Ashtakavarga, and more) — powered by Swiss Ephemeris with sidereal / Lahiri ayanamsa
 - **Server-side**: User data, feed content, payments, service requests
 - **Caching**: React Query for API data, AsyncStorage for offline data
 
@@ -188,20 +195,28 @@ See documentation files for detailed deployment instructions.
 
 ## Documentation
 
-- [Frontend Architecture](frontend.md) - Detailed mobile app design and implementation
-- [Backend Architecture](backend.md) - Detailed backend setup and data models
-- [Mobile README](mobile/README.md) - Mobile app development guide
-- [Backend README](backend/README.md) - Backend development guide
+- [Frontend Architecture](frontend.md) — Detailed mobile/web app design and implementation
+- [Backend Architecture](backend.md) — Detailed backend setup and data models
+- [Mobile README](mobile/README.md) — Mobile/web app development guide
+- [Backend README](backend/README.md) — Backend development guide
+- [Tool Rework Plan](tool_rework_plan/README.md) — 16 Vedic tool Copilot prompts
+- [Frontend Rework (#34)](extensive_frontend_rework/README.md) — MD3 migration Copilot prompts
+- [Tool Analysis](tool_analysis/README.md) — Deep technical analysis of all Jyotish tools
+- [Market Analysis](market_analysis/README.md) — Indian + global competitor research
 
 ## Design Principles
 
+### Vedic Foundation
+- **Sidereal by default**: Lahiri ayanamsa applied to all charts; tropical mode available as secondary option
+- **Divination first**: Every chart screen surfaces predictions, Dasha timing, Yoga analysis, and Graha Shanti remedies — not raw numbers alone
+- **Indian UX patterns**: Hindi/Devanagari labels alongside English; currency in ₹; Panchang and Muhurta as first-class features
+
 ### UI/UX
-- **Material Design 3**: All UI components follow Material Design 3 guidelines using `react-native-paper` and `react-native-paper-dates` — no custom pickers or alternative UI kits
-- **Clean & Uncluttered**: Max 3 primary cards per screen
-- **Progressive Disclosure**: Summary first, details on tap
+- **Material Design 3**: All UI components follow MD3 using `react-native-paper` and `react-native-paper-dates` — no custom pickers or alternative UI kits
+- **Cross-platform adaptive**: Responsive two-column layout on web ≥ 768 px; single-column on mobile
+- **Clean & Uncluttered**: Max 3 primary cards per screen; progressive disclosure
 - **Warm & Grounded**: Calm guidance, modern spiritual aesthetic
 - **Daily Ritual**: Habit-forming features with streaks
-- **Mainstream Appeal**: Simple, accessible tools
 
 ### Technical
 - **Client-side Calculations**: Zero backend costs for astrology
@@ -225,7 +240,7 @@ See documentation files for detailed deployment instructions.
 
 ## Roadmap
 
-### Phase 1: MVP (Current)
+### Phase 1: MVP (Complete)
 - [x] Project boilerplate setup
 - [x] Basic UI implementation
 - [x] Firebase authentication (email/password + anonymous)
@@ -236,28 +251,48 @@ See documentation files for detailed deployment instructions.
 - [x] Push token registration + backend sync (`PUT /api/users/me/push-token`)
 - [x] `last_login_at` tracking on User record
 
-### Phase 2: Core Features
-- [x] Astrology engine integration (Swiss Ephemeris)
+### Phase 2: Core Jyotish Features (Complete)
+- [x] Swiss Ephemeris integration (sidereal / Lahiri ayanamsa)
 - [x] Feed and blog content (live Strapi data with language + category filtering)
 - [x] User profiles with birth details editing
-- [x] Service requests: ask question, book call
-- [x] Request a Report screen (third service type: PDF reports)
+- [x] Service requests: Ask a Question, Book a Call
+- [x] Request a Report screen
 - [x] Full Panchang screen (yoga, karana, sunrise/sunset, muhurat)
 - [x] Remedy of the Day card in daily feed
 - [x] Astrologer email + WhatsApp notifications on service request (SendGrid / Twilio)
 - [x] User notification on service request completion
 
-### Phase 3: Advanced Features
+### Phase 3: Advanced Features (Complete)
 - [x] Push notifications
-- [x] Daily streak reminder (local push scheduled for 08:00 next day)
+- [x] Daily streak reminder
 - [x] Analytics tracking
-- [x] Multi-language support
+- [x] Multi-language support (English + Hindi)
 - [x] Offline mode
-- [x] Ad placeholder cards in feed (every 5 items)
+- [x] Ad placeholder cards in feed
 
-### Phase 4: Production
+### Phase 4: Tool Rework — Full Vedic Suite (In Progress)
+- [ ] MD3 frontend rework (see `extensive_frontend_rework/` — 16 prompts)
+- [ ] Janma Kundli — full North Indian square wheel with Yogas + Graha Shanti
+- [ ] Kundli Milan — Ashtakoot Guna Milan (36-point scoring) + Mangal Dosha
+- [ ] Vimshottari Dasha — Mahadasha / Antardasha / Pratyantardasha timeline
+- [ ] Gochar — current transit calculator with Sade Sati indicator
+- [ ] Varshaphal — annual solar return chart
+- [ ] Navamsa & Varga Charts — D9, D10, D12 divisional charts
+- [ ] Panchang Vishesh — extended daily Panchang
+- [ ] Muhurta — auspicious timing calculator
+- [ ] Tithi & Chandra — moon phase + lunar calendar
+- [ ] Nakshatra Vishesh — detailed nakshatra + pada analysis
+- [ ] Grahan — eclipse calculator (solar + lunar) with Vedic significance
+- [ ] Ashtakavarga — planetary strength grid (SAV)
+- [ ] Prashna — horary / question-based chart
+- [ ] Hora — planetary hours (Vedic)
+- [ ] Graha Shanti — dedicated remedies screen
+- [ ] Dainik Rashifal — daily Vedic horoscope with push notification config
+
+### Phase 5: Production
 - [ ] Cloud deployment
-- [ ] App store submission
+- [ ] App Store + Play Store submission
+- [ ] Web deployment
 - [ ] Marketing and analytics
 - [ ] User feedback iteration
 
