@@ -12,8 +12,7 @@ Copilot prompts.
 
 ## Guiding Rules (apply to every prompt in this megaplan)
 
-These rules extend the ones from `extensive_frontend_rework/README.md` and apply
-to all four phases:
+These rules extend the ones from the frontend rework and apply to all four phases:
 
 1. **Only `react-native-paper` components** — no raw `TouchableOpacity` wrappers,
    no custom `StyleSheet` cards.
@@ -22,7 +21,7 @@ to all four phases:
 3. **All calculations are sidereal (Lahiri ayanamsa)** — the engine never returns
    tropical longitudes to the UI layer; conversion happens inside the engine.
 4. **No hardcoded user-facing strings in screens or services** — all display text
-   comes from `ContentService` (see `tool_rework_plan/CONTENT_LAYER_PLAN.md`).
+   comes from `ContentService` (see `CONTENT_LAYER_PLAN.md`).
 5. **Platform-adaptive, not platform-specific** — use `Platform.OS` guards only
    where behavior genuinely differs; prefer Paper/Expo components that handle
    all three platforms natively.
@@ -57,11 +56,11 @@ Phase B — Storage Rework  (3 prompts)
   mobile/src/utils/chartCache.ts     ← B02
   mobile/src/utils/storage.ts        ← B03 (updated)
 
-Phase C — Frontend Rework  (16 prompts — existing folder)
-  extensive_frontend_rework/prompt-01 … prompt-16
+Phase C — Frontend Rework  (16 prompts)
+  frontend-rework/prompt-C01 … prompt-C16
 
-Phase D — Tool Rework  (16 prompts — existing folder)
-  tool_rework_plan/01 … 16
+Phase D — Tool Rework  (16 prompts)
+  tool-rework/prompt-D01 … prompt-D16
 ```
 
 **Dependency order: A → B → C → D**
@@ -86,8 +85,38 @@ Phase D must wait for C (tools build on the MD3 UI shell).
 | B01 | Storage | `storage-rework/prompt-B01-storage-types.md` | Create `utils/storageTypes.ts` — typed `StorageKeys` enum, `CacheEntry<T>`, TTL constants | New file |
 | B02 | Storage | `storage-rework/prompt-B02-chart-cache.md` | Create `utils/chartCache.ts` — platform-adaptive caching (AsyncStorage mobile / localStorage web) with TTL, invalidation, per-user keys | New file |
 | B03 | Storage | `storage-rework/prompt-B03-content-cache.md` | Update `utils/storage.ts` — add typed wrappers, feed/Rashifal cache with stale-while-revalidate, Prashna history | Update file |
-| C01–C16 | Frontend | `extensive_frontend_rework/prompt-01` … `prompt-16` | MD3 frontend rework (existing — see that folder's README) | See #34 |
-| D01–D16 | Tools | `tool_rework_plan/01` … `16` | 16 Jyotish tool screens (existing — see that folder's README) | See tool plan |
+| C01 | Frontend | `frontend-rework/prompt-C01-theme-setup.md` | Create MD3 theme file; update `App.tsx` | `theme/md3Theme.ts`, `App.tsx` |
+| C02 | Frontend | `frontend-rework/prompt-C02-navigation.md` | Replace bottom tab navigator with Paper `BottomNavigation` | `navigation/MainNavigator.tsx` |
+| C03 | Frontend | `frontend-rework/prompt-C03-login-screen.md` | Rewrite `LoginScreen.tsx` | `screens/LoginScreen.tsx` |
+| C04 | Frontend | `frontend-rework/prompt-C04-onboarding-part-a.md` | Rewrite `OnboardingScreen.tsx` steps 0–2 | `screens/OnboardingScreen.tsx` |
+| C05 | Frontend | `frontend-rework/prompt-C05-onboarding-part-b.md` | Rewrite `OnboardingScreen.tsx` steps 3–4 + outer shell | `screens/OnboardingScreen.tsx` |
+| C06 | Frontend | `frontend-rework/prompt-C06-daily-feed-screen.md` | Rewrite `DailyFeedScreen.tsx` | `screens/DailyFeedScreen.tsx` |
+| C07 | Frontend | `frontend-rework/prompt-C07-feed-components.md` | Rewrite `FeedItemCard`, `AdCard`, `RemedyCard` | `components/` |
+| C08 | Frontend | `frontend-rework/prompt-C08-tools-screen.md` | Rewrite `ToolsScreen.tsx` | `screens/ToolsScreen.tsx` |
+| C09 | Frontend | `frontend-rework/prompt-C09-home-screen.md` | Rewrite `HomeScreen.tsx` | `screens/HomeScreen.tsx` |
+| C10 | Frontend | `frontend-rework/prompt-C10-profile-part-a.md` | Rewrite `ProfileScreen.tsx` — main view | `screens/ProfileScreen.tsx` |
+| C11 | Frontend | `frontend-rework/prompt-C11-profile-part-b.md` | Rewrite `ProfileScreen.tsx` — edit-details modal | `screens/ProfileScreen.tsx` |
+| C12 | Frontend | `frontend-rework/prompt-C12-kundli-screen.md` | Rewrite `KundliScreen.tsx` | `screens/KundliScreen.tsx` |
+| C13 | Frontend | `frontend-rework/prompt-C13-compatibility-screen.md` | Rewrite `CompatibilityScreen.tsx` | `screens/CompatibilityScreen.tsx` |
+| C14 | Frontend | `frontend-rework/prompt-C14-panchang-screen.md` | Rewrite `PanchangScreen.tsx` | `screens/PanchangScreen.tsx` |
+| C15 | Frontend | `frontend-rework/prompt-C15-blog-screens.md` | Rewrite `BlogListScreen.tsx` + `BlogPostScreen.tsx` | `screens/Blog*.tsx` |
+| C16 | Frontend | `frontend-rework/prompt-C16-service-screens.md` | Rewrite `AskQuestionScreen`, `BookCallScreen`, `RequestReportScreen` | `screens/` |
+| D01 | Tools | `tool-rework/prompt-D01-natal-birth-chart.md` | Create `JanmaKundliScreen.tsx` + `KundliWheel` SVG | New files |
+| D02 | Tools | `tool-rework/prompt-D02-kundli-milan.md` | Create `KundliMilanScreen.tsx` | New file |
+| D03 | Tools | `tool-rework/prompt-D03-vimshottari-dasha.md` | Create `DashaScreen.tsx` + Dasha timeline | New files |
+| D04 | Tools | `tool-rework/prompt-D04-gochar-transits.md` | Create `GocharScreen.tsx` + Sade Sati indicator | New files |
+| D05 | Tools | `tool-rework/prompt-D05-varshaphal.md` | Create `VarshaphalScreen.tsx` | New file |
+| D06 | Tools | `tool-rework/prompt-D06-navamsa-varga-charts.md` | Create `VargaChartsScreen.tsx` + D9/D10 wheels | New files |
+| D07 | Tools | `tool-rework/prompt-D07-panchang-vishesh.md` | Create `PanchangVisheshScreen.tsx` | New file |
+| D08 | Tools | `tool-rework/prompt-D08-muhurta.md` | Create `MuhurtaScreen.tsx` + auspicious window finder | New files |
+| D09 | Tools | `tool-rework/prompt-D09-tithi-chandra.md` | Create `TithiChandraScreen.tsx` + animated moon | New files |
+| D10 | Tools | `tool-rework/prompt-D10-nakshatra-vishesh.md` | Create `NakshatraScreen.tsx` + pada analysis | New files |
+| D11 | Tools | `tool-rework/prompt-D11-grahan-eclipse.md` | Create `GrahanScreen.tsx` + eclipse calendar | New files |
+| D12 | Tools | `tool-rework/prompt-D12-ashtakavarga.md` | Create `AshtakavargaScreen.tsx` + SAV grid | New files |
+| D13 | Tools | `tool-rework/prompt-D13-prashna-horary.md` | Create `PrashnaScreen.tsx` + question chart | New files |
+| D14 | Tools | `tool-rework/prompt-D14-hora-planetary-hours.md` | Create `HoraScreen.tsx` + live hora indicator | New files |
+| D15 | Tools | `tool-rework/prompt-D15-graha-shanti-remedies.md` | Create `GrahaShantiremediesScreen.tsx` | New file |
+| D16 | Tools | `tool-rework/prompt-D16-dainik-rashifal.md` | Create `DainikRashifalScreen.tsx` + notification config | New files |
 
 ---
 
@@ -197,9 +226,9 @@ All callers use the same `getCachedChart` / `setCachedChart` API regardless of p
 
 ---
 
-## Phase C — Frontend Rework (existing #34)
+## Phase C — Frontend Rework
 
-See `extensive_frontend_rework/README.md` for the complete 16-prompt sequence.
+See `frontend-rework/` for the complete 16-prompt sequence (C01–C16).
 
 **Execute after Phase B is complete.** Key dependency: C01 (theme setup) and C02
 (navigation) use the storage system but do not depend on engine changes.
@@ -209,16 +238,16 @@ will be using the new Phase A engine modules by the time Phase C runs.
 
 ---
 
-## Phase D — Tool Rework (existing plan)
+## Phase D — Tool Rework
 
-See `tool_rework_plan/README.md` for the complete 16-prompt sequence.
+See `tool-rework/` for the complete 16-prompt sequence (D01–D16).
 
 **Execute after Phase C is complete.** Every tool screen:
 - Uses the MD3 theme from C01
 - Uses the BottomNavigation from C02 (Tools tab already exists)
 - Uses the new engine methods from A08 (`calculateDasha`, `calculateGochar`, etc.)
 - Uses the typed storage from B01–B03 for caching
-- Uses `ContentService` from `tool_rework_plan/CONTENT_LAYER_PLAN.md` for all display text
+- Uses `ContentService` from `CONTENT_LAYER_PLAN.md` for all display text
 
 ---
 
