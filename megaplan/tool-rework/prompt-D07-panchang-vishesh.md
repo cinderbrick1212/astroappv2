@@ -77,7 +77,7 @@ and daily planetary hora schedule.
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Auspicious elements: `primaryContainer` chip/card
 - Inauspicious periods (Rahu Kaal etc.): `errorContainer` chip with clock icon

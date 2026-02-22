@@ -80,7 +80,7 @@ Purna Tithis (5th, 10th, 15th/Purnima) — auspicious, full energy
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Shukla Paksha (waxing): `primaryContainer` background tone
 - Krishna Paksha (waning): `surfaceVariant` background tone

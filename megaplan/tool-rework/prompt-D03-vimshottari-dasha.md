@@ -83,7 +83,7 @@ spiritual practices for the current Dasha lord.
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Current Mahadasha period: `elevated` Card with `primary` accent
 - Past Dashas: `surfaceVariant` dimmed styling

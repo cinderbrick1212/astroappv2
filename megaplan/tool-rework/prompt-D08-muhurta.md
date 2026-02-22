@@ -86,7 +86,7 @@ within a user-selected date range (default: next 7 days).
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Activity Chips: `secondaryContainer` unselected, `primary` filled when selected
 - Best window card: `elevated` Card with `primary` left border accent

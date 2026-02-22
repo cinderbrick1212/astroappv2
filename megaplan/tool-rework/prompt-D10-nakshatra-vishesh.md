@@ -76,7 +76,7 @@ affinities, relationship patterns, spiritual purpose, and personalised remedies.
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Birth nakshatra segment on wheel: `primary` fill color
 - Pada indicator: 4-segment visual with active pada in `primary`, others in `surfaceVariant`

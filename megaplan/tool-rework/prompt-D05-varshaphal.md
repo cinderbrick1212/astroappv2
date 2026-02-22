@@ -73,7 +73,7 @@ placements for the year, and a 12-month divinatory forecast broken into quarters
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Annual Lagna chip: `primaryContainer`
 - Muntha chip: `secondaryContainer`

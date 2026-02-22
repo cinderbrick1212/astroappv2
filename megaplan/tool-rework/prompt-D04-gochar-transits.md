@@ -86,7 +86,7 @@ Current sidereal longitudes of all 9 grahas — refreshed daily.
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Sade Sati banner: `errorContainer` background — highly visible when active
 - Benefic transit cards: `primaryContainer`; malefic: `errorContainer`

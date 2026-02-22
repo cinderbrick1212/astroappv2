@@ -89,7 +89,7 @@ The starting planet for Hour 1 is determined by the day of the week.
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Current Hora: `elevated` Card with `primary` border, large planet glyph, live countdown
 - Benefic planet Horas (Sun, Moon, Jupiter, Venus, Mercury): `primaryContainer` in timeline

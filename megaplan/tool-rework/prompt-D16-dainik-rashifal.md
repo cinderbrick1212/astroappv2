@@ -101,13 +101,13 @@ All prediction paragraphs are assembled by combining:
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Overall rating: 5-bar `ProgressBar` or 5-star row using `primary` color
 - Daily prediction: `elevated` Card — the dominant visual on screen
 - Area of focus chips: `secondaryContainer`
 - Lucky factors: `primaryContainer` chips in a row
-- Remedy card: `secondaryContainer` background (matches #34 `RemedyCard`)
+- Remedy card: `secondaryContainer` background (matches `frontend-rework/prompt-C07` RemedyCard)
 - Tomorrow preview: `outlined` card at bottom — teaser styling
 
 ---

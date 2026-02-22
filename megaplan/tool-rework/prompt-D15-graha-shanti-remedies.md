@@ -8,8 +8,8 @@ deity worship. Remedies are prescribed based on the natal chart's afflictions.
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen). New route: `GrahaShanti`.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). New route: `GrahaShanti`.
 Depends on Tool 01 (Janma Kundli) for afflicted planet detection.
 Remedy snippets appear in every tool screen (Tools 01–12); this screen is the
 dedicated deep-dive where users can explore and understand all their remedies.
@@ -93,7 +93,7 @@ yantra, charity, fasting, deity worship, and auspicious colours.
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Priority remedy banner: `elevated` Card with `primary` border
 - Each graha remedy card: `outlined`, collapsible via Paper `List.Accordion`

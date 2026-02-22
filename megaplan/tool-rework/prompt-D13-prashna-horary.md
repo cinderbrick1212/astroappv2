@@ -95,7 +95,7 @@ the Prashna Chakra technique.
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Answer verdict: "Yes" → `primaryContainer`; "No" → `errorContainer`; "Conditional" → `secondaryContainer`; "Unclear" → `surfaceVariant`
 - Prashna wheel: same visual rules as Janma Kundli wheel

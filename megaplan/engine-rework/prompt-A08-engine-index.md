@@ -143,6 +143,7 @@ import type { VargaChart } from './engine/vargas';
 import type { AshtakavargaResult } from './engine/ashtakavarga';
 import type { GrahaPosition } from './engine/ephemeris';
 import type { AshtakootResult } from './engine/ashtakoot';
+import type { PanchangData } from './panchang';
 
 export interface GocharResult {
   transitPositions: GrahaPosition[];

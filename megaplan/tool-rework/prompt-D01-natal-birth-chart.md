@@ -76,7 +76,7 @@ No screen renders a string that is not sourced from the content service.
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - All colors from `useTheme().colors.*` — no hex values
 - North Indian square wheel: Lagna cell border uses `theme.colors.primary`

@@ -83,7 +83,7 @@ Each chart is rendered as a North Indian square wheel with a divinatory reading.
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Active chart tab: `SegmentedButtons` from react-native-paper
 - Vargottama planets: `primaryContainer` Chip with star icon

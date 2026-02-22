@@ -104,7 +104,7 @@ const KOOT_HINDI: Record<string, string> = {
 }
 ```
 
-### Verdict thresholds (consistent with `tool_rework_plan/02-kundli-milan/prompt.md`)
+### Verdict thresholds (consistent with `megaplan/tool-rework/prompt-D02-kundli-milan.md`)
 
 | Score | Verdict | Hindi |
 |-------|---------|-------|

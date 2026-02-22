@@ -64,7 +64,9 @@ Phase D — Tool Rework  (16 prompts)
 ```
 
 **Dependency order: A → B → C → D**
-Phase A and B can be worked in parallel (engine has no UI dependency).
+Phase A and B prompts can be *drafted* in parallel, but B01 (`storageTypes.ts`) imports
+`DashaTimeline` (A04) and `GocharResult / EclipseEvent / VarshaphalChart` (A08) — so B01
+cannot be *compiled* until A04 and A08 are complete. Execute A01–A08 first, then B01–B03.
 Phase C must wait for B (screens read from storage).
 Phase D must wait for C (tools build on the MD3 UI shell).
 
@@ -258,7 +260,7 @@ See `tool-rework/` for the complete 16-prompt sequence (D01–D16).
 - [ ] All 9 grahas returned in `calculateChart()` output
 - [ ] Sun and Moon longitudes match old engine output to within 0.1° for a test date (1990-01-01 12:00 UTC, 77.2°E 28.6°N)
 - [ ] Vimshottari Dasha sequence sums to 120 years exactly
-- [ ] Ashtakavarga SAV totals per sign never exceed 56
+- [ ] Ashtakavarga SAV totals per sign never exceed 8 with simplified tables (A07 initial); expand to full Parashari tables before D12 to achieve traditional 0–56 range
 
 ### After Phase B (Storage)
 - [ ] `cd mobile && npx expo start --web` — no `AsyncStorage` import errors on web

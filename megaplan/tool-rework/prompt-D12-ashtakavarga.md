@@ -12,6 +12,11 @@ Web · iOS · Android
 Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). New route: `Ashtakavarga`.
 Depends on Tool 01 (requires full natal chart).
 
+> **Prerequisite:** `engine/ashtakavarga.ts` (A07) ships with simplified contribution
+> tables (SAV range 0–8). The scoring thresholds below (0–56) and the `Strong / Moderate /
+> Weak` ratings require the full Parashari tables. Expand A07's contribution tables to the
+> complete 8-contributor-per-planet-per-sign tables before executing this prompt.
+
 ---
 
 ## What this tool does
@@ -83,7 +88,7 @@ scoring houses.
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - SAV ≥ 30 cells: `primaryContainer` fill in grid
 - SAV 25–29 cells: `secondaryContainer` fill

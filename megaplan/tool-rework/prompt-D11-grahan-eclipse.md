@@ -85,7 +85,7 @@ showing which natal planets (if any) are within orb of the eclipse degree.
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Solar eclipse cards: `errorContainer` background (Sun is covered = danger/intensity)
 - Lunar eclipse cards: `surfaceVariant` background (Moon dims = emotional release)

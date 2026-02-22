@@ -95,7 +95,7 @@ All verdicts, descriptions, and recommendations come from the content service.
 
 ---
 
-## Key UI rules (from #34 theme)
+## Key UI rules (from megaplan theme)
 
 - Total score: `displaySmall` typography, color-coded — `primary` ≥ 28, `secondary` 21–27, `error` < 18
 - Koot table: full-marks rows use `primaryContainer`; zero-point rows use `errorContainer`
