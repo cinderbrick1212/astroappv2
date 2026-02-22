@@ -225,7 +225,7 @@ export function detectYogas(
       yogas.push({
         key: 'voshi',
         name: 'Voshi Yoga',
-        nameHindi: 'वोशी योग',
+        nameHindi: 'वोशि योग',
         quality: 'benefic',
         category: 'other',
         formingCondition: 'Planet in 12th from Sun',

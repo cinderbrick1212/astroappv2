@@ -253,8 +253,10 @@ export function scoreMuhurta(
     reasons.push('Nakshatra in avoid list');
   }
 
-  // Surgery: not on Amavasya (29) or Purnima (14)
-  if (activity === 'surgery' && tithiIndex !== 29 && tithiIndex !== 14) {
+  // Surgery: not on Amavasya or Purnima
+  const PURNIMA_INDEX = 14;
+  const AMAVASYA_INDEX = 29;
+  if (activity === 'surgery' && tithiIndex !== AMAVASYA_INDEX && tithiIndex !== PURNIMA_INDEX) {
     score += 1;
     reasons.push('Not on Purnima/Amavasya (+1)');
   }

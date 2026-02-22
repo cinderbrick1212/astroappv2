@@ -121,6 +121,13 @@ export interface AfflictedGraha {
   severity: 'high' | 'medium' | 'low';
 }
 
+// ── Constants for affliction detection ────────────────────────────────────────
+
+/** Debilitation sign index for each graha (0–11) */
+const DEBILITATED: Record<string, number> = {
+  Sun: 6, Moon: 7, Mars: 3, Mercury: 11, Jupiter: 9, Venus: 5, Saturn: 0,
+};
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function profileToDate(profile: UserProfile): Date {
@@ -284,15 +291,15 @@ export const astrologyEngine = {
     const saturnSign = saturn ? this.getZodiacSign(saturn.siderealLon) : '';
 
     // Sade Sati: Saturn in 12th, 1st, or 2nd from natal Moon sign
-    const diff12 = ((saturnRashi - natalMoonRashi + 12) % 12);
+    const saturnMoonOffset = ((saturnRashi - natalMoonRashi + 12) % 12);
     let phase: GocharResult['sadeSatiStatus']['phase'] = 'none';
     let isActive = false;
-    if (diff12 === 11) { phase = 'rising'; isActive = true; }
-    else if (diff12 === 0) { phase = 'peak'; isActive = true; }
-    else if (diff12 === 1) { phase = 'setting'; isActive = true; }
+    if (saturnMoonOffset === 11) { phase = 'rising'; isActive = true; }
+    else if (saturnMoonOffset === 0) { phase = 'peak'; isActive = true; }
+    else if (saturnMoonOffset === 1) { phase = 'setting'; isActive = true; }
 
     // Ashtama Shani: Saturn in 8th from natal Moon
-    const ashtamaShaniActive = diff12 === 7;
+    const ashtamaShaniActive = saturnMoonOffset === 7;
 
     // Significant transits
     const lagnaLon = chart.ascendant;
@@ -399,11 +406,6 @@ export const astrologyEngine = {
   getAfflictedGrahas(profile: UserProfile): AfflictedGraha[] {
     const chart = this.calculateKundli(profile);
     const afflicted: AfflictedGraha[] = [];
-
-    // Debilitation check
-    const DEBILITATED: Record<string, number> = {
-      Sun: 6, Moon: 7, Mars: 3, Mercury: 11, Jupiter: 9, Venus: 5, Saturn: 0,
-    };
 
     for (const planet of chart.planets) {
       const rashiIdx = Math.floor(ephemeris.norm(planet.longitude) / 30);
