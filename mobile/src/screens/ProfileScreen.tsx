@@ -20,6 +20,8 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import { kundliService } from '../services/kundli';
 import { analytics } from '../services/analytics';
 import { storage } from '../utils/storage';
+import DatePickerModal from '../components/DatePickerModal';
+import TimePickerModal from '../components/TimePickerModal';
 
 const GENDERS: Array<'male' | 'female' | 'other'> = ['male', 'female', 'other'];
 
@@ -36,6 +38,8 @@ const ProfileScreen: React.FC = () => {
   const { profile, isLoading, updateProfile, isUpdating } = useUserProfile();
   const { t, i18n } = useTranslation();
   const [editVisible, setEditVisible] = useState(false);
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [timePickerVisible, setTimePickerVisible] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [form, setForm] = useState<EditForm>({
     birth_date: '',
@@ -96,13 +100,7 @@ const ProfileScreen: React.FC = () => {
 
   const handleSave = () => {
     if (!form.birth_date) {
-      Alert.alert('Missing field', 'Please enter your date of birth.');
-      return;
-    }
-    // Validate format and that it is a real calendar date
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateRegex.test(form.birth_date) || isNaN(new Date(form.birth_date).getTime())) {
-      Alert.alert('Invalid date', 'Please enter a valid date in YYYY-MM-DD format.');
+      Alert.alert('Missing field', 'Please select your date of birth.');
       return;
     }
     updateProfile(
@@ -266,26 +264,40 @@ const ProfileScreen: React.FC = () => {
           <ScrollView style={styles.modalBody} keyboardShouldPersistTaps="handled">
             <View style={styles.formGroup}>
               <Text style={styles.formLabel}>Date of Birth</Text>
-              <TextInput
-                style={styles.formInput}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor={colors.textTertiary}
-                value={form.birth_date}
-                onChangeText={v => setForm(f => ({ ...f, birth_date: v }))}
-                keyboardType="numbers-and-punctuation"
-              />
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setDatePickerVisible(true)}
+              >
+                <Text style={styles.pickerButtonIcon}>🗓️</Text>
+                <Text
+                  style={[
+                    styles.pickerButtonText,
+                    !form.birth_date && styles.pickerButtonPlaceholder,
+                  ]}
+                >
+                  {form.birth_date || 'Select date of birth'}
+                </Text>
+                <Text style={styles.pickerButtonArrow}>›</Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.formGroup}>
               <Text style={styles.formLabel}>Time of Birth</Text>
-              <TextInput
-                style={styles.formInput}
-                placeholder="HH:MM (24-hour, e.g. 14:30)"
-                placeholderTextColor={colors.textTertiary}
-                value={form.birth_time}
-                onChangeText={v => setForm(f => ({ ...f, birth_time: v }))}
-                keyboardType="numbers-and-punctuation"
-              />
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setTimePickerVisible(true)}
+              >
+                <Text style={styles.pickerButtonIcon}>🕐</Text>
+                <Text
+                  style={[
+                    styles.pickerButtonText,
+                    !form.birth_time && styles.pickerButtonPlaceholder,
+                  ]}
+                >
+                  {form.birth_time || 'Select time of birth'}
+                </Text>
+                <Text style={styles.pickerButtonArrow}>›</Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.formGroup}>
@@ -337,6 +349,25 @@ const ProfileScreen: React.FC = () => {
           </ScrollView>
         </KeyboardAvoidingView>
       </Modal>
+
+      <DatePickerModal
+        visible={datePickerVisible}
+        value={form.birth_date}
+        onConfirm={date => {
+          setForm(f => ({ ...f, birth_date: date }));
+          setDatePickerVisible(false);
+        }}
+        onCancel={() => setDatePickerVisible(false)}
+      />
+      <TimePickerModal
+        visible={timePickerVisible}
+        value={form.birth_time}
+        onConfirm={time => {
+          setForm(f => ({ ...f, birth_time: time }));
+          setTimePickerVisible(false);
+        }}
+        onCancel={() => setTimePickerVisible(false)}
+      />
     </>
   );
 };
@@ -539,6 +570,31 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     fontSize: 16,
     color: colors.textPrimary,
+  },
+  pickerButton: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    padding: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pickerButtonIcon: {
+    fontSize: 18,
+    marginRight: spacing.sm,
+  },
+  pickerButtonText: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.textPrimary,
+  },
+  pickerButtonPlaceholder: {
+    color: colors.textTertiary,
+  },
+  pickerButtonArrow: {
+    fontSize: 20,
+    color: colors.textTertiary,
   },
   genderRow: {
     flexDirection: 'row',
