@@ -13,6 +13,7 @@ import {
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { storage } from '../utils/storage';
+import { dateHelpers } from '../utils/dateHelpers';
 import DatePickerModal from '../components/DatePickerModal';
 import TimePickerModal from '../components/TimePickerModal';
 
@@ -195,7 +196,7 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
               </TouchableOpacity>
             </View>
             <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Time of Birth (24hr)</Text>
+              <Text style={styles.formLabel}>Time of Birth</Text>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => setTimePickerVisible(true)}
@@ -207,7 +208,7 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
                     !data.birth_time && styles.pickerButtonPlaceholder,
                   ]}
                 >
-                  {data.birth_time || 'Select time of birth'}
+                  {data.birth_time ? dateHelpers.formatTimeAmPm(data.birth_time) : 'Select time of birth'}
                 </Text>
                 <Text style={styles.pickerButtonArrow}>›</Text>
               </TouchableOpacity>
@@ -280,7 +281,7 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
               {[
                 { label: 'Name', value: data.name, icon: '👤' },
                 { label: 'Date of Birth', value: data.birth_date, icon: '🎂' },
-                { label: 'Time of Birth', value: data.birth_time, icon: '🕐' },
+                { label: 'Time of Birth', value: dateHelpers.formatTimeAmPm(data.birth_time), icon: '🕐' },
                 { label: 'Place of Birth', value: data.birth_place, icon: '📍' },
                 { label: 'Gender', value: data.gender.charAt(0).toUpperCase() + data.gender.slice(1), icon: GENDER_ICONS[data.gender] },
               ].map((item, i) => (

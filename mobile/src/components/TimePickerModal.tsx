@@ -21,7 +21,6 @@ const TimePickerModalWrapper: React.FC<Props> = ({ visible, value, onConfirm, on
       onDismiss={onCancel}
       hours={hours}
       minutes={minutes}
-      use24HourClock
       onConfirm={({ hours: h, minutes: m }) => {
         onConfirm(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
       }}
