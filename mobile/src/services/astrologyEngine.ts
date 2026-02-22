@@ -110,6 +110,39 @@ export const calcMoonLongitude = (jd: number): number => {
 export const tropicalToVedic = (tropicalLon: number, jd: number): number =>
   norm(tropicalLon - getAyanamsha(jd));
 
+/**
+ * Calculate Greenwich Mean Sidereal Time (GMST) in degrees for a given JD.
+ * Based on Meeus "Astronomical Algorithms", Chapter 12.
+ */
+export const calcGMST = (jd: number): number => {
+  const T = (jd - 2451545.0) / 36525;
+  // GMST at 0h UT + rotation for fractional day
+  const gmst =
+    280.46061837 +
+    360.98564736629 * (jd - 2451545.0) +
+    0.000387933 * T * T -
+    (T * T * T) / 38710000;
+  return norm(gmst);
+};
+
+/**
+ * Calculate the Ascendant (Lagna) in tropical degrees using Local Sidereal Time.
+ * Formula: tan(Asc) = cos(LST) / -(sin(LST)*cos(ε) + tan(φ)*sin(ε))
+ */
+export const calcAscendant = (jd: number, latitude: number, longitude: number): number => {
+  const T = (jd - 2451545.0) / 36525;
+  const obliquity = (23.4393 - 0.013 * T) * (Math.PI / 180); // ε
+  const gmst = calcGMST(jd);
+  const lst = norm(gmst + longitude); // Local Sidereal Time in degrees
+  const lstRad = lst * (Math.PI / 180);
+  const latRad = latitude * (Math.PI / 180);
+
+  const y = Math.cos(lstRad);
+  const x = -(Math.sin(lstRad) * Math.cos(obliquity) + Math.tan(latRad) * Math.sin(obliquity));
+  let asc = Math.atan2(y, x) * (180 / Math.PI);
+  return norm(asc);
+};
+
 export const astrologyEngine = {
   toJulianDay,
   calcSunLongitude,
@@ -119,6 +152,7 @@ export const astrologyEngine = {
   /**
    * Calculate chart for a given birth date/time/location.
    * Returns sun sign, moon sign, nakshatra, lagna, and planet positions.
+   * The date parameter must already be in UTC.
    */
   calculateChart(
     date: Date,
@@ -130,11 +164,9 @@ export const astrologyEngine = {
     const sunVedic = tropicalToVedic(calcSunLongitude(jd), jd);
     const moonVedic = tropicalToVedic(calcMoonLongitude(jd), jd);
 
-    // Simplified lagna: ascendant advances ~1° every 4 min from sun position.
-    // NOTE: This is a rough approximation. Precise lagna requires the birthplace
-    // longitude and Local Sidereal Time; treat this result as indicative only.
-    const hourOfDay = date.getUTCHours() + date.getUTCMinutes() / 60;
-    const lagnaApprox = norm(sunVedic + (hourOfDay - 6) * 15);
+    // Proper Ascendant via Local Sidereal Time
+    const tropicalAsc = calcAscendant(jd, latitude, longitude);
+    const lagnaApprox = tropicalToVedic(tropicalAsc, jd);
 
     const moonSign = this.getZodiacSign(moonVedic);
     const sunSign = this.getZodiacSign(sunVedic);

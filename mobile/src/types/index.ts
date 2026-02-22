@@ -79,6 +79,7 @@ export interface ServiceRequest {
 // Navigation types
 export type RootStackParamList = {
   Auth: undefined;
+  Onboarding: undefined;
   App: undefined;
 };
 
