@@ -6,6 +6,8 @@
 
 ## 1. Quick Reference: All-Platform Overview
 
+### Western Platforms
+
 | Platform | Natal Chart | Synastry | Transits | Solar Return | Progressions | Astrocartography | Asteroids | Vedic | House Systems | Mobile App | Free Tier | Visual Style |
 |----------|:-----------:|:--------:|:--------:|:------------:|:------------:|:----------------:|:---------:|:-----:|:-------------:|:----------:|:---------:|:------------:|
 | **Astro.com** | ✅ Free | ✅ Free | ✅ Free | ✅ Free | ✅ Free | ✅ Free | ✅ Limited | ✅ | 10+ options | ❌ Web only | Generous | Functional/dated |
@@ -21,6 +23,18 @@
 | **Nebula** | ✅ Free | ✅ Free | ✅ Free | ❌ | ❌ | ❌ | ❌ | ❌ | Placidus | ✅ iOS/Android | Limited | Modern/friendly |
 | **Astro Gold** | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Extensive | ✅ | All systems | ✅ iOS/Android | Trial only | Professional |
 | **Solar Fire** | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Extensive | ✅ | All systems | ❌ Desktop only | ❌ | Professional |
+
+### Indian / Vedic Platforms
+
+| Platform | Vedic Kundli | Panchang | Kundli Matching | Dasha System | Navamsa D9 | Human Consult | AI Features | Mobile App | Free Tier | Visual Style |
+|----------|:------------:|:--------:|:---------------:|:------------:|:----------:|:-------------:|:-----------:|:----------:|:---------:|:------------:|
+| **Astrotalk** | ✅ Free | ✅ Free | ✅ Free | ✅ Full | ✅ | ✅ Marketplace | ✅ AI pre-screen | ✅ iOS/Android | Good | Functional/dated |
+| **AstroSage** | ✅ Free | ✅ Detailed | ✅ Free | ✅ Full | ✅ D1–D60 | ✅ Directory | ❌ | ✅ iOS/Android | Excellent | Dense/dated |
+| **mPanchang** | ✅ Free | ✅ Best-in-class | ✅ Free | ✅ | ✅ D9 | ❌ | ❌ | ✅ iOS/Android | Excellent | Functional/basic |
+| **Clickastro** | ✅ Full | ✅ | ✅ Premium | ✅ Full | ✅ Full | ✅ | ❌ | ✅ iOS/Android | Limited | Functional/dated |
+| **Cosmic Insights** | ✅ Full | ❌ | ❌ | ✅ Full | ✅ D1–D12 | ❌ | ❌ | ✅ iOS/Android | Limited | Beautiful/modern |
+| **Guruji Astro** | ✅ Basic | ❌ | ❌ | ✅ Basic | D1 only | ❌ | ✅ LLM chat | ✅ iOS/Android | Good | Clean/modern |
+| **GaneshaSpeaks** | ❌ Sun-sign | ❌ | ❌ | ❌ | ❌ | ✅ Chat | ❌ | ✅ iOS/Android | Ad-supported | Colorful/commercial |
 
 ---
 
@@ -144,6 +158,8 @@
 
 ## 9. Key Differentiator Summary
 
+### Western Platforms
+
 | Platform | Single Biggest Differentiator | Why It Matters |
 |----------|------------------------------|----------------|
 | Astro.com | Most comprehensive free professional tools | Trust + authority for serious users |
@@ -156,11 +172,22 @@
 | Cafe Astrology | Massive free interpretation library | SEO + education; entry point for beginners |
 | Nebula | LLM conversational astrology chat | AI-native interaction model |
 
+### Indian / Vedic Platforms
+
+| Platform | Single Biggest Differentiator | Why It Matters |
+|----------|------------------------------|----------------|
+| Astrotalk | Largest verified astrologer marketplace (15,000+ astrologers) | Trust + scale; network effects |
+| AstroSage | Deepest free Vedic tool set (D1–D60 divisional charts) | Reference authority for serious practitioners |
+| mPanchang | Best-in-class daily Panchang and Muhurta calculator | Indispensable daily use for traditional users |
+| Clickastro | 40+ years of Vedic software credibility; South Indian specialist | Trusted by professional astrologers |
+| Cosmic Insights | Modern UX + deep Vedic content for English-speaking diaspora | Premium feel that Western-educated users expect |
+| Guruji Astro | AI-native LLM chat for Vedic queries | First-mover in India's AI astrology space |
+
 ---
 
 ## 10. Feature Gaps — Opportunities for AstroAppV2
 
-The following features are NOT well-served by any single current platform:
+### Western Market Gaps
 
 | Gap | Current Situation | Opportunity |
 |-----|------------------|-------------|
@@ -173,6 +200,18 @@ The following features are NOT well-served by any single current platform:
 | Astrocartography on mobile | AstroSeek web only; no quality mobile version | Interactive mobile astrocartography map |
 | Wearable integration | No astrology app integrates with Apple Watch/Health | Moon phase + biorhythm integration potential |
 
+### Indian / Vedic Market Gaps
+
+| Gap | Current Situation | Opportunity |
+|-----|------------------|-------------|
+| Modern UX for Vedic tools | AstroSage/mPanchang have depth but dated design | Beautiful, modern Vedic app for diaspora and urban India |
+| Kundli matching on modern mobile app | Available only in dated apps | Premium mobile-first Kundli matching with clean UX |
+| Vedic + Western in one app | No single app handles both traditions authentically | Tradition toggle in one premium app |
+| AI + authentic Vedic calculations | Guruji Astro has AI but limited depth | LLM interpretations grounded in real Dasha + Navamsa data |
+| English-first Vedic with full Panchang | Cosmic Insights lacks Panchang; mPanchang lacks modern UX | Combine Cosmic Insights quality with mPanchang depth |
+| Social sharing for Vedic charts | No Vedic app has social features | Nakshatra + Dasha share cards for Instagram/WhatsApp |
+
 ---
 
 *Data sourced from App Store reviews, SimilarWeb traffic estimates, Sensor Tower download estimates — February 2026*
+*See also: [Indian Competitors (detailed)](indian_competitors.md)*
