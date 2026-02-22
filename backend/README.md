@@ -1,6 +1,13 @@
-# Backend - Strapi CMS
+# Backend — Strapi CMS (AstroAppV2 — Vedic Jyotish Platform)
 
-This is the backend service for the Astrology App, built with Strapi v5.
+This is the backend service for AstroAppV2 — a **Vedic / Jyotish astrology platform**
+for Web, iOS, and Android. Built with Strapi v5.
+
+> **Role of the backend:** The backend does NOT perform any astrology calculations.
+> All Jyotish computations (Kundli, Dasha, Gochar, Panchang, Muhurta, etc.) run
+> entirely client-side via Swiss Ephemeris (sidereal / Lahiri ayanamsa).
+> The backend manages user data, Vedic content (Rashifal feed, blog posts),
+> premium service requests, and payment processing.
 
 ## Tech Stack
 
@@ -107,12 +114,14 @@ The following content types are automatically created from schemas:
 - `longitude` (Decimal)
 
 #### FeedItem
-- `type` (Enumeration: daily_horoscope, tip, news, announcement)
+- `type` (Enumeration: daily_horoscope, tip, panchang_update, remedy, announcement)
+- `rashi` (String, optional) — if set, this item is shown only to users of that Moon sign
+- `dasha_lord` (String, optional) — if set, shown only to users in this Mahadasha
 - `title` (String)
 - `summary` (Text)
 - `body` (Rich Text)
 - `media` (Media - single image)
-- `language_code` (String, default: 'en')
+- `language_code` (String, default: 'hi') — Hindi first, English secondary
 - `priority` (Integer)
 - `is_active` (Boolean)
 

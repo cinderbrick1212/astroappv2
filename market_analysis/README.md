@@ -24,11 +24,12 @@
 
 ## Quick Summary
 
-- **Market size:** $2.2B globally, CAGR ~13% through 2030
-- **Dominant Western players:** Co-Star (social), Astro.com (depth), TimePassages (design), Pattern (psychology)
+- **Market size:** $2.2B globally, CAGR ~13% through 2030; India is the fastest-growing segment
 - **Dominant Indian players:** Astrotalk ($100M+ revenue), AstroSage (Vedic depth), mPanchang (Panchang), Cosmic Insights (diaspora)
-- **Key opportunity:** No single app combines Co-Star's social UX with Astro.com's technical depth AND authentic Vedic tools with modern design
-- **Target positioning:** "The only astrology app that gives you Co-Star's social experience with Astro.com's technical depth — beautifully designed for the mobile generation, with authentic Vedic tools for the global South Asian community."
+- **Dominant Western players:** Co-Star (social), Astro.com (depth), TimePassages (design), Pattern (psychology)
+- **AstroAppV2 positioning:** Authentic Vedic / Jyotish tools (sidereal, Whole Sign, Dasha, Panchang, Muhurta, Prashna) delivered with Co-Star's modern UX, across Web + iOS + Android
+- **Key gap in market:** No single app combines deep Jyotish accuracy (AstroSage level) with a modern Material Design 3 interface and full cross-platform (web + mobile) coverage
+- **Target audience:** South Asian users globally (India, diaspora in US/UK/AU/CA) + spiritually curious mainstream users seeking authentic Indian astrology
 
 ---
 

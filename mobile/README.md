@@ -1,6 +1,8 @@
-# Mobile App - React Native (Expo)
+# Mobile / Web App — React Native (Expo)
 
-This is the mobile application for the Astrology App, built with React Native and Expo.
+This is the **Web, iOS, and Android** application for AstroAppV2 — a Vedic / Jyotish astrology platform built with React Native and Expo.
+
+> **Tradition:** All astrology calculations use the **sidereal zodiac (Lahiri ayanamsa)** and **Whole Sign houses** by default, as is standard in Indian Jyotish practice. Swiss Ephemeris powers all client-side calculations.
 
 ## Tech Stack
 
@@ -28,10 +30,16 @@ mobile/
 │   ├── screens/               # Screen components
 │   │   ├── LoginScreen.tsx
 │   │   ├── DailyFeedScreen.tsx
-│   │   ├── ToolsScreen.tsx
+│   │   ├── ToolsScreen.tsx         # Hub linking to all Jyotish tools
+│   │   ├── JanmaKundliScreen.tsx   # Full birth chart (Vedic)
+│   │   ├── KundliMilanScreen.tsx   # Ashtakoot compatibility
+│   │   ├── DashaScreen.tsx         # Vimshottari Dasha timeline
+│   │   ├── GocharScreen.tsx        # Current transits
+│   │   ├── PanchangScreen.tsx      # Daily Panchang
 │   │   ├── HomeScreen.tsx
 │   │   └── ProfileScreen.tsx
 │   ├── components/            # Reusable components
+│   │   ├── KundliWheel.tsx         # North Indian square SVG chart
 │   │   ├── FeedHeader.tsx
 │   │   ├── FeedItemCard.tsx
 │   │   └── LoadingSkeleton.tsx
@@ -40,25 +48,24 @@ mobile/
 │   │   ├── useUserProfile.ts
 │   │   ├── useFeedItems.ts
 │   │   └── usePayments.ts
-│   ├── services/              # Business logic services
-│   │   ├── astrologyEngine.ts
-│   │   ├── kundli.ts
-│   │   ├── compatibility.ts
-│   │   ├── panchang.ts
-│   │   └── horoscope.ts
+│   ├── services/              # Jyotish calculation services
+│   │   ├── astrologyEngine.ts      # Swiss Ephemeris wrapper (sidereal/Lahiri)
+│   │   ├── kundli.ts               # Janma Kundli + Varga charts
+│   │   ├── compatibility.ts        # Ashtakoot Guna Milan
+│   │   ├── panchang.ts             # Tithi, Nakshatra, Yoga, Karana
+│   │   ├── dasha.ts                # Vimshottari Dasha calculator
+│   │   └── horoscope.ts            # Dainik Rashifal generator
 │   ├── utils/                 # Utility functions
 │   │   ├── storage.ts
 │   │   ├── dateHelpers.ts
 │   │   └── validation.ts
 │   ├── types/                 # TypeScript types
 │   │   └── index.ts
-│   ├── theme/                 # Design tokens
-│   │   ├── colors.ts
-│   │   ├── typography.ts
-│   │   └── spacing.ts
+│   ├── theme/                 # MD3 design tokens
+│   │   └── md3Theme.ts
 │   └── locales/               # Translations
 │       ├── en.json
-│       └── hi.json
+│       └── hi.json            # Hindi / Devanagari
 ├── assets/                    # Static assets
 ├── App.tsx                    # Root component
 ├── app.json                   # Expo configuration
@@ -161,42 +168,55 @@ eas build --platform android
 
 ### Core Screens
 
-#### 1. Feed Tab
-- Daily personalized content feed
-- Horoscope cards
-- Blog posts
-- Tips and remedies
+#### 1. Feed Tab — दैनिक फ़ीड
+- Dainik Rashifal (daily Vedic horoscope, nakshatra-based)
+- Panchang summary card (Tithi, Nakshatra, Yoga, Rahu Kaal)
+- Remedy of the Day (Graha Shanti tip)
+- Blog posts and tips
 - Streak tracking
 
-#### 2. Tools Tab
-- Kundli Lite (Birth chart summary)
-- Compatibility calculator
-- Daily Panchang
-- Lucky factors
+#### 2. Tools Tab — ज्योतिष उपकरण
+Full Vedic / Jyotish tool suite (see `tool_rework_plan/` for implementation prompts):
+- **Janma Kundli** — Full North Indian square chart with Yogas + Graha Shanti
+- **Kundli Milan** — Ashtakoot Guna Milan (36-point scoring) + Mangal Dosha
+- **Vimshottari Dasha** — Mahadasha / Antardasha timeline
+- **Gochar** — Current transits with Sade Sati indicator
+- **Panchang Vishesh** — Extended daily Panchang
+- **Muhurta** — Auspicious timing calculator
+- **Navamsa & Varga Charts** — D9, D10, D12 divisional charts
+- **Ashtakavarga** — Planetary strength grid
+- **Prashna** — Horary / question chart
+- **Hora** — Vedic planetary hours
+- **And more** (see `tool_rework_plan/README.md`)
 
-#### 3. Home Tab
+#### 3. Home Tab — होम
 - User dashboard
 - Today's focus
 - Quick actions
 - Premium services
 
-#### 4. Profile Tab
-- Birth details
+#### 4. Profile Tab — प्रोफ़ाइल
+- Birth details (date, time, place — used for all Jyotish calculations)
 - Premium status
 - Payment history
-- Settings
+- Language settings (English / Hindi)
 
 ### Services
 
-All astrology calculations are performed **client-side**:
+All Jyotish calculations run **client-side** using Swiss Ephemeris (sidereal / Lahiri ayanamsa):
 
-- **Kundli**: Birth chart calculations
-- **Compatibility**: Ashtakoot Milan algorithm
-- **Panchang**: Hindu calendar data
-- **Horoscope**: Daily predictions
-- **Lucky Factors**: Personalized lucky elements
+| Service | Purpose |
+|---------|---------|
+| `astrologyEngine.ts` | Swiss Ephemeris wrapper — all sidereal planetary calculations |
+| `kundli.ts` | Janma Kundli, Varga charts, Yogas, Ashtakavarga |
+| `compatibility.ts` | Ashtakoot Guna Milan (36-point scoring), Mangal Dosha |
+| `panchang.ts` | Tithi, Vara, Nakshatra, Yoga, Karana, Rahu Kaal, Muhurta windows |
+| `dasha.ts` | Vimshottari Dasha calculator — Mahadasha / Antardasha / Pratyantardasha |
+| `horoscope.ts` | Dainik Rashifal generator (uses `mobile/src/data/` content library) |
 
-*Note: Service implementations are placeholders and require Swiss Ephemeris integration.*
+**Content layer** (`mobile/src/data/`): All display text (interpretations, predictions,
+remedies) lives in structured data files — see `tool_rework_plan/CONTENT_LAYER_PLAN.md`.
+No screen or service file contains hardcoded user-facing strings.
 
 ## State Management
 
@@ -287,16 +307,11 @@ npm test
 
 ## Next Steps
 
-1. Implement Swiss Ephemeris integration for astrology calculations
-2. Add Firebase authentication flows
-3. Implement Razorpay payment integration
-4. Add push notifications
-5. Implement offline support
-6. Add analytics tracking
-7. Create UI/UX designs for all screens
-8. Add comprehensive error handling
-9. Implement accessibility features
-10. Add unit and integration tests
+See the planning documents for what to build next:
+
+1. **[extensive_frontend_rework/](extensive_frontend_rework/README.md)** — Apply all 16 MD3 frontend rework prompts first (#34)
+2. **[tool_rework_plan/](tool_rework_plan/README.md)** — Apply all 16 Vedic tool prompts after the frontend rework
+3. **[tool_rework_plan/CONTENT_LAYER_PLAN.md](tool_rework_plan/CONTENT_LAYER_PLAN.md)** — Build the `mobile/src/data/` content layer alongside the tool screens
 
 ## Documentation
 
