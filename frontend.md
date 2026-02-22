@@ -17,6 +17,7 @@ We are implementing a React Native (Expo) mobile application that focuses on:
 
 **Key Design Principles:**
 
+- **Material Design 3 (Strict Rule)**: All UI components must use [Material Design 3](https://m3.material.io/) via `react-native-paper`. Date/time pickers must use `react-native-paper-dates`. Custom picker or dialog implementations are not permitted.
 - **Clean, uncluttered UI**: No more than 3 primary cards per screen
 - **Progressive disclosure**: Summary first, details behind taps
 - **Warm, grounded mood**: Calm guidance, modern spiritual aesthetic
@@ -1060,6 +1061,15 @@ All tools are designed for **progressive disclosure**: show summary cards, hide 
 ---
 
 ## 10) UI/UX Design System
+
+### 10.0 Material Design (Strict Rule)
+
+All UI work in this project **must** conform to [Material Design 3 (M3)](https://m3.material.io/):
+
+- **Component library**: Use `react-native-paper` (MD3) for all interactive components (buttons, text inputs, dialogs, surfaces, etc.). Do not use bare React Native `TouchableOpacity`/`TextInput` when an MD3 equivalent exists.
+- **Date & time pickers**: Always use `react-native-paper-dates`. Custom scroll-wheel pickers or plain text field date entry are **not** allowed.
+- **Theme**: The app theme is configured in `App.tsx` via `PaperProvider`. All color, typography, and elevation decisions must trace back to the MD3 theme tokens defined in `src/theme/`.
+- **No alternative kits**: Do not introduce other UI libraries (e.g., NativeBase, UI Kitten) alongside `react-native-paper`.
 
 ### 10.1 Color Palette
 
