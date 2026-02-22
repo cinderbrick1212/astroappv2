@@ -1,25 +1,48 @@
 /**
- * Astrology Engine - Pure JS implementation
- * Uses simplified astronomical formulas (Meeus "Astronomical Algorithms")
- * without requiring a native Swiss Ephemeris module.
+ * Astrology Engine — Public API facade
+ * Delegates all calculations to Phase A engine modules while preserving
+ * 100% backward compatibility with every existing caller.
  */
 
-const NAKSHATRA_NAMES = [
-  'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra',
-  'Punarvasu', 'Pushya', 'Ashlesha', 'Magha', 'Purva Phalguni', 'Uttara Phalguni',
-  'Hasta', 'Chitra', 'Swati', 'Vishakha', 'Anuradha', 'Jyeshtha',
-  'Mula', 'Purva Ashadha', 'Uttara Ashadha', 'Shravana', 'Dhanishtha',
-  'Shatabhisha', 'Purva Bhadrapada', 'Uttara Bhadrapada', 'Revati',
-];
+import * as ephemeris from './engine/ephemeris';
+import { calcGMST as _calcGMST, getVedicLagna, assignHouse as _assignHouse, assignHouses } from './engine/houses';
+import { getNakshatraIndex as _getNakshatraIndex, getNakshatraName, getNakshatraPada, getNakshatraResult, NAKSHATRA_NAMES } from './engine/nakshatra';
+import { getDashaTimeline } from './engine/dasha';
+import { calculateAshtakoot } from './engine/ashtakoot';
+import { calculateAshtakavarga as _calcAshtakavarga } from './engine/ashtakavarga';
+import { calculateVarga } from './engine/vargas';
+import { detectYogas } from './engine/yogas';
+
+import type { GrahaPosition } from './engine/ephemeris';
+import type { HouseData } from './engine/houses';
+import type { DashaTimeline } from './engine/dasha';
+import type { AshtakootResult } from './engine/ashtakoot';
+import type { AshtakavargaResult } from './engine/ashtakavarga';
+import type { VargaChart } from './engine/vargas';
+import type { DetectedYoga } from './engine/yogas';
+import type { UserProfile } from '../types';
+
+// ── Re-exports for backward compatibility ────────────────────────────────────
+
+export { toJulianDay } from './engine/ephemeris';
+export { calcGMST } from './engine/houses';
+
+export const calcSunLongitude = ephemeris.getSunLongitude;
+export const calcMoonLongitude = ephemeris.getMoonLongitude;
+export const tropicalToVedic = ephemeris.siderealLongitude;
+export { calcAscendant } from './engine/houses';
+
+// Re-export types from engine modules
+export type { GrahaPosition, DashaTimeline, AshtakootResult, AshtakavargaResult, VargaChart, DetectedYoga, HouseData };
+
+// ── Constants (kept for backward compat) ─────────────────────────────────────
 
 const RASHI_NAMES = [
   'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
   'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',
 ];
 
-// Lahiri ayanamsha for year 2000 and annual rate
-const AYANAMSHA_2000 = 23.853;
-const AYANAMSHA_RATE = 0.01396; // degrees per year
+// ── Existing interfaces (preserved) ──────────────────────────────────────────
 
 export interface PlanetPosition {
   planet: string;
@@ -30,6 +53,7 @@ export interface PlanetPosition {
 }
 
 export interface ChartData {
+  // Existing fields — unchanged
   ascendant: number;
   lagnaSign: string;
   planets: PlanetPosition[];
@@ -37,211 +61,380 @@ export interface ChartData {
   moonSign: string;
   sunSign: string;
   nakshatra: string;
+
+  // New fields added in A08
+  nakshatraPada: number;
+  nakshatraIndex: number;
+  lagnaSignIndex: number;
+  moonLongitude: number;
+  sunLongitude: number;
 }
 
-/** Convert a calendar date/time to Julian Day Number */
-export const toJulianDay = (date: Date): number => {
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth() + 1;
-  const day =
-    date.getUTCDate() +
-    date.getUTCHours() / 24 +
-    date.getUTCMinutes() / 1440;
+// ── New types for Phase D ────────────────────────────────────────────────────
 
-  let Y = year;
-  let M = month;
-  if (M <= 2) {
-    Y -= 1;
-    M += 12;
-  }
-  const A = Math.floor(Y / 100);
-  const B = 2 - A + Math.floor(A / 4);
-  return (
-    Math.floor(365.25 * (Y + 4716)) +
-    Math.floor(30.6001 * (M + 1)) +
-    day +
-    B -
-    1524.5
-  );
-};
+export interface GocharResult {
+  transitPositions: GrahaPosition[];
+  sadeSatiStatus: {
+    isActive: boolean;
+    phase: 'rising' | 'peak' | 'setting' | 'none';
+    saturnSign: string;
+    natalMoonSign: string;
+  };
+  ashtamaShaniActive: boolean;
+  significantTransits: TransitEvent[];
+}
 
-/** Lahiri ayanamsha for a given Julian Day */
-const getAyanamsha = (jd: number): number => {
-  const yearsSince2000 = (jd - 2451545.0) / 365.25;
-  return AYANAMSHA_2000 + AYANAMSHA_RATE * yearsSince2000;
-};
+export interface TransitEvent {
+  transitingGraha: string;
+  natalHouse: number;
+  aspect: string;
+  orb: number;
+}
 
-/** Normalise angle to [0, 360) */
-const norm = (angle: number): number => {
-  angle = angle % 360;
-  return angle < 0 ? angle + 360 : angle;
-};
+export interface VarshaphalChart {
+  returnDate: Date;
+  varshaLagna: string;
+  varshaLagnaIndex: number;
+  muntha: string;
+  munthaHouse: number;
+  planets: GrahaPosition[];
+}
 
-/** Approximate tropical sun longitude (Meeus, degrees) */
-export const calcSunLongitude = (jd: number): number => {
-  const T = (jd - 2451545.0) / 36525;
-  const L0 = 280.46646 + 36000.76983 * T;
-  const M = (357.52911 + 35999.05029 * T) * (Math.PI / 180);
-  const C =
-    (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M) +
-    (0.019993 - 0.000101 * T) * Math.sin(2 * M) +
-    0.000289 * Math.sin(3 * M);
-  return norm(L0 + C);
-};
+export interface EclipseEvent {
+  type: 'total_solar' | 'annular_solar' | 'partial_solar' | 'total_lunar' | 'penumbral_lunar';
+  date: Date;
+  siderealDeg: number;
+  rashi: string;
+  nakshatra: string;
+  visibleFromIndia: boolean;
+}
 
-/** Approximate tropical moon longitude (Meeus simplified, degrees) */
-export const calcMoonLongitude = (jd: number): number => {
-  const T = (jd - 2451545.0) / 36525;
-  const L = 218.3165 + 481267.8813 * T;
-  const M = (357.5291 + 35999.0503 * T) * (Math.PI / 180);
-  const Mp = (134.9634 + 477198.8676 * T) * (Math.PI / 180);
-  const D = (297.8502 + 445267.1115 * T) * (Math.PI / 180);
-  const F = (93.2721 + 483202.0175 * T) * (Math.PI / 180);
-  const dL =
-    6.289 * Math.sin(Mp) -
-    1.274 * Math.sin(2 * D - Mp) +
-    0.658 * Math.sin(2 * D) -
-    0.186 * Math.sin(M) -
-    0.114 * Math.sin(2 * F);
-  return norm(L + dL);
-};
+export interface EclipseImpact {
+  natalGraha: string;
+  natalLon: number;
+  orb: number;
+}
 
-/** Convert tropical to Vedic (sidereal) longitude using Lahiri ayanamsha */
-export const tropicalToVedic = (tropicalLon: number, jd: number): number =>
-  norm(tropicalLon - getAyanamsha(jd));
+export interface AfflictedGraha {
+  graha: string;
+  reason: string;
+  severity: 'high' | 'medium' | 'low';
+}
 
-/**
- * Calculate Greenwich Mean Sidereal Time (GMST) in degrees for a given JD.
- * Based on Meeus "Astronomical Algorithms", Chapter 12.
- */
-export const calcGMST = (jd: number): number => {
-  const T = (jd - 2451545.0) / 36525;
-  // GMST at 0h UT + rotation for fractional day
-  const gmst =
-    280.46061837 +
-    360.98564736629 * (jd - 2451545.0) +
-    0.000387933 * T * T -
-    (T * T * T) / 38710000;
-  return norm(gmst);
-};
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- * Calculate the Ascendant (Lagna) in tropical degrees using Local Sidereal Time.
- * Formula: tan(Asc) = cos(LST) / -(sin(LST)*cos(ε) + tan(φ)*sin(ε))
- */
-export const calcAscendant = (jd: number, latitude: number, longitude: number): number => {
-  const T = (jd - 2451545.0) / 36525;
-  const obliquity = (23.4393 - 0.013 * T) * (Math.PI / 180); // ε
-  const gmst = calcGMST(jd);
-  const lst = norm(gmst + longitude); // Local Sidereal Time in degrees
-  const lstRad = lst * (Math.PI / 180);
-  const latRad = latitude * (Math.PI / 180);
+function profileToDate(profile: UserProfile): Date {
+  const [hours, minutes] = (profile.birth_time || '06:00').split(':').map(Number);
+  const date = new Date(profile.birth_date);
+  date.setUTCHours(hours || 6, minutes || 0, 0, 0);
+  return date;
+}
 
-  const y = Math.cos(lstRad);
-  const x = -(Math.sin(lstRad) * Math.cos(obliquity) + Math.tan(latRad) * Math.sin(obliquity));
-  let asc = Math.atan2(y, x) * (180 / Math.PI);
-  return norm(asc);
-};
+// ── Public API ───────────────────────────────────────────────────────────────
 
 export const astrologyEngine = {
-  toJulianDay,
-  calcSunLongitude,
-  calcMoonLongitude,
-  tropicalToVedic,
+  toJulianDay: ephemeris.toJulianDay,
+  calcSunLongitude: ephemeris.getSunLongitude,
+  calcMoonLongitude: ephemeris.getMoonLongitude,
+  tropicalToVedic: ephemeris.siderealLongitude,
 
   /**
    * Calculate chart for a given birth date/time/location.
-   * Returns sun sign, moon sign, nakshatra, lagna, and planet positions.
-   * The date parameter must already be in UTC.
+   * Now returns all 9 grahas (was Sun + Moon only).
    */
   calculateChart(
     date: Date,
     latitude: number,
     longitude: number,
-    timezone: string
+    _timezone: string
   ): ChartData {
-    const jd = toJulianDay(date);
-    const sunVedic = tropicalToVedic(calcSunLongitude(jd), jd);
-    const moonVedic = tropicalToVedic(calcMoonLongitude(jd), jd);
+    const jd = ephemeris.toJulianDay(date);
 
-    // Proper Ascendant via Local Sidereal Time
-    const tropicalAsc = calcAscendant(jd, latitude, longitude);
-    const lagnaApprox = tropicalToVedic(tropicalAsc, jd);
+    // Get all 9 graha positions
+    const allGrahas = ephemeris.getAllGrahaPositions(jd);
+
+    // Get Vedic Lagna
+    const lagna = getVedicLagna(jd, latitude, longitude);
+    const lagnaLon = lagna.lagnaLon;
+
+    // Assign houses to planets
+    const withHouses = assignHouses(allGrahas, lagnaLon);
+
+    // Build PlanetPosition array (backward-compatible)
+    const planets: PlanetPosition[] = withHouses.map((p) => ({
+      planet: p.graha.charAt(0).toUpperCase() + p.graha.slice(1),
+      longitude: p.siderealLon,
+      latitude: 0,
+      sign: this.getZodiacSign(p.siderealLon),
+      house: p.house,
+    }));
+
+    const sunGraha = allGrahas.find((g) => g.graha === 'sun')!;
+    const moonGraha = allGrahas.find((g) => g.graha === 'moon')!;
+    const sunVedic = sunGraha.siderealLon;
+    const moonVedic = moonGraha.siderealLon;
 
     const moonSign = this.getZodiacSign(moonVedic);
     const sunSign = this.getZodiacSign(sunVedic);
-    const nakshatra = this.getNakshatra(moonVedic);
-    const lagnaSign = this.getZodiacSign(lagnaApprox);
+    const nakshatra = getNakshatraName(moonVedic);
+    const nakshatraResult = getNakshatraResult(moonVedic);
 
-    const planets: PlanetPosition[] = [
-      {
-        planet: 'Sun',
-        longitude: sunVedic,
-        latitude: 0,
-        sign: sunSign,
-        house: (Math.floor(norm(sunVedic - lagnaApprox) / 30) % 12) + 1,
-      },
-      {
-        planet: 'Moon',
-        longitude: moonVedic,
-        latitude: 0,
-        sign: moonSign,
-        house: (Math.floor(norm(moonVedic - lagnaApprox) / 30) % 12) + 1,
-      },
-    ];
-
-    const houses = Array.from({ length: 12 }, (_, i) =>
-      norm(lagnaApprox + i * 30)
-    );
-
-    return { ascendant: lagnaApprox, lagnaSign, planets, houses, moonSign, sunSign, nakshatra };
+    return {
+      ascendant: lagnaLon,
+      lagnaSign: lagna.lagnaSign,
+      lagnaSignIndex: lagna.lagnaSignIndex,
+      planets,
+      houses: lagna.cusps,
+      moonSign,
+      sunSign,
+      nakshatra,
+      nakshatraPada: nakshatraResult.pada,
+      nakshatraIndex: nakshatraResult.index,
+      moonLongitude: moonVedic,
+      sunLongitude: sunVedic,
+    };
   },
 
-  /**
-   * Zodiac sign (Vedic rashi) for a given longitude
-   */
+  /** Zodiac sign (Vedic rashi) for a given longitude */
   getZodiacSign(longitude: number): string {
-    const index = Math.floor(norm(longitude) / 30);
+    const index = Math.floor(ephemeris.norm(longitude) / 30);
     return RASHI_NAMES[index] || 'Unknown';
   },
 
-  /**
-   * Rashi index (0–11) for a given longitude
-   */
+  /** Rashi index (0–11) for a given longitude */
   getRashiIndex(longitude: number): number {
-    return Math.floor(norm(longitude) / 30);
+    return Math.floor(ephemeris.norm(longitude) / 30);
   },
 
-  /**
-   * Nakshatra name from moon longitude
-   */
+  /** Nakshatra name from moon longitude */
   getNakshatra(moonLongitude: number): string {
-    const index = Math.floor(norm(moonLongitude) * 27 / 360);
-    return NAKSHATRA_NAMES[Math.min(index, 26)];
+    return getNakshatraName(moonLongitude);
   },
 
-  /**
-   * Nakshatra index (0–26) from moon longitude
-   */
+  /** Nakshatra index (0–26) from moon longitude */
   getNakshatraIndex(moonLongitude: number): number {
-    return Math.floor(norm(moonLongitude) * 27 / 360) % 27;
+    return _getNakshatraIndex(moonLongitude);
   },
 
-  /**
-   * Approximate Vedic moon sign from a birth date
-   */
+  /** Approximate Vedic moon sign from a birth date */
   getMoonSign(birthDate: Date): string {
-    const jd = toJulianDay(birthDate);
-    const moonVedic = tropicalToVedic(calcMoonLongitude(jd), jd);
+    const jd = ephemeris.toJulianDay(birthDate);
+    const moonVedic = ephemeris.siderealLongitude(ephemeris.getMoonLongitude(jd), jd);
     return this.getZodiacSign(moonVedic);
   },
 
-  /**
-   * Approximate Vedic sun sign from a birth date
-   */
+  /** Approximate Vedic sun sign from a birth date */
   getSunSign(birthDate: Date): string {
-    const jd = toJulianDay(birthDate);
-    const sunVedic = tropicalToVedic(calcSunLongitude(jd), jd);
+    const jd = ephemeris.toJulianDay(birthDate);
+    const sunVedic = ephemeris.siderealLongitude(ephemeris.getSunLongitude(jd), jd);
     return this.getZodiacSign(sunVedic);
+  },
+
+  // ── New methods for Phase D ──────────────────────────────────────────────
+
+  /** Tool 01 — Janma Kundli (convenience wrapper) */
+  calculateKundli(profile: UserProfile): ChartData {
+    const date = profileToDate(profile);
+    return this.calculateChart(
+      date,
+      profile.latitude ?? 28.6,
+      profile.longitude ?? 77.2,
+      profile.timezone
+    );
+  },
+
+  /** Tool 02 — Kundli Milan */
+  calculateKundliMilan(profileA: UserProfile, profileB: UserProfile): AshtakootResult {
+    const chartA = this.calculateKundli(profileA);
+    const chartB = this.calculateKundli(profileB);
+    const marsHouseA = chartA.planets.find((p) => p.planet === 'Mars')?.house ?? 0;
+    const marsHouseB = chartB.planets.find((p) => p.planet === 'Mars')?.house ?? 0;
+    return calculateAshtakoot(
+      chartA.moonLongitude,
+      chartB.moonLongitude,
+      marsHouseA,
+      marsHouseB,
+      chartA.lagnaSignIndex,
+      chartB.lagnaSignIndex
+    );
+  },
+
+  /** Tool 03 — Vimshottari Dasha */
+  calculateDasha(profile: UserProfile): DashaTimeline {
+    const date = profileToDate(profile);
+    const jd = ephemeris.toJulianDay(date);
+    const moonSid = ephemeris.siderealLongitude(ephemeris.getMoonLongitude(jd), jd);
+    return getDashaTimeline(new Date(profile.birth_date), moonSid);
+  },
+
+  /** Tool 04 — Gochar (Transits) */
+  calculateGochar(profile: UserProfile, date?: Date): GocharResult {
+    const transitDate = date ?? new Date();
+    const transitJd = ephemeris.toJulianDay(transitDate);
+    const transitPositions = ephemeris.getAllGrahaPositions(transitJd);
+
+    const chart = this.calculateKundli(profile);
+    const natalMoonSign = chart.moonSign;
+    const natalMoonRashi = chart.planets.find((p) => p.planet === 'Moon')
+      ? Math.floor(ephemeris.norm(chart.moonLongitude) / 30)
+      : 0;
+
+    const saturn = transitPositions.find((p) => p.graha === 'saturn');
+    const saturnRashi = saturn ? Math.floor(ephemeris.norm(saturn.siderealLon) / 30) : -1;
+    const saturnSign = saturn ? this.getZodiacSign(saturn.siderealLon) : '';
+
+    // Sade Sati: Saturn in 12th, 1st, or 2nd from natal Moon sign
+    const diff12 = ((saturnRashi - natalMoonRashi + 12) % 12);
+    let phase: GocharResult['sadeSatiStatus']['phase'] = 'none';
+    let isActive = false;
+    if (diff12 === 11) { phase = 'rising'; isActive = true; }
+    else if (diff12 === 0) { phase = 'peak'; isActive = true; }
+    else if (diff12 === 1) { phase = 'setting'; isActive = true; }
+
+    // Ashtama Shani: Saturn in 8th from natal Moon
+    const ashtamaShaniActive = diff12 === 7;
+
+    // Significant transits
+    const lagnaLon = chart.ascendant;
+    const significantTransits: TransitEvent[] = transitPositions
+      .filter((t) => t.graha !== 'rahu' && t.graha !== 'ketu')
+      .map((t) => ({
+        transitingGraha: t.graha,
+        natalHouse: _assignHouse(t.siderealLon, lagnaLon),
+        aspect: 'conjunction',
+        orb: 0,
+      }));
+
+    return {
+      transitPositions,
+      sadeSatiStatus: { isActive, phase, saturnSign, natalMoonSign },
+      ashtamaShaniActive,
+      significantTransits,
+    };
+  },
+
+  /** Live sidereal planet positions for today */
+  getCurrentPositions(): GrahaPosition[] {
+    const jd = ephemeris.toJulianDay(new Date());
+    return ephemeris.getAllGrahaPositions(jd);
+  },
+
+  /** Tool 05 — Varshaphal (Solar Return) */
+  calculateVarshaphal(profile: UserProfile, year?: number): VarshaphalChart {
+    const targetYear = year ?? new Date().getFullYear();
+    const birthDate = profileToDate(profile);
+    const birthJd = ephemeris.toJulianDay(birthDate);
+    const natalSunLon = ephemeris.getSunLongitude(birthJd);
+
+    // Approximate solar return: find when Sun returns to natal longitude
+    const approxReturnDate = new Date(targetYear, birthDate.getUTCMonth(), birthDate.getUTCDate());
+    const returnJd = ephemeris.toJulianDay(approxReturnDate);
+    const lat = profile.latitude ?? 28.6;
+    const lng = profile.longitude ?? 77.2;
+
+    const allGrahas = ephemeris.getAllGrahaPositions(returnJd);
+    const lagna = getVedicLagna(returnJd, lat, lng);
+
+    // Muntha: sign = (natal lagna sign + years since birth) % 12
+    const chart = this.calculateKundli(profile);
+    const age = targetYear - new Date(profile.birth_date).getFullYear();
+    const munthaIdx = (chart.lagnaSignIndex + age) % 12;
+    const muntha = RASHI_NAMES[munthaIdx];
+    const munthaHouse = _assignHouse(munthaIdx * 30, lagna.lagnaLon);
+
+    return {
+      returnDate: approxReturnDate,
+      varshaLagna: lagna.lagnaSign,
+      varshaLagnaIndex: lagna.lagnaSignIndex,
+      muntha,
+      munthaHouse,
+      planets: allGrahas,
+    };
+  },
+
+  /** Tool 06 — Varga Charts */
+  calculateVargaChart(profile: UserProfile, divisor: 3 | 7 | 9 | 10 | 12): VargaChart {
+    const date = profileToDate(profile);
+    const jd = ephemeris.toJulianDay(date);
+    const allGrahas = ephemeris.getAllGrahaPositions(jd);
+    const lagna = getVedicLagna(jd, profile.latitude ?? 28.6, profile.longitude ?? 77.2);
+    return calculateVarga(allGrahas, lagna.lagnaLon, divisor);
+  },
+
+  /** Tool 10 — Nakshatra convenience */
+  getMoonNakshatra(profile: UserProfile): { nakshatraKey: string; nakshatraIndex: number; pada: number } {
+    const chart = this.calculateKundli(profile);
+    return {
+      nakshatraKey: chart.nakshatra,
+      nakshatraIndex: chart.nakshatraIndex,
+      pada: chart.nakshatraPada,
+    };
+  },
+
+  /** Tool 11 — Eclipses (simplified; returns empty for now — expand with real data) */
+  getEclipses(_year: number): EclipseEvent[] {
+    return [];
+  },
+
+  /** Tool 11 — Eclipse personal impact */
+  getEclipsePersonalImpact(_eclipseDeg: number, _profile: UserProfile): EclipseImpact[] {
+    return [];
+  },
+
+  /** Tool 12 — Ashtakavarga */
+  calculateAshtakavarga(profile: UserProfile): AshtakavargaResult {
+    const date = profileToDate(profile);
+    const jd = ephemeris.toJulianDay(date);
+    const allGrahas = ephemeris.getAllGrahaPositions(jd);
+    const lagna = getVedicLagna(jd, profile.latitude ?? 28.6, profile.longitude ?? 77.2);
+    return _calcAshtakavarga(allGrahas, lagna.lagnaLon);
+  },
+
+  /** Tool 13 — Prashna (Horary Chart) */
+  calculatePrashna(timestamp: Date, lat: number, lng: number): ChartData {
+    return this.calculateChart(timestamp, lat, lng, 'UTC');
+  },
+
+  /** Tool 15 — Afflicted Grahas for remedies */
+  getAfflictedGrahas(profile: UserProfile): AfflictedGraha[] {
+    const chart = this.calculateKundli(profile);
+    const afflicted: AfflictedGraha[] = [];
+
+    // Debilitation check
+    const DEBILITATED: Record<string, number> = {
+      Sun: 6, Moon: 7, Mars: 3, Mercury: 11, Jupiter: 9, Venus: 5, Saturn: 0,
+    };
+
+    for (const planet of chart.planets) {
+      const rashiIdx = Math.floor(ephemeris.norm(planet.longitude) / 30);
+
+      // Check debilitation
+      if (DEBILITATED[planet.planet] === rashiIdx) {
+        afflicted.push({
+          graha: planet.planet,
+          reason: 'debilitated',
+          severity: 'high',
+        });
+      }
+
+      // Combustion: planet within ~6° of Sun (except Moon)
+      if (planet.planet !== 'Sun' && planet.planet !== 'Moon' &&
+          planet.planet !== 'Rahu' && planet.planet !== 'Ketu') {
+        const sunPlanet = chart.planets.find((p) => p.planet === 'Sun');
+        if (sunPlanet) {
+          let diff = Math.abs(planet.longitude - sunPlanet.longitude);
+          if (diff > 180) diff = 360 - diff;
+          if (diff < 6) {
+            afflicted.push({
+              graha: planet.planet,
+              reason: 'combust',
+              severity: diff < 3 ? 'high' : 'medium',
+            });
+          }
+        }
+      }
+    }
+
+    return afflicted;
   },
 };
