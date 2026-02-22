@@ -6,8 +6,8 @@ Vedic / Jyotish — Vimshottari Dasha system (120-year cycle), Mahadasha → Ant
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen). New route: `Dasha`.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). New route: `Dasha`.
 
 ---
 

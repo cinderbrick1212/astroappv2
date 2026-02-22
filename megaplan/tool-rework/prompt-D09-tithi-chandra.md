@@ -7,8 +7,8 @@ and the Moon's daily nakshatra transit. Standalone tool — does not require bir
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen). New route: `TithiChandra`.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). New route: `TithiChandra`.
 
 ---
 

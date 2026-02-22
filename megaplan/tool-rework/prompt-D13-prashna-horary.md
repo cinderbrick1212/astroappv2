@@ -8,8 +8,8 @@ data is not required — only the current moment and location matter.
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen). New route: `Prashna`.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). New route: `Prashna`.
 Standalone — does not depend on Tools 01–12. Birth data optional for enhanced reading.
 
 ---

@@ -8,8 +8,8 @@ Rising sign (Lagna) used where available for more accurate house-specific predic
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme), 06 (DailyFeedScreen), and 07 (FeedComponents).
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme), C06 (DailyFeedScreen), and C07 (FeedComponents).
 New route: `DainikRashifal`. Also feeds content into the main daily feed (prompt 06).
 Depends on Tool 03 (Dasha) and Tool 04 (Gochar) for enriched daily predictions.
 
@@ -69,7 +69,7 @@ All prediction paragraphs are assembled by combining:
 | `components/OverallRatingBar.tsx` | 1–5 star / 5-bar visual day rating |
 | `components/AreaFocusChip.tsx` | Chips for Career / Health / Relationships / Finance |
 | `components/LuckyFactorsCard.tsx` | Lucky number, color, time in a compact 3-chip row |
-| `components/RemedyOfDayCard.tsx` | Reuse existing `RemedyCard` component from #34 prompt 07 |
+| `components/RemedyOfDayCard.tsx` | Reuse existing `RemedyCard` component from `frontend-rework/prompt-C07` |
 
 ---
 
@@ -122,4 +122,4 @@ All prediction paragraphs are assembled by combining:
 - [ ] Dasha note changes when Dasha lord changes (not daily — period-based)
 - [ ] Push notification scheduled correctly using `useNotifications` hook
 - [ ] User can configure notification time in Profile
-- [ ] Rashifal card also appears in the main daily feed (DailyFeedScreen from #34 prompt 06)
+- [ ] Rashifal card also appears in the main daily feed (DailyFeedScreen from `frontend-rework/prompt-C06`)

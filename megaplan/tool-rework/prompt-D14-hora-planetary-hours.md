@@ -8,8 +8,8 @@ planets in the Chaldean sequence. The day's first Hora lord = the day's ruling p
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen). New route: `Hora`.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). New route: `Hora`.
 Standalone — does not require birth data (though name used for personalisation).
 
 ---

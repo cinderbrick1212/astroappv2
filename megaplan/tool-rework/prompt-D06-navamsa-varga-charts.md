@@ -7,8 +7,8 @@ D9 (Navamsa), D10 (Dashamsha), D12 (Dwadashamsha), D3 (Drekkana), D7 (Saptamsha)
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen). New route: `VargaCharts`.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). New route: `VargaCharts`.
 Depends on Tool 01 (Janma Kundli) — Varga charts are sub-divisions of the natal chart.
 
 ---

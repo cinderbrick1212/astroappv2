@@ -8,8 +8,8 @@ by proximity of eclipse degree to natal planets.
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen). Standalone — does not
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). Standalone — does not
 require birth data for the eclipse calendar view; personalized impact requires birth data.
 
 ---

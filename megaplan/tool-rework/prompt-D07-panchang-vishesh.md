@@ -7,8 +7,8 @@ Includes Rahu Kaal, Gulika Kaal, Abhijit Muhurta, and sunrise/sunset times.
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Extends the basic `PanchangScreen` from #34 prompt 14 with deeper divinatory content.
+## Integration with megaplan
+Extends the basic `PanchangScreen` from `frontend-rework/prompt-C14` with deeper divinatory content.
 New route: `PanchangVishesh`. The basic Panchang card in ToolsScreen links here.
 
 ---

@@ -6,9 +6,9 @@ Vedic / Jyotish — sidereal zodiac (Lahiri ayanamsa), Whole Sign houses, nine g
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on `extensive_frontend_rework` prompts 01 (MD3 theme) and 08 (ToolsScreen hub).
-Replaces the lightweight `KundliScreen` from prompt 12 of #34 with the full Janma Kundli.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (MD3 theme) and C08 (ToolsScreen hub).
+Replaces the lightweight `KundliScreen` from `frontend-rework/prompt-C12` with the full Janma Kundli.
 
 ---
 

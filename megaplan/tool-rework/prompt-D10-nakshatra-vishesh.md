@@ -7,8 +7,8 @@ deity, symbol, gana, Yoni, Nadi — the complete nakshatra profile.
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen). New route: `NakshatraVishesh`.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). New route: `NakshatraVishesh`.
 Depends on Tool 01 (birth nakshatra comes from Janma Kundli).
 
 ---

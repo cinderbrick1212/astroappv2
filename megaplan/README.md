@@ -115,7 +115,7 @@ Phase D must wait for C (tools build on the MD3 UI shell).
 | D12 | Tools | `tool-rework/prompt-D12-ashtakavarga.md` | Create `AshtakavargaScreen.tsx` + SAV grid | New files |
 | D13 | Tools | `tool-rework/prompt-D13-prashna-horary.md` | Create `PrashnaScreen.tsx` + question chart | New files |
 | D14 | Tools | `tool-rework/prompt-D14-hora-planetary-hours.md` | Create `HoraScreen.tsx` + live hora indicator | New files |
-| D15 | Tools | `tool-rework/prompt-D15-graha-shanti-remedies.md` | Create `GrahaShantiremediesScreen.tsx` | New file |
+| D15 | Tools | `tool-rework/prompt-D15-graha-shanti-remedies.md` | Create `GrahaShantScreen.tsx` | New file |
 | D16 | Tools | `tool-rework/prompt-D16-dainik-rashifal.md` | Create `DainikRashifalScreen.tsx` + notification config | New files |
 
 ---
@@ -300,9 +300,7 @@ mobile/src/
 │   ├── kundli.ts                  ← updated to use engine/
 │   ├── compatibility.ts           ← updated to use engine/ashtakoot
 │   ├── panchang.ts                ← updated to use engine/panchang
-│   ├── horoscope.ts               ← updated to use contentService
-│   ├── dasha.ts                   ← new (Phase A04)
-│   └── contentService.ts          ← new (CONTENT_LAYER_PLAN.md)
+│   └── horoscope.ts               ← updated to use contentService
 │
 ├── utils/
 │   ├── storageTypes.ts            ← Phase B01 (new)
@@ -319,7 +317,9 @@ mobile/src/
 │   ├── remedies.ts
 │   ├── ashtakoot.ts
 │   ├── panchang.ts
+│   ├── muhurta.ts
 │   ├── rashifal.ts
+│   ├── contentService.ts          ← new (CONTENT_LAYER_PLAN.md)
 │   └── index.ts
 │
 ├── theme/

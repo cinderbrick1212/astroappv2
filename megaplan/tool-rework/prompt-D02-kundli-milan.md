@@ -6,9 +6,9 @@ Vedic / Jyotish — Ashtakoot Guna Milan, 36-point scoring system, Mangal Dosha 
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen).
-Replaces the existing `CompatibilityScreen` from #34 prompt 13 with full Ashtakoot Milan.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen).
+Replaces the existing `CompatibilityScreen` from `frontend-rework/prompt-C13` with full Ashtakoot Milan.
 
 ---
 

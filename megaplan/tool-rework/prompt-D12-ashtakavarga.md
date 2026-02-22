@@ -8,8 +8,8 @@ The Sarva Ashtakavarga (SAV) totals per sign predict overall life strength in ea
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen). New route: `Ashtakavarga`.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). New route: `Ashtakavarga`.
 Depends on Tool 01 (requires full natal chart).
 
 ---

@@ -8,8 +8,8 @@ inauspicious periods (Rahu Kaal, Gulika, Durmuhurta).
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen). New route: `Muhurta`.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). New route: `Muhurta`.
 Depends on Tool 07 (Panchang Vishesh) for daily Panchang data.
 
 ---

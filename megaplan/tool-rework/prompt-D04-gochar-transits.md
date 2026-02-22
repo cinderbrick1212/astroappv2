@@ -7,8 +7,8 @@ Ashtama Shani, and Jupiter transit (Guru Gochar) as primary timing indicators.
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen). New route: `Gochar`.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). New route: `Gochar`.
 Feeds prediction content into the daily feed (Tool 16 — Dainik Rashifal).
 
 ---

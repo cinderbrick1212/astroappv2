@@ -7,8 +7,8 @@ returns to its natal sidereal longitude each year, at the user's current locatio
 ## Platforms
 Web · iOS · Android
 
-## Integration with #34
-Depends on #34 prompts 01 (theme) and 08 (ToolsScreen). New route: `Varshaphal`.
+## Integration with megaplan
+Depends on `frontend-rework` prompts C01 (theme) and C08 (ToolsScreen). New route: `Varshaphal`.
 Depends on Tool 01 (Janma Kundli) for natal chart reference.
 
 ---

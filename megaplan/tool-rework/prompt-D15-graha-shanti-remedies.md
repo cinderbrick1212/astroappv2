@@ -80,7 +80,7 @@ yantra, charity, fasting, deity worship, and auspicious colours.
 
 | Service | Method | Purpose |
 |---------|--------|---------|
-| `astrologyEngine` | `getAfflictedPlanets(profile)` | Returns list of grahas needing propitiation + reason |
+| `astrologyEngine` | `getAfflictedGrahas(profile)` | Returns list of grahas needing propitiation + reason |
 | `contentService` | `getGrahaShanti(profile)` | Full personalised remedy prescription |
 | `analytics` | `grahaShantViewed()` | Fires on mount |
 
