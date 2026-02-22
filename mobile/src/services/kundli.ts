@@ -5,6 +5,8 @@
 
 import { astrologyEngine, ChartData } from './astrologyEngine';
 import { storage } from '../utils/storage';
+import { getCachedChart, setCachedChart, clearUserCache } from '../utils/chartCache';
+import { StorageKey, TTL } from '../utils/storageTypes';
 
 /** Return UTC offset in hours for a timezone name (e.g. 'Asia/Kolkata' → 5.5) */
 const getTimezoneOffset = (timezone: string): number => {
@@ -158,10 +160,14 @@ const getCurrentDasha = (nakshatra: string, birthDate: Date): { planet: string; 
   return { planet, endYear: dashYear + DASHA_YEARS[planet] };
 };
 
-interface KundliCacheEntry {
-  birthKey: string;
-  data: KundliData;
-}
+const getCacheUserId = async (): Promise<string> => {
+  const userData = await storage.get<{ id?: number | string; email?: string }>(storage.keys.USER_DATA);
+  if (userData?.id !== undefined && userData.id !== null) {
+    return String(userData.id);
+  }
+  if (userData?.email) return userData.email;
+  return 'guest';
+};
 
 // Traditional insights keyed by rashi
 const RASHI_INSIGHTS: Record<string, string[]> = {
@@ -190,13 +196,11 @@ export const kundliService = {
     birthPlace: { latitude: number; longitude: number },
     timezone: string
   ): Promise<KundliData> {
-    const birthKey = `${birthDate.toISOString()}_${birthTime}_${birthPlace.latitude}_${birthPlace.longitude}`;
-    const cached = await storage.get<KundliCacheEntry>(storage.keys.KUNDLI_CACHE);
-    if (cached && cached.birthKey === birthKey) {
-      return cached.data;
-    }
+    const userId = await getCacheUserId();
+    const cached = await getCachedChart<KundliData>(userId, StorageKey.KUNDLI_CACHE, TTL.KUNDLI);
+    if (cached) return cached;
     const data = this.calculateKundli(birthDate, birthTime, birthPlace, timezone);
-    await storage.set(storage.keys.KUNDLI_CACHE, { birthKey, data });
+    await setCachedChart(userId, StorageKey.KUNDLI_CACHE, data);
     return data;
   },
 
@@ -259,6 +263,7 @@ export const kundliService = {
    * Invalidate cached kundli (call when birth details change).
    */
   async clearCache(): Promise<void> {
-    await storage.remove(storage.keys.KUNDLI_CACHE);
+    const userId = await getCacheUserId();
+    await clearUserCache(userId);
   },
 };
