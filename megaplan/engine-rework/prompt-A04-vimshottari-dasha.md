@@ -170,5 +170,5 @@ No React Native / Expo imports. Works identically on Web, iOS, Android.
 - [ ] `sequence[8].endDate` ≈ `birthDate + 120 years`
 - [ ] `currentMahadasha.isCurrent` is `true` and all others are `false`
 - [ ] All Antardasha durations within a Mahadasha sum to exactly the Mahadasha duration
-- [ ] `getDashaTimeline` with a test birth date (1990-01-15, Moon in Rohini) returns Venus Mahadasha as the starting lord
+- [ ] `getDashaTimeline` with a test birth date (1990-01-15, Moon in Rohini) returns Moon Mahadasha as the starting lord
 - [ ] `currentAntardasha` and `currentPratyantardasha` both have `isCurrent === true`

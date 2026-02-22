@@ -142,6 +142,7 @@ import type { DashaTimeline } from './engine/dasha';
 import type { VargaChart } from './engine/vargas';
 import type { AshtakavargaResult } from './engine/ashtakavarga';
 import type { GrahaPosition } from './engine/ephemeris';
+import type { AshtakootResult } from './engine/ashtakoot';
 
 export interface GocharResult {
   transitPositions: GrahaPosition[];
@@ -192,6 +193,40 @@ export interface AfflictedGraha {
   severity: 'high' | 'medium' | 'low';
 }
 ```
+
+---
+
+## `services/panchang.ts` — required update (A08)
+
+`services/panchang.ts` currently calls old `astrologyEngine` primitives directly.
+As part of A08, update it to delegate to `engine/panchang.ts` and expose the two
+public methods that Phase D tool screens call:
+
+```typescript
+import { toJulianDay } from './astrologyEngine';
+import {
+  getSunriseSunset,
+  getRahuKaal, getGulikaKaal, getYamghant,
+  getAbhijitMuhurta, getHoraSchedule, scoreMuhurta,
+} from './engine/panchang';
+import { getTithiIndex, getNakshatraIndex } from './engine/nakshatra';
+
+// Used by D07 (PanchangVishesh), D08 (Muhurta), D09 (TithiChandra)
+export async function calculatePanchang(
+  date: Date,
+  lat: number,
+  lng: number
+): Promise<PanchangData>
+
+// Used by D14 (Hora) — wraps engine getSunriseSunset with Date→JD conversion
+export function getSunriseSunsetForDate(
+  date: Date,
+  lat: number,
+  lng: number
+): SunriseSunset
+```
+
+All existing callers of `panchangService` continue to work unchanged.
 
 ---
 

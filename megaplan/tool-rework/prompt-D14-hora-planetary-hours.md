@@ -76,7 +76,7 @@ The starting planet for Hour 1 is determined by the day of the week.
 
 | Service | Method | Purpose |
 |---------|--------|---------|
-| `panchangService` | `getSunriseSunset(date, lat, lng)` | Exact sunrise/sunset for Hora division |
+| `panchangService` | `getSunriseSunsetForDate(date, lat, lng)` | Exact sunrise/sunset for Hora division |
 | `contentService` | `getHoraContent(date, lat, lng)` | All 24 Horas with planet, times, activities |
 | `analytics` | `horaViewed()` | Fires on mount |
 
