@@ -157,7 +157,7 @@ export interface IndividualAshtakavarga {
 
 export interface AshtakavargaResult {
   individual: IndividualAshtakavarga[];   // 8 rows (7 planets + lagna)
-  sarva: number[];                        // 12 totals (sum of all 8 rows per sign), range 0–56
+  sarva: number[];                        // 12 totals (sum of all 8 rows per sign), range 0–8 with simplified tables; 0–56 with full Parashari tables
   savByHouse: Record<number, number>;     // house number (1–12) → SAV score
 }
 
@@ -222,5 +222,5 @@ No React Native / Expo imports. Works identically on Web, iOS, Android.
 ### ashtakavarga.ts
 - [ ] `individual` array has exactly 8 entries
 - [ ] Each `individual.points` array has exactly 12 values, all 0 or 1
-- [ ] `sarva` array has exactly 12 values, each in range 0–56
+- [ ] `sarva` array has exactly 12 values, each in range 0–8 (simplified tables) — expand to full Parashari tables before running D12 to achieve the traditional 0–56 range
 - [ ] Sum of all `sarva` values = sum of all individual points (cross-check)

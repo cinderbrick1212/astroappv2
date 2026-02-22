@@ -92,6 +92,12 @@ then `houses.assignHouses(planets, lagnaLon)` to assign house numbers.
 Add these to the `astrologyEngine` object:
 
 ```typescript
+// Tool 01 — Janma Kundli (convenience wrapper that accepts a profile object)
+calculateKundli(profile: UserProfile): ChartData
+
+// Tool 02 — Kundli Milan (delegates to engine/ashtakoot)
+calculateKundliMilan(profileA: UserProfile, profileB: UserProfile): AshtakootResult
+
 // Tool 03 — Vimshottari Dasha
 calculateDasha(profile: UserProfile): DashaTimeline
 
@@ -108,6 +114,9 @@ calculateVargaChart(profile: UserProfile, divisor: 3|7|9|10|12): VargaChart
 // Tool 07 — Panchang (used by PanchangVishesh, Hora, Tithi tools)
 // → panchangService already handles this; expose a convenience wrapper
 getPanchangForDate(date: Date, lat: number, lng: number): PanchangData
+
+// Tool 10 — Nakshatra (convenience wrapper returning nakshatra + pada from profile)
+getMoonNakshatra(profile: UserProfile): { nakshatraKey: string; nakshatraIndex: number; pada: number }
 
 // Tool 11 — Eclipses
 getEclipses(year: number): EclipseEvent[]
@@ -133,6 +142,8 @@ import type { DashaTimeline } from './engine/dasha';
 import type { VargaChart } from './engine/vargas';
 import type { AshtakavargaResult } from './engine/ashtakavarga';
 import type { GrahaPosition } from './engine/ephemeris';
+import type { AshtakootResult } from './engine/ashtakoot';
+import type { PanchangData } from './panchang';
 
 export interface GocharResult {
   transitPositions: GrahaPosition[];
@@ -186,6 +197,40 @@ export interface AfflictedGraha {
 
 ---
 
+## `services/panchang.ts` — required update (A08)
+
+`services/panchang.ts` currently calls old `astrologyEngine` primitives directly.
+As part of A08, update it to delegate to `engine/panchang.ts` and expose the two
+public methods that Phase D tool screens call:
+
+```typescript
+import { toJulianDay } from './astrologyEngine';
+import {
+  getSunriseSunset,
+  getRahuKaal, getGulikaKaal, getYamghant,
+  getAbhijitMuhurta, getHoraSchedule, scoreMuhurta,
+} from './engine/panchang';
+import { getTithiIndex, getNakshatraIndex } from './engine/nakshatra';
+
+// Used by D07 (PanchangVishesh), D08 (Muhurta), D09 (TithiChandra)
+export async function calculatePanchang(
+  date: Date,
+  lat: number,
+  lng: number
+): Promise<PanchangData>
+
+// Used by D14 (Hora) — wraps engine getSunriseSunset with Date→JD conversion
+export function getSunriseSunsetForDate(
+  date: Date,
+  lat: number,
+  lng: number
+): SunriseSunset
+```
+
+All existing callers of `panchangService` continue to work unchanged.
+
+---
+
 ## Platform compatibility
 
 The facade itself has no React Native / Expo imports. Each engine module is
@@ -200,6 +245,8 @@ also pure TypeScript, so the full engine works on Web, iOS, and Android.
 - [ ] `astrologyEngine.calcMoonLongitude` produces the same result (within 0.1°)
 - [ ] `astrologyEngine.tropicalToVedic` produces the same result (within 0.05°)
 - [ ] `astrologyEngine.calculateChart` now returns 9 planets instead of 2
+- [ ] `astrologyEngine.calculateKundli(profile)` returns the same `ChartData` as `calculateChart` with profile fields extracted
+- [ ] `astrologyEngine.calculateKundliMilan(profileA, profileB)` returns an `AshtakootResult` identical to calling `engine/ashtakoot.calculateAshtakoot` directly
 - [ ] `astrologyEngine.getMoonSign` still works unchanged
 - [ ] `astrologyEngine.getSunSign` still works unchanged
 - [ ] `astrologyEngine.getNakshatra` still works unchanged
