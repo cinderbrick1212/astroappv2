@@ -1,78 +1,107 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { StyleSheet, ScrollView, View, Share } from 'react-native';
 import {
-  View,
   Text,
-  StyleSheet,
-  ScrollView,
   ActivityIndicator,
-} from 'react-native';
-import { RouteProp, useRoute } from '@react-navigation/native';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
-import { useBlogPost } from '../hooks/useBlogPost';
+  Card,
+  Button,
+  Chip,
+  useTheme,
+} from 'react-native-paper';
+import { useRoute, RouteProp } from '@react-navigation/native';
 import { AppStackParamList } from '../types';
-import { analytics } from '../services/analytics';
+import { useBlogPost } from '../hooks/useBlogPost';
 
 type BlogPostRoute = RouteProp<AppStackParamList, 'BlogPost'>;
 
 const BlogPostScreen: React.FC = () => {
+  const theme = useTheme();
   const route = useRoute<BlogPostRoute>();
   const { id } = route.params;
-  const { blogPost, isLoading, error } = useBlogPost(id);
+  const { post, isLoading } = useBlogPost(id);
 
-  useEffect(() => {
-    analytics.blogPostViewed(id);
-  }, [id]);
+  const handleShare = async () => {
+    if (!post) return;
+    await Share.share({ title: post.title, message: post.title });
+  };
 
   if (isLoading) {
     return (
-      <View style={styles.centeredContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
+      <View style={[styles.centered, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
 
-  if (error || !blogPost) {
+  if (!post) {
     return (
-      <View style={styles.centeredContainer}>
-        <Text style={styles.errorText}>Could not load blog post. Please try again.</Text>
+      <View style={[styles.centered, { backgroundColor: theme.colors.background }]}>
+        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+          Post not found.
+        </Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        {/* Title */}
-        <Text style={styles.title}>{blogPost.title}</Text>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      {/* Title */}
+      <View style={styles.header}>
+        <Text variant="headlineMedium" style={{ color: theme.colors.onBackground }}>
+          {post.title}
+        </Text>
 
         {/* Meta */}
         <View style={styles.metaRow}>
-          {blogPost.author ? (
-            <Text style={styles.author}>By {blogPost.author}</Text>
+          {post.author ? (
+            <Chip
+              icon="account-outline"
+              mode="flat"
+              compact
+              style={{ backgroundColor: theme.colors.secondaryContainer }}
+              textStyle={{ color: theme.colors.onSecondaryContainer }}
+            >
+              {post.author}
+            </Chip>
           ) : null}
-          <Text style={styles.date}>
-            {new Date(blogPost.published_at).toLocaleDateString('en-US', {
-              year: 'numeric',
+          <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, marginLeft: 8 }}>
+            {new Date(post.published_at).toLocaleDateString('en-US', {
               month: 'long',
               day: 'numeric',
+              year: 'numeric',
             })}
           </Text>
         </View>
+      </View>
 
-        {/* Categories */}
-        {blogPost.categories && blogPost.categories.length > 0 && (
-          <View style={styles.categoriesRow}>
-            {blogPost.categories.map(cat => (
-              <View key={cat} style={styles.categoryTag}>
-                <Text style={styles.categoryTagText}>{cat}</Text>
-              </View>
-            ))}
-          </View>
-        )}
+      {/* Body text */}
+      <Card mode="elevated" elevation={0} style={styles.bodyCard}>
+        <Card.Content>
+          {/* Render plain excerpt/body text. If react-native-render-html is available, use it here. */}
+          <Text variant="bodyLarge" style={{ color: theme.colors.onSurface, lineHeight: 26 }}>
+            {post.excerpt}
+          </Text>
+          {post.body ? (
+            <Text
+              variant="bodyMedium"
+              style={{ color: theme.colors.onSurface, lineHeight: 24, marginTop: 16 }}
+            >
+              {post.body}
+            </Text>
+          ) : null}
+        </Card.Content>
+      </Card>
 
-        {/* Body */}
-        <Text style={styles.body}>{blogPost.body}</Text>
+      {/* Share */}
+      <View style={styles.footer}>
+        <Button
+          mode="outlined"
+          icon="share-variant-outline"
+          onPress={handleShare}
+          accessibilityLabel="Share this post"
+        >
+          Share
+        </Button>
       </View>
     </ScrollView>
   );
@@ -81,66 +110,29 @@ const BlogPostScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
-  centeredContainer: {
+  centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing.xl,
-    backgroundColor: colors.background,
   },
-  errorText: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  content: {
-    padding: spacing.lg,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: colors.textPrimary,
-    lineHeight: 34,
-    marginBottom: spacing.md,
+  header: {
+    padding: 20,
+    paddingBottom: 12,
   },
   metaRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  author: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  date: {
-    fontSize: 13,
-    color: colors.textTertiary,
-  },
-  categoriesRow: {
-    flexDirection: 'row',
+    marginTop: 12,
     flexWrap: 'wrap',
-    gap: spacing.xs,
-    marginBottom: spacing.lg,
   },
-  categoryTag: {
-    backgroundColor: colors.primaryLight,
-    borderRadius: 12,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
+  bodyCard: {
+    marginHorizontal: 16,
+    marginBottom: 16,
   },
-  categoryTagText: {
-    fontSize: 12,
-    color: colors.textOnPrimary,
-    fontWeight: '500',
-  },
-  body: {
-    fontSize: 16,
-    color: colors.textPrimary,
-    lineHeight: 26,
+  footer: {
+    paddingHorizontal: 16,
+    paddingBottom: 32,
   },
 });
 

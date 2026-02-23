@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
+import { StyleSheet, ScrollView, View } from 'react-native';
+import {
+  Text,
+  Card,
+  Chip,
+  List,
+  Divider,
+  DataTable,
+  ProgressBar,
+  Button,
+  ActivityIndicator,
+  useTheme,
+} from 'react-native-paper';
 import { useUserProfile } from '../hooks/useUserProfile';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { kundliService, KundliData } from '../services/kundli';
 import { analytics } from '../services/analytics';
 
 const KundliScreen: React.FC = () => {
+  const theme = useTheme();
   const { profile, isLoading } = useUserProfile();
   const [kundli, setKundli] = useState<KundliData | null>(null);
   const [calculating, setCalculating] = useState(false);
@@ -36,30 +47,47 @@ const KundliScreen: React.FC = () => {
       .finally(() => setCalculating(false));
   }, [profile?.birth_date, profile?.birth_time, profile?.birth_place]);
 
+  // Loading state
   if (isLoading || calculating) {
-    return <LoadingSkeleton />;
+    return (
+      <View style={[styles.centered, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginTop: 16 }}>
+          {calculating ? 'Calculating your chart…' : 'Loading…'}
+        </Text>
+      </View>
+    );
   }
 
+  // Error state
   if (calcError) {
     return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyIcon}>⚠️</Text>
-        <Text style={styles.emptyTitle}>Calculation Error</Text>
-        <Text style={styles.emptyText}>
+      <View style={[styles.centered, { backgroundColor: theme.colors.background }]}>
+        <Text variant="headlineSmall" style={{ color: theme.colors.error, textAlign: 'center' }}>
+          Calculation Error
+        </Text>
+        <Text
+          variant="bodyMedium"
+          style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center', marginTop: 8, paddingHorizontal: 24 }}
+        >
           Could not calculate your Kundli. Please check your birth details and try again.
         </Text>
       </View>
     );
   }
 
+  // No birth details
   const hasBirthDetails = !!(profile?.birth_date && profile?.birth_time && profile?.birth_place);
-
   if (!hasBirthDetails) {
     return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyIcon}>🔯</Text>
-        <Text style={styles.emptyTitle}>Birth Details Required</Text>
-        <Text style={styles.emptyText}>
+      <View style={[styles.centered, { backgroundColor: theme.colors.background }]}>
+        <Text variant="headlineSmall" style={{ color: theme.colors.onBackground, textAlign: 'center' }}>
+          Birth Details Required
+        </Text>
+        <Text
+          variant="bodyMedium"
+          style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center', marginTop: 8, paddingHorizontal: 24 }}
+        >
           Add your birth date, time, and place in your Profile to view your Kundli.
         </Text>
       </View>
@@ -69,75 +97,119 @@ const KundliScreen: React.FC = () => {
   if (!kundli) return null;
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Key Insights */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Key Placements</Text>
-        <View style={styles.card}>
-          <View style={styles.insightRow}>
-            <Text style={styles.insightLabel}>Lagna (Ascendant)</Text>
-            <Text style={styles.insightValue}>{kundli.lagna}</Text>
-          </View>
-          <View style={styles.insightRow}>
-            <Text style={styles.insightLabel}>Rashi (Moon Sign)</Text>
-            <Text style={styles.insightValue}>{kundli.rashi}</Text>
-          </View>
-          <View style={styles.insightRow}>
-            <Text style={styles.insightLabel}>Sun Sign</Text>
-            <Text style={styles.insightValue}>{kundli.sunSign}</Text>
-          </View>
-          <View style={[styles.insightRow, { borderBottomWidth: 0 }]}>
-            <Text style={styles.insightLabel}>Nakshatra</Text>
-            <Text style={styles.insightValue}>{kundli.nakshatra}</Text>
-          </View>
-        </View>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+
+      {/* Key Placements — as assist Chips */}
+      <View style={styles.chipRow}>
+        <Chip
+          icon="arrow-up-bold-circle-outline"
+          mode="flat"
+          style={[styles.placementChip, { backgroundColor: theme.colors.primaryContainer }]}
+          textStyle={{ color: theme.colors.onPrimaryContainer }}
+          accessibilityLabel={`Lagna: ${kundli.lagna}`}
+        >
+          Lagna: {kundli.lagna}
+        </Chip>
+        <Chip
+          icon="moon-waning-crescent"
+          mode="flat"
+          style={[styles.placementChip, { backgroundColor: theme.colors.primaryContainer }]}
+          textStyle={{ color: theme.colors.onPrimaryContainer }}
+          accessibilityLabel={`Rashi: ${kundli.rashi}`}
+        >
+          Rashi: {kundli.rashi}
+        </Chip>
+        <Chip
+          icon="star-four-points"
+          mode="flat"
+          style={[styles.placementChip, { backgroundColor: theme.colors.primaryContainer }]}
+          textStyle={{ color: theme.colors.onPrimaryContainer }}
+          accessibilityLabel={`Nakshatra: ${kundli.nakshatra}`}
+        >
+          {kundli.nakshatra}
+        </Chip>
       </View>
 
       {/* Current Dasha */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Current Mahadasha</Text>
-        <View style={styles.dashaCard}>
-          <Text style={styles.dashaIcon}>🪐</Text>
-          <View style={styles.dashaMeta}>
-            <Text style={styles.dashaPlanet}>{kundli.dasha.planet} Dasha</Text>
-            <Text style={styles.dashaEnds}>Ends approx. {kundli.dasha.endYear}</Text>
-          </View>
-        </View>
-      </View>
+      <List.Subheader style={{ color: theme.colors.primary }}>Current Mahadasha</List.Subheader>
+      <Card mode="outlined" style={styles.card}>
+        <Card.Title
+          title={`${kundli.dasha.planet} Dasha`}
+          subtitle={`Ends approx. ${kundli.dasha.endYear}`}
+          titleVariant="titleMedium"
+          left={props => <List.Icon {...props} icon="orbit" color={theme.colors.primary} />}
+        />
+        <Card.Content>
+          <ProgressBar
+            progress={0.55}
+            color={theme.colors.primary}
+            style={{ height: 6, borderRadius: 3, marginBottom: 4 }}
+            theme={theme}
+            accessibilityLabel="Dasha period progress"
+          />
+          <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
+            Period in progress
+          </Text>
+        </Card.Content>
+      </Card>
 
-      {/* Insights */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Planetary Insights</Text>
-        {kundli.insights.map((insight, i) => (
-          <View key={i} style={styles.insightCard}>
-            <Text style={styles.insightBullet}>✦</Text>
-            <Text style={styles.insightText}>{insight}</Text>
-          </View>
-        ))}
-      </View>
+      {/* Planetary Insights */}
+      <List.Subheader style={{ color: theme.colors.primary }}>Planetary Insights</List.Subheader>
+      {kundli.insights.map((insight, i) => (
+        <Card
+          key={i}
+          mode="elevated"
+          elevation={1}
+          style={styles.card}
+          accessibilityLabel={`Insight: ${insight}`}
+        >
+          <Card.Title
+            title={insight}
+            titleVariant="bodyMedium"
+            titleNumberOfLines={3}
+            left={props => (
+              <List.Icon {...props} icon="star-shooting" color={theme.colors.primary} />
+            )}
+          />
+        </Card>
+      ))}
 
-      {/* Planet positions */}
+      {/* Planet Positions — DataTable */}
       {kundli.chartData.planets.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Planet Positions</Text>
-          <View style={styles.card}>
-            {kundli.chartData.planets.map((p, i) => (
-              <View
-                key={p.planet}
-                style={[
-                  styles.insightRow,
-                  i === kundli.chartData.planets.length - 1 && { borderBottomWidth: 0 },
-                ]}
-              >
-                <Text style={styles.insightLabel}>{p.planet}</Text>
-                <Text style={styles.insightValue}>
-                  {p.sign} · House {p.house}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
+        <>
+          <List.Subheader style={{ color: theme.colors.primary }}>Planet Positions</List.Subheader>
+          <Card mode="outlined" style={styles.card}>
+            <DataTable>
+              <DataTable.Header>
+                <DataTable.Title>Planet</DataTable.Title>
+                <DataTable.Title>Sign</DataTable.Title>
+                <DataTable.Title numeric>House</DataTable.Title>
+              </DataTable.Header>
+              {kundli.chartData.planets.map(p => (
+                <DataTable.Row key={p.planet} accessibilityLabel={`${p.planet} in ${p.sign}, house ${p.house}`}>
+                  <DataTable.Cell>
+                    <Text variant="bodySmall" style={{ color: theme.colors.primary, fontWeight: '600' }}>
+                      {p.planet}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text variant="bodySmall" style={{ color: theme.colors.onSurface }}>
+                      {p.sign}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell numeric>
+                    <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                      {p.house}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+              ))}
+            </DataTable>
+          </Card>
+        </>
       )}
+
+      <View style={styles.bottomPad} />
     </ScrollView>
   );
 };
@@ -145,115 +217,29 @@ const KundliScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
-  emptyContainer: {
+  centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing.xl,
-    backgroundColor: colors.background,
+    padding: 32,
   },
-  emptyIcon: {
-    fontSize: 64,
-    marginBottom: spacing.lg,
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    padding: 16,
+    paddingBottom: 8,
   },
-  emptyTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-    textAlign: 'center',
-  },
-  emptyText: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  section: {
-    marginHorizontal: spacing.md,
-    marginTop: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginBottom: spacing.sm,
+  placementChip: {
+    marginBottom: 4,
   },
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
+    marginHorizontal: 16,
+    marginBottom: 8,
   },
-  insightRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.divider,
-  },
-  insightLabel: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  insightValue: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.primary,
-  },
-  dashaCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  dashaIcon: {
-    fontSize: 32,
-    marginRight: spacing.md,
-  },
-  dashaMeta: {
-    flex: 1,
-  },
-  dashaPlanet: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.primary,
-  },
-  dashaEnds: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  insightCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: colors.surface,
-    borderRadius: 10,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  insightBullet: {
-    fontSize: 14,
-    color: colors.primary,
-    marginRight: spacing.sm,
-    marginTop: 2,
-  },
-  insightText: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.textPrimary,
-    lineHeight: 20,
+  bottomPad: {
+    height: 24,
   },
 });
 
