@@ -89,7 +89,6 @@ const RequestReportScreen: React.FC = () => {
           onValueChange={v => setReportType(v as ReportType)}
           buttons={REPORT_TYPES}
           theme={theme}
-          accessibilityLabel="Select report type"
         />
 
         <TextInput

@@ -27,11 +27,11 @@
 - [x] C09 — `frontend-rework/prompt-C09-home-screen.md`
 - [x] C10 — `frontend-rework/prompt-C10-profile-part-a.md`
 - [x] C11 — `frontend-rework/prompt-C11-profile-part-b.md`
-- [ ] C12 — `frontend-rework/prompt-C12-kundli-screen.md`
-- [ ] C13 — `frontend-rework/prompt-C13-compatibility-screen.md`
-- [ ] C14 — `frontend-rework/prompt-C14-panchang-screen.md`
-- [ ] C15 — `frontend-rework/prompt-C15-blog-screens.md`
-- [ ] C16 — `frontend-rework/prompt-C16-service-screens.md`
+- [x] C12 — `frontend-rework/prompt-C12-kundli-screen.md`
+- [x] C13 — `frontend-rework/prompt-C13-compatibility-screen.md`
+- [x] C14 — `frontend-rework/prompt-C14-panchang-screen.md`
+- [x] C15 — `frontend-rework/prompt-C15-blog-screens.md`
+- [x] C16 — `frontend-rework/prompt-C16-service-screens.md`
 
 ## Phase D — Tool Rework
 - [ ] D01 — `tool-rework/prompt-D01-natal-birth-chart.md`

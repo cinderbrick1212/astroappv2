@@ -18,7 +18,7 @@ const BlogPostScreen: React.FC = () => {
   const theme = useTheme();
   const route = useRoute<BlogPostRoute>();
   const { id } = route.params;
-  const { post, isLoading } = useBlogPost(id);
+  const { blogPost: post, isLoading } = useBlogPost(id);
 
   const handleShare = async () => {
     if (!post) return;
