@@ -13,90 +13,7 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
 import type { AfflictedGraha } from '../services/astrologyEngine';
-
-interface RemedyInfo {
-  gemstone: string;
-  mantra: string;
-  charity: string;
-  fastingDay: string;
-  deity: string;
-  color: string;
-}
-
-const REMEDY_DATA: Record<string, RemedyInfo> = {
-  Sun: {
-    gemstone: 'Ruby (Manikya)',
-    mantra: 'Om Hraam Hreem Hraum Sah Suryaya Namaha',
-    charity: 'Donate wheat, jaggery, or copper on Sundays',
-    fastingDay: 'Sunday',
-    deity: 'Lord Surya',
-    color: 'Red / Copper',
-  },
-  Moon: {
-    gemstone: 'Pearl (Moti)',
-    mantra: 'Om Shraam Shreem Shraum Sah Chandraya Namaha',
-    charity: 'Donate rice, white cloth, or silver on Mondays',
-    fastingDay: 'Monday',
-    deity: 'Lord Shiva',
-    color: 'White / Silver',
-  },
-  Mars: {
-    gemstone: 'Red Coral (Moonga)',
-    mantra: 'Om Kraam Kreem Kraum Sah Bhaumaya Namaha',
-    charity: 'Donate red lentils, jaggery, or copper on Tuesdays',
-    fastingDay: 'Tuesday',
-    deity: 'Lord Hanuman',
-    color: 'Red / Scarlet',
-  },
-  Mercury: {
-    gemstone: 'Emerald (Panna)',
-    mantra: 'Om Braam Breem Braum Sah Budhaya Namaha',
-    charity: 'Donate green moong dal, green cloth on Wednesdays',
-    fastingDay: 'Wednesday',
-    deity: 'Lord Vishnu',
-    color: 'Green',
-  },
-  Jupiter: {
-    gemstone: 'Yellow Sapphire (Pukhraj)',
-    mantra: 'Om Graam Greem Graum Sah Gurave Namaha',
-    charity: 'Donate turmeric, yellow cloth, or books on Thursdays',
-    fastingDay: 'Thursday',
-    deity: 'Lord Brihaspati',
-    color: 'Yellow / Gold',
-  },
-  Venus: {
-    gemstone: 'Diamond (Heera)',
-    mantra: 'Om Draam Dreem Draum Sah Shukraya Namaha',
-    charity: 'Donate white rice, silk, or perfume on Fridays',
-    fastingDay: 'Friday',
-    deity: 'Goddess Lakshmi',
-    color: 'White / Bright',
-  },
-  Saturn: {
-    gemstone: 'Blue Sapphire (Neelam)',
-    mantra: 'Om Praam Preem Praum Sah Shanaischaraya Namaha',
-    charity: 'Donate black sesame, iron, or mustard oil on Saturdays',
-    fastingDay: 'Saturday',
-    deity: 'Lord Shani',
-    color: 'Black / Dark Blue',
-  },
-  Rahu: {
-    gemstone: 'Hessonite Garnet (Gomed)',
-    mantra: 'Om Bhraam Bhreem Bhraum Sah Rahave Namaha',
-    charity: 'Donate black blanket, mustard seeds on Saturdays',
-    fastingDay: 'Saturday',
-    deity: 'Goddess Durga',
-    color: 'Dark Blue / Smoke',
-  },
-  Ketu: {
-    gemstone: "Cat's Eye (Lehsuniya)",
-    mantra: 'Om Sraam Sreem Sraum Sah Ketave Namaha',
-    charity: 'Donate sesame, grey blanket on Tuesdays',
-    fastingDay: 'Tuesday',
-    deity: 'Lord Ganesha',
-    color: 'Grey / Brown',
-  },
-};
+import { getRemedyContent } from '../data';
 
 const getSeverityStyle = (severity: string, colors: Record<string, unknown>) => {
   switch (severity) {
@@ -233,7 +150,7 @@ const GrahaShantScreen: React.FC = () => {
       {/* Remedy Cards */}
       <List.Subheader style={{ color: theme.colors.primary }}>Remedies</List.Subheader>
       {afflicted.map((a, i) => {
-        const remedy = REMEDY_DATA[a.graha];
+        const remedy = getRemedyContent(a.graha.toLowerCase());
         if (!remedy) return null;
         const severity = getSeverityStyle(a.severity, theme.colors as unknown as Record<string, unknown>);
         return (
@@ -264,7 +181,7 @@ const GrahaShantScreen: React.FC = () => {
               />
               <Divider />
               <List.Item
-                title={remedy.mantra}
+                title={remedy.mantraTransliteration}
                 description="Mantra"
                 titleNumberOfLines={2}
                 left={props => <List.Icon {...props} icon="hands-pray" color={theme.colors.primary} />}
@@ -298,7 +215,7 @@ const GrahaShantScreen: React.FC = () => {
               />
               <Divider />
               <List.Item
-                title={remedy.color}
+                title={remedy.colour}
                 description="Auspicious Color"
                 left={props => <List.Icon {...props} icon="palette-outline" color={theme.colors.primary} />}
                 titleStyle={{ color: theme.colors.onSurface }}

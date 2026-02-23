@@ -12,40 +12,17 @@ import {
 import { panchangService } from '../services/panchang';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { analytics } from '../services/analytics';
+import { getTithiContent } from '../data';
 
-// Tithi name → number (1-30) mapping
-const TITHI_LIST: { name: string; number: number }[] = [
-  { name: 'Pratipada', number: 1 },
-  { name: 'Dwitiya', number: 2 },
-  { name: 'Tritiya', number: 3 },
-  { name: 'Chaturthi', number: 4 },
-  { name: 'Panchami', number: 5 },
-  { name: 'Shashthi', number: 6 },
-  { name: 'Saptami', number: 7 },
-  { name: 'Ashtami', number: 8 },
-  { name: 'Navami', number: 9 },
-  { name: 'Dashami', number: 10 },
-  { name: 'Ekadashi', number: 11 },
-  { name: 'Dwadashi', number: 12 },
-  { name: 'Trayodashi', number: 13 },
-  { name: 'Chaturdashi', number: 14 },
-  { name: 'Purnima', number: 15 },
-  { name: 'Pratipada', number: 16 },
-  { name: 'Dwitiya', number: 17 },
-  { name: 'Tritiya', number: 18 },
-  { name: 'Chaturthi', number: 19 },
-  { name: 'Panchami', number: 20 },
-  { name: 'Shashthi', number: 21 },
-  { name: 'Saptami', number: 22 },
-  { name: 'Ashtami', number: 23 },
-  { name: 'Navami', number: 24 },
-  { name: 'Dashami', number: 25 },
-  { name: 'Ekadashi', number: 26 },
-  { name: 'Dwadashi', number: 27 },
-  { name: 'Trayodashi', number: 28 },
-  { name: 'Chaturdashi', number: 29 },
-  { name: 'Amavasya', number: 30 },
-];
+// Tithi name → number (1-30) mapping (fall back to panchang content)
+const getTithiNumber = (tithiName: string): number => {
+  const normalized = tithiName.trim().split(/\s+/)[0].toLowerCase();
+  for (let i = 1; i <= 30; i++) {
+    const tc = getTithiContent(i);
+    if (tc && tc.name.toLowerCase() === normalized) return i;
+  }
+  return 1;
+};
 
 const getMoonPhaseEmoji = (tithiNumber: number): { emoji: string; label: string } => {
   if (tithiNumber === 30) return { emoji: '🌑', label: 'New Moon' };
@@ -58,23 +35,12 @@ const getMoonPhaseEmoji = (tithiNumber: number): { emoji: string; label: string 
   return { emoji: '🌘', label: 'Waning Crescent' };
 };
 
-const getTithiNumber = (tithiName: string): number => {
-  const normalized = tithiName.trim().split(/\s+/)[0];
-  const match = TITHI_LIST.find(
-    (t) => t.name.toLowerCase() === normalized.toLowerCase()
-  );
-  return match?.number ?? 1;
-};
-
 const getAuspiciousness = (tithiNumber: number): { level: string; description: string } => {
-  if (tithiNumber === 11 || tithiNumber === 26)
-    return { level: 'Highly Auspicious', description: 'Ekadashi — ideal for fasting, prayer, and spiritual practices.' };
-  if (tithiNumber === 15)
-    return { level: 'Auspicious', description: 'Purnima — full moon, excellent for charity and worship.' };
-  if (tithiNumber === 30)
-    return { level: 'Mixed', description: 'Amavasya — new moon, suitable for ancestor rituals (Pitru Tarpan).' };
-  if ([2, 3, 5, 7, 10, 12, 13].includes(tithiNumber % 15 || 15))
-    return { level: 'Auspicious', description: 'A favorable tithi for new ventures and important activities.' };
+  const tc = getTithiContent(tithiNumber);
+  if (tc) {
+    const level = tc.nature === 'shubh' ? 'Auspicious' : tc.nature === 'ashubh' ? 'Inauspicious' : 'Mixed';
+    return { level, description: tc.auspiciousness };
+  }
   return { level: 'Neutral', description: 'A regular tithi — proceed with routine activities.' };
 };
 

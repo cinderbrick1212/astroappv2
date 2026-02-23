@@ -18,15 +18,15 @@ const FeedHeader: React.FC<FeedHeaderProps> = ({ date, userName, streak }) => {
     year: 'numeric',
   });
 
-  const hour = date.getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  // Vedic greeting for the astrology theme
+  const greeting = 'Namaste';
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.primaryContainer }]}>
       <View style={styles.row}>
         <View style={styles.textBlock}>
-          <Text variant="titleMedium" style={{ color: theme.colors.onPrimaryContainer }}>
-            {greeting}{userName ? `, ${userName}` : ''}
+          <Text variant="headlineSmall" style={{ color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }}>
+            {greeting}{userName ? `, ${userName}` : ''}! ✨
           </Text>
           <Text variant="bodySmall" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.75, marginTop: 2 }}>
             {dateStr}
@@ -36,8 +36,8 @@ const FeedHeader: React.FC<FeedHeaderProps> = ({ date, userName, streak }) => {
           <Chip
             icon="fire"
             mode="flat"
-            style={{ backgroundColor: theme.colors.secondaryContainer }}
-            textStyle={{ color: theme.colors.onSecondaryContainer }}
+            style={{ backgroundColor: theme.colors.secondaryContainer, borderRadius: 16 }}
+            textStyle={{ color: theme.colors.onSecondaryContainer, fontWeight: '600' }}
             accessibilityLabel={`${streak} day streak`}
           >
             {streak} day{streak !== 1 ? 's' : ''}

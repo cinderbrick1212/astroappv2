@@ -44,7 +44,8 @@ const ToolsScreen: React.FC = () => {
 
       {/* Panchang Card */}
       <Card
-        mode="outlined"
+        mode="elevated"
+        elevation={1}
         style={styles.card}
         onPress={() => navigation.navigate('Panchang')}
         accessibilityLabel="Daily Panchang — tap for details"
@@ -93,7 +94,7 @@ const ToolsScreen: React.FC = () => {
       </Card>
 
       {/* Lucky Factors Card */}
-      <Card mode="outlined" style={styles.card} accessibilityLabel="Lucky factors for today">
+      <Card mode="elevated" elevation={1} style={styles.card} accessibilityLabel="Lucky factors for today">
         <Card.Title
           title="Lucky Factors"
           subtitle="Your auspicious elements today"
@@ -208,13 +209,14 @@ const ToolsScreen: React.FC = () => {
       <List.Subheader style={{ color: theme.colors.primary }}>Premium Services</List.Subheader>
 
       {[
-        { icon: 'help-circle-outline', label: 'Ask a Question',  subtitle: 'Get a personalized answer from an astrologer', price: '₹49',  screen: 'AskQuestion' as const },
-        { icon: 'phone-in-talk-outline', label: 'Book a Call',     subtitle: 'Live consultation with an astrologer',          price: '₹999', screen: 'BookCall' as const },
-        { icon: 'file-chart-outline', label: 'Request a Report', subtitle: 'Detailed PDF report from an astrologer',         price: '₹299', screen: 'RequestReport' as const },
+        { icon: 'help-circle-outline', label: 'Ask a Question', subtitle: 'Get a personalized answer from an astrologer', price: '₹49', screen: 'AskQuestion' as const },
+        { icon: 'phone-in-talk-outline', label: 'Book a Call', subtitle: 'Live consultation with an astrologer', price: '₹999', screen: 'BookCall' as const },
+        { icon: 'file-chart-outline', label: 'Request a Report', subtitle: 'Detailed PDF report from an astrologer', price: '₹299', screen: 'RequestReport' as const },
       ].map(service => (
         <Card
           key={service.label}
-          mode="outlined"
+          mode="elevated"
+          elevation={1}
           style={styles.card}
           onPress={() => navigation.navigate(service.screen)}
           accessibilityLabel={`${service.label} — ${service.price}`}

@@ -24,6 +24,9 @@ import { storage } from '../utils/storage';
 import { dateHelpers } from '../utils/dateHelpers';
 import DatePickerModal from '../components/DatePickerModal';
 import TimePickerModal from '../components/TimePickerModal';
+import { astrologyEngine } from '../services/astrologyEngine';
+import { horoscopeService } from '../services/horoscope';
+import CityAutocomplete from '../components/CityAutocomplete';
 
 const GENDERS: Array<'male' | 'female' | 'other'> = ['male', 'female', 'other'];
 
@@ -31,6 +34,8 @@ interface EditForm {
   birth_date: string;
   birth_time: string;
   birth_place: string;
+  latitude?: number;
+  longitude?: number;
   timezone: string;
   gender: 'male' | 'female' | 'other';
 }
@@ -48,6 +53,8 @@ const ProfileScreen: React.FC = () => {
     birth_date: '',
     birth_time: '',
     birth_place: '',
+    latitude: undefined,
+    longitude: undefined,
     timezone: 'Asia/Kolkata',
     gender: 'other',
   });
@@ -95,6 +102,8 @@ const ProfileScreen: React.FC = () => {
       birth_date: profile?.birth_date ?? '',
       birth_time: profile?.birth_time ?? '',
       birth_place: profile?.birth_place ?? '',
+      latitude: profile?.latitude,
+      longitude: profile?.longitude,
       timezone: profile?.timezone ?? 'Asia/Kolkata',
       gender: profile?.gender ?? 'other',
     });
@@ -111,6 +120,8 @@ const ProfileScreen: React.FC = () => {
         birth_date: form.birth_date,
         birth_time: form.birth_time || '06:00',
         birth_place: form.birth_place,
+        latitude: form.latitude,
+        longitude: form.longitude,
         timezone: form.timezone,
         gender: form.gender,
       },
@@ -127,6 +138,21 @@ const ProfileScreen: React.FC = () => {
       }
     );
   };
+
+  // Calculate astrological details for display
+  const astProps = React.useMemo(() => {
+    if (!profile?.birth_date || !profile?.birth_time || !profile?.birth_place) return null;
+    try {
+      const chart = astrologyEngine.calculateKundli(profile);
+      return {
+        lagna: chart.lagnaSign,
+        rashi: chart.moonSign,
+        nakshatra: `${chart.nakshatra} (Pada ${chart.nakshatraPada})`
+      };
+    } catch {
+      return null;
+    }
+  }, [profile]);
 
   return (
     <>
@@ -159,15 +185,15 @@ const ProfileScreen: React.FC = () => {
                 {user.email}
               </Text>
             ) : null}
-            <Chip
-              mode="flat"
-              style={[styles.tierChip, { backgroundColor: theme.colors.secondaryContainer }]}
-              textStyle={{ color: theme.colors.onSecondaryContainer }}
-              icon="star-outline"
-              accessibilityLabel="Free tier"
+            <Button
+              mode="outlined"
+              onPress={openEditModal}
+              style={{ marginTop: 16, borderColor: theme.colors.primary }}
+              textColor={theme.colors.primary}
+              accessibilityLabel="Edit profile details"
             >
-              Free Tier
-            </Chip>
+              Edit Profile
+            </Button>
           </Card.Content>
         </Card>
 
@@ -194,14 +220,51 @@ const ProfileScreen: React.FC = () => {
             left={props => <List.Icon {...props} icon="map-marker-outline" color={theme.colors.primary} />}
             titleStyle={{ color: profile?.birth_place ? theme.colors.onSurface : theme.colors.onSurfaceVariant }}
           />
+          {astProps && (
+            <>
+              <Divider />
+              <List.Item
+                title={`${astProps.lagna}`}
+                description="Lagna (Ascendant)"
+                left={props => <List.Icon {...props} icon="arrow-up-circle-outline" color={theme.colors.primary} />}
+              />
+              <Divider />
+              <List.Item
+                title={`${astProps.rashi}`}
+                description="Moon Sign (Rashi)"
+                left={props => <List.Icon {...props} icon="moon-waning-crescent" color={theme.colors.primary} />}
+              />
+              <Divider />
+              <List.Item
+                title={`${astProps.nakshatra}`}
+                description="Nakshatra"
+                left={props => <List.Icon {...props} icon="star-four-points-outline" color={theme.colors.primary} />}
+              />
+            </>
+          )}
+        </Card>
+
+        {/* Subscription Card */}
+        <Card
+          mode="contained"
+          style={[styles.card, { backgroundColor: theme.colors.tertiaryContainer, marginTop: 16 }]}
+        >
+          <Card.Title
+            title="✨ AstroWitt Pro"
+            subtitle="Unlimited reports, priority support, ad-free experience"
+            subtitleNumberOfLines={2}
+            titleVariant="titleMedium"
+            titleStyle={{ color: theme.colors.onTertiaryContainer, fontWeight: 'bold' }}
+            subtitleStyle={{ color: theme.colors.onTertiaryContainer, opacity: 0.9, marginTop: 4, lineHeight: 20 }}
+          />
           <Card.Actions>
             <Button
-              mode="contained-tonal"
-              icon="pencil-outline"
-              onPress={openEditModal}
-              accessibilityLabel="Edit birth details"
+              mode="contained"
+              onPress={() => { }}
+              buttonColor={theme.colors.tertiary}
+              textColor={theme.colors.onTertiary}
             >
-              Edit Details
+              Upgrade
             </Button>
           </Card.Actions>
         </Card>
@@ -219,7 +282,7 @@ const ProfileScreen: React.FC = () => {
           />
           <Divider />
           <List.Item
-            title={t('profile.notifications')}
+            title={t('profile.notifications') || 'Notifications'}
             left={props => <List.Icon {...props} icon="bell-outline" color={theme.colors.primary} />}
             right={() => (
               <Switch
@@ -231,6 +294,31 @@ const ProfileScreen: React.FC = () => {
             )}
           />
           <Divider />
+          <List.Item
+            title="Dark Mode"
+            left={props => <List.Icon {...props} icon="theme-light-dark" color={theme.colors.primary} />}
+            right={() => (
+              <Switch
+                value={true}
+                onValueChange={() => { }}
+                color={theme.colors.primary}
+                accessibilityLabel="Toggle dark mode"
+              />
+            )}
+          />
+          <Divider />
+          <List.Item
+            title="Chart Style"
+            description="South Indian"
+            left={props => <List.Icon {...props} icon="chart-box-outline" color={theme.colors.primary} />}
+            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+            accessibilityLabel="Select chart style"
+          />
+        </Card>
+
+        {/* About Section */}
+        <List.Subheader style={{ color: theme.colors.primary, marginTop: 8 }}>About</List.Subheader>
+        <Card mode="outlined" style={styles.card}>
           <List.Item
             title="Privacy Policy"
             left={props => <List.Icon {...props} icon="lock-outline" color={theme.colors.primary} />}
@@ -244,16 +332,27 @@ const ProfileScreen: React.FC = () => {
             right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
             accessibilityLabel="Terms of Service"
           />
+          <Divider />
+          <List.Item
+            title="Rate AstroWitt"
+            left={props => <List.Icon {...props} icon="star-outline" color={theme.colors.primary} />}
+            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+            accessibilityLabel="Rate on App Store"
+          />
+          <Divider />
+          <List.Item
+            title="Version"
+            description="2.1.0"
+            left={props => <List.Icon {...props} icon="information-outline" color={theme.colors.primary} />}
+          />
         </Card>
 
         {/* Logout */}
         <View style={styles.logoutSection}>
           <Button
-            mode="outlined"
-            icon="logout"
+            mode="text"
             onPress={handleLogout}
             textColor={theme.colors.error}
-            style={{ borderColor: theme.colors.error }}
             contentStyle={styles.buttonContent}
             accessibilityLabel="Sign out"
           >
@@ -328,15 +427,17 @@ const ProfileScreen: React.FC = () => {
             </Button>
 
             {/* Place of birth */}
-            <TextInput
-              mode="outlined"
+            <CityAutocomplete
+              value={form.birth_place}
+              onSelect={city => setForm(f => ({
+                ...f,
+                birth_place: city.name,
+                latitude: city.latitude,
+                longitude: city.longitude
+              }))}
               label="Place of Birth"
               placeholder="City, Country"
-              value={form.birth_place}
-              onChangeText={v => setForm(f => ({ ...f, birth_place: v }))}
-              style={styles.formInput}
-              theme={theme}
-              accessibilityLabel="Enter place of birth"
+              containerStyle={styles.formInput}
             />
 
             {/* Timezone */}

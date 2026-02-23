@@ -22,20 +22,7 @@ import { dateHelpers } from '../utils/dateHelpers';
 import DatePickerModal from '../components/DatePickerModal';
 import TimePickerModal from '../components/TimePickerModal';
 
-const COMMON_CITIES = [
-  { name: 'Delhi', lat: 28.6139, lng: 77.209 },
-  { name: 'Mumbai', lat: 19.076, lng: 72.8777 },
-  { name: 'Bangalore', lat: 12.9716, lng: 77.5946 },
-  { name: 'Chennai', lat: 13.0827, lng: 80.2707 },
-  { name: 'Kolkata', lat: 22.5726, lng: 88.3639 },
-  { name: 'Hyderabad', lat: 17.385, lng: 78.4867 },
-  { name: 'Pune', lat: 18.5204, lng: 73.8567 },
-  { name: 'Jaipur', lat: 26.9124, lng: 75.7873 },
-  { name: 'Lucknow', lat: 26.8467, lng: 80.9462 },
-  { name: 'Ahmedabad', lat: 23.0225, lng: 72.5714 },
-  { name: 'Varanasi', lat: 25.3176, lng: 82.9739 },
-  { name: 'Patna', lat: 25.6093, lng: 85.1376 },
-];
+import CityAutocomplete from '../components/CityAutocomplete';
 
 const GENDERS: Array<'male' | 'female' | 'other'> = ['male', 'female', 'other'];
 
@@ -114,18 +101,32 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
   };
 
   const finish = async () => {
-    // Save profile data locally
+    // Save the raw onboarding data
     await storage.set(storage.keys.ONBOARDING_PROFILE, data);
+
+    // Also save as USER_PROFILE so useUserProfile can read it immediately
+    const profileData = {
+      id: 'local',
+      birth_date: data.birth_date,
+      birth_time: data.birth_time,
+      birth_place: data.birth_place,
+      timezone: data.timezone,
+      gender: data.gender,
+      latitude: data.latitude,
+      longitude: data.longitude,
+    };
+    await storage.set(storage.keys.USER_PROFILE, profileData);
+
     await storage.set(storage.keys.ONBOARDING_COMPLETE, true);
     onComplete();
   };
 
-  const selectCity = (city: typeof COMMON_CITIES[0]) => {
+  const handleCitySelect = (city: { name: string; latitude: number; longitude: number }) => {
     setData(d => ({
       ...d,
       birth_place: city.name,
-      latitude: city.lat,
-      longitude: city.lng,
+      latitude: city.latitude,
+      longitude: city.longitude,
     }));
     setError('');
   };
@@ -265,36 +266,19 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
             >
               Select a city or type your birth place
             </Text>
-            <TextInput
-              mode="outlined"
-              label="City name"
+            <CityAutocomplete
               value={data.birth_place}
-              onChangeText={v => setData(d => ({ ...d, birth_place: v }))}
-              style={styles.inputFull}
-              theme={theme}
-              accessibilityLabel="Enter birth place city"
+              onSelect={handleCitySelect}
+              label="City"
+              placeholder="Search birth city..."
+              containerStyle={{ marginTop: 8 }}
             />
             <Text
-              variant="labelLarge"
-              style={[{ color: theme.colors.onSurfaceVariant, marginTop: 20, marginBottom: 12, alignSelf: 'flex-start' }]}
+              variant="labelSmall"
+              style={[{ color: theme.colors.onSurfaceVariant, marginTop: 16, textAlign: 'center' }]}
             >
-              Popular Cities
+              Start typing your birth city to see coordinate-accurate suggestions
             </Text>
-            <View style={styles.cityGrid}>
-              {COMMON_CITIES.map(city => (
-                <Chip
-                  key={city.name}
-                  mode={data.birth_place === city.name ? 'flat' : 'outlined'}
-                  selected={data.birth_place === city.name}
-                  onPress={() => selectCity(city)}
-                  style={styles.cityChip}
-                  accessibilityLabel={`Select ${city.name}`}
-                  theme={theme}
-                >
-                  {city.name}
-                </Chip>
-              ))}
-            </View>
           </View>
         );
 
@@ -313,11 +297,11 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
             <Card mode="outlined" style={[styles.inputFull, { borderColor: theme.colors.outlineVariant }]}>
               <Card.Content>
                 {[
-                  { label: 'Name',          value: data.name,                                                    icon: 'account-outline' },
-                  { label: 'Date of Birth', value: data.birth_date,                                              icon: 'calendar-outline' },
-                  { label: 'Time of Birth', value: dateHelpers.formatTimeAmPm(data.birth_time),                  icon: 'clock-outline' },
-                  { label: 'Place of Birth',value: data.birth_place,                                             icon: 'map-marker-outline' },
-                  { label: 'Gender',        value: data.gender.charAt(0).toUpperCase() + data.gender.slice(1),   icon: 'gender-male-female' },
+                  { label: 'Name', value: data.name, icon: 'account-outline' },
+                  { label: 'Date of Birth', value: data.birth_date, icon: 'calendar-outline' },
+                  { label: 'Time of Birth', value: dateHelpers.formatTimeAmPm(data.birth_time), icon: 'clock-outline' },
+                  { label: 'Place of Birth', value: data.birth_place, icon: 'map-marker-outline' },
+                  { label: 'Gender', value: data.gender.charAt(0).toUpperCase() + data.gender.slice(1), icon: 'gender-male-female' },
                 ].map((item, i, arr) => (
                   <List.Item
                     key={item.label}

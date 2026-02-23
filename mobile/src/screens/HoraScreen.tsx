@@ -11,27 +11,17 @@ import {
 import { panchangService } from '../services/panchang';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { analytics } from '../services/analytics';
+import { getGrahaContent } from '../data';
 
 const HORA_PLANETS = ['Sun', 'Venus', 'Mercury', 'Moon', 'Saturn', 'Jupiter', 'Mars'] as const;
 
 const WEEKDAY_RULERS: Record<number, string> = {
-  0: 'Sun',
-  1: 'Moon',
-  2: 'Mars',
-  3: 'Mercury',
-  4: 'Jupiter',
-  5: 'Venus',
-  6: 'Saturn',
+  0: 'Sun', 1: 'Moon', 2: 'Mars', 3: 'Mercury', 4: 'Jupiter', 5: 'Venus', 6: 'Saturn',
 };
 
-const HORA_GUIDANCE: Record<string, string> = {
-  Sun: 'Authority / Government',
-  Venus: 'Arts / Relationships',
-  Mercury: 'Communication / Business',
-  Moon: 'Travel / Meditation',
-  Saturn: 'Labor / Discipline',
-  Jupiter: 'Teaching / Spirituality',
-  Mars: 'Action / Competition',
+const getHoraGuidance = (ruler: string): string => {
+  const graha = getGrahaContent(ruler.toLowerCase());
+  return graha ? graha.karakas.slice(0, 2).join(' / ') : ruler;
 };
 
 const HORA_ICONS: Record<string, string> = {
@@ -210,7 +200,7 @@ const HoraScreen: React.FC = () => {
                 style={{ alignSelf: 'flex-start', backgroundColor: theme.colors.primary }}
                 textStyle={{ color: theme.colors.onPrimary }}
               >
-                {HORA_GUIDANCE[currentHora.ruler]}
+                {getHoraGuidance(currentHora.ruler)}
               </Chip>
             </Card.Content>
           </Card>
@@ -233,7 +223,7 @@ const HoraScreen: React.FC = () => {
         >
           <List.Item
             title={`${hora.ruler} Hora`}
-            description={`${hora.startTime} – ${hora.endTime} • ${HORA_GUIDANCE[hora.ruler]}`}
+            description={`${hora.startTime} – ${hora.endTime} • ${getHoraGuidance(hora.ruler)}`}
             titleStyle={{
               color: hora.isCurrent ? theme.colors.onPrimaryContainer : theme.colors.onSurface,
               fontWeight: hora.isCurrent ? '700' : '400',
@@ -269,7 +259,7 @@ const HoraScreen: React.FC = () => {
         >
           <List.Item
             title={`${hora.ruler} Hora`}
-            description={`${hora.startTime} – ${hora.endTime} • ${HORA_GUIDANCE[hora.ruler]}`}
+            description={`${hora.startTime} – ${hora.endTime} • ${getHoraGuidance(hora.ruler)}`}
             titleStyle={{
               color: hora.isCurrent ? theme.colors.onPrimaryContainer : theme.colors.onSurface,
               fontWeight: hora.isCurrent ? '700' : '400',

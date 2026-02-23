@@ -17,6 +17,7 @@ import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
 import type { UserProfile } from '../types';
 import type { AshtakootResult } from '../services/engine/ashtakoot';
+import CityAutocomplete from '../components/CityAutocomplete';
 
 type ScreenState = 'form' | 'calculating' | 'results';
 
@@ -48,6 +49,9 @@ const KundliMilanScreen: React.FC = () => {
   const [partnerName, setPartnerName] = useState('');
   const [partnerDate, setPartnerDate] = useState('');
   const [partnerTime, setPartnerTime] = useState('');
+  const [partnerPlace, setPartnerPlace] = useState('');
+  const [partnerLat, setPartnerLat] = useState<number | undefined>();
+  const [partnerLng, setPartnerLng] = useState<number | undefined>();
   const [screenState, setScreenState] = useState<ScreenState>('form');
   const [result, setResult] = useState<AshtakootResult | null>(null);
 
@@ -78,8 +82,10 @@ const KundliMilanScreen: React.FC = () => {
       id: 'partner',
       birth_date: partnerDate.trim(),
       birth_time: partnerTime.trim(),
-      birth_place: profile.birth_place ?? '',
-      timezone: profile.timezone ?? '',
+      birth_place: partnerPlace,
+      latitude: partnerLat,
+      longitude: partnerLng,
+      timezone: profile.timezone ?? 'Asia/Kolkata',
       gender: 'other',
     };
 
@@ -124,34 +130,39 @@ const KundliMilanScreen: React.FC = () => {
       <List.Subheader style={{ color: theme.colors.primary }}>
         Person B (Partner)
       </List.Subheader>
-      <TextInput
-        mode="outlined"
-        label="Name"
-        value={partnerName}
-        onChangeText={setPartnerName}
-        style={styles.input}
-        accessibilityLabel="Enter partner name"
-      />
-      <TextInput
-        mode="outlined"
-        label="Date of Birth"
-        placeholder="YYYY-MM-DD"
-        value={partnerDate}
-        onChangeText={setPartnerDate}
-        keyboardType="numbers-and-punctuation"
-        style={styles.input}
-        accessibilityLabel="Enter partner date of birth"
-      />
-      <TextInput
-        mode="outlined"
-        label="Time of Birth"
-        placeholder="HH:MM"
-        value={partnerTime}
-        onChangeText={setPartnerTime}
-        keyboardType="numbers-and-punctuation"
-        style={styles.input}
-        accessibilityLabel="Enter partner time of birth"
-      />
+      <Card mode="outlined" style={[styles.card, { backgroundColor: theme.colors.surfaceVariant, paddingVertical: 8 }]}>
+        <Card.Content>
+          <TextInput
+            mode="outlined"
+            label="Name"
+            value={partnerName}
+            onChangeText={setPartnerName}
+            style={styles.input}
+            accessibilityLabel="Enter partner name"
+          />
+          <TextInput
+            mode="outlined"
+            label="Date of Birth"
+            placeholder="YYYY-MM-DD"
+            value={partnerDate}
+            onChangeText={setPartnerDate}
+            keyboardType="numbers-and-punctuation"
+            style={styles.input}
+            accessibilityLabel="Enter partner date of birth"
+          />
+          <CityAutocomplete
+            value={partnerPlace}
+            onSelect={city => {
+              setPartnerPlace(city.name);
+              setPartnerLat(city.latitude);
+              setPartnerLng(city.longitude);
+            }}
+            label="Birth Place"
+            placeholder="Search partner's city..."
+            containerStyle={styles.input}
+          />
+        </Card.Content>
+      </Card>
       <Button
         mode="contained"
         onPress={handleCalculate}

@@ -18,25 +18,16 @@ import { analytics } from '../services/analytics';
 import { storage } from '../utils/storage';
 import type { ChartData } from '../services/astrologyEngine';
 import type { PrashnaHistoryEntry } from '../utils/storageTypes';
+import { getRashiByIndex } from '../data';
+
+const RASHI_NAMES = [
+  'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+  'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',
+];
 
 const CATEGORIES = [
   'Career', 'Relationship', 'Health', 'Finance', 'Travel', 'Education', 'Spiritual', 'General',
 ] as const;
-
-const PRASHNA_LAGNA_INTERPRETATIONS: Record<string, string> = {
-  Aries: 'The querent has strong will and energy. Quick results are likely. Action-oriented outcomes.',
-  Taurus: 'Stability and patience are key. Material gains indicated. Slow but steady progress.',
-  Gemini: 'Communication is central. Multiple options exist. Seek clarity before deciding.',
-  Cancer: 'Emotional factors dominate. Family influence is strong. Intuition guides the answer.',
-  Leo: 'Authority and confidence lead the way. Success through leadership. Favorable for recognition.',
-  Virgo: 'Attention to detail matters. Analytical approach needed. Health or service-related outcomes.',
-  Libra: 'Partnerships and balance are highlighted. Negotiations succeed. Seek harmony in decisions.',
-  Scorpio: 'Hidden factors at play. Transformation is imminent. Deep investigation required.',
-  Sagittarius: 'Optimism is warranted. Long-distance matters favored. Spiritual or educational growth.',
-  Capricorn: 'Discipline and hard work bring results. Delayed but certain outcomes. Authority figures involved.',
-  Aquarius: 'Unconventional solutions work best. Group efforts favored. Innovation leads to success.',
-  Pisces: 'Intuition is your greatest guide. Spiritual matters highlighted. Compassion brings resolution.',
-};
 
 type ScreenState = 'form' | 'calculating' | 'result';
 
@@ -105,7 +96,9 @@ const PrashnaScreen: React.FC = () => {
 
   // Result state
   if (screenState === 'result' && chartResult) {
-    const interpretation = PRASHNA_LAGNA_INTERPRETATIONS[chartResult.lagnaSign] ?? 'Consult the chart details for deeper insight.';
+    const rashiIndex = RASHI_NAMES.indexOf(chartResult.lagnaSign);
+    const rashiData = rashiIndex >= 0 ? getRashiByIndex(rashiIndex) : null;
+    const interpretation = rashiData?.rashiInterpretation.standard ?? 'Consult the chart details for deeper insight.';
     return (
       <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
 

@@ -14,19 +14,7 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
 import type { DashaTimeline, DashaPeriod, AntardashaPeriod } from '../services/engine/dasha';
-
-// Planet → spiritual practice lookup
-const PLANET_PRACTICES: Record<string, string> = {
-  Ketu: 'Om Namah Shivaya — meditation and detachment practices',
-  Venus: 'Om Shukraya Namaha — devotional music, art, and gratitude',
-  Sun: 'Aditya Hridaya Stotra — Surya Namaskar at sunrise',
-  Moon: 'Om Chandraya Namaha — chanting, calming pranayama',
-  Mars: 'Om Mangalaya Namaha — Hanuman Chalisa, physical discipline',
-  Rahu: 'Om Rahave Namaha — mindfulness, Durga mantra',
-  Jupiter: 'Om Gurave Namaha — study of scriptures, guru seva',
-  Saturn: 'Om Shanaischaraya Namaha — seva (selfless service), discipline',
-  Mercury: 'Om Budhaya Namaha — japa, learning, Vishnu Sahasranama',
-};
+import { getDashaContent } from '../data';
 
 const formatDate = (d: Date): string =>
   d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -151,15 +139,17 @@ const DashaScreen: React.FC = () => {
 
       {/* Current Antardasha */}
       <List.Subheader style={{ color: theme.colors.primary }}>Current Antardasha</List.Subheader>
-      <Card mode="elevated" elevation={1} style={styles.card}>
+      <Card mode="elevated" elevation={1} style={[styles.card, { backgroundColor: theme.colors.secondaryContainer }]}>
         <Card.Title
           title={`${currentAntardasha.antarLord} Antardasha`}
           subtitle={`Sub-lord: ${currentAntardasha.antarLordHindi}`}
           titleVariant="titleSmall"
-          left={props => <List.Icon {...props} icon="star-four-points" color={theme.colors.primary} />}
+          titleStyle={{ color: theme.colors.onSecondaryContainer }}
+          subtitleStyle={{ color: theme.colors.onSecondaryContainer, opacity: 0.8 }}
+          left={props => <List.Icon {...props} icon="star-four-points" color={theme.colors.onSecondaryContainer} />}
         />
         <Card.Content>
-          <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
+          <Text variant="labelSmall" style={{ color: theme.colors.onSecondaryContainer, opacity: 0.9 }}>
             {formatDate(currentAntardasha.startDate)} — {formatDate(currentAntardasha.endDate)}
           </Text>
         </Card.Content>
@@ -255,17 +245,17 @@ const DashaScreen: React.FC = () => {
       <Card
         mode="elevated"
         elevation={1}
-        style={[styles.card, { backgroundColor: theme.colors.secondaryContainer }]}
+        style={[styles.card, { backgroundColor: theme.colors.tertiaryContainer }]}
       >
         <Card.Title
           title={`${currentMahadasha.lord} Dasha Recommendation`}
           titleVariant="titleSmall"
-          titleStyle={{ color: theme.colors.onSecondaryContainer }}
-          left={props => <List.Icon {...props} icon="hands-pray" color={theme.colors.onSecondaryContainer} />}
+          titleStyle={{ color: theme.colors.onTertiaryContainer }}
+          left={props => <List.Icon {...props} icon="hands-pray" color={theme.colors.onTertiaryContainer} />}
         />
         <Card.Content>
-          <Text variant="bodyMedium" style={{ color: theme.colors.onSecondaryContainer }}>
-            {PLANET_PRACTICES[currentMahadasha.lord] ?? 'Continue your regular spiritual practice.'}
+          <Text variant="bodyMedium" style={{ color: theme.colors.onTertiaryContainer }}>
+            {getDashaContent(currentMahadasha.lord.toLowerCase())?.spiritualPractice ?? 'Continue your regular spiritual practice.'}
           </Text>
         </Card.Content>
       </Card>

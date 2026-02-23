@@ -30,19 +30,12 @@ import { toJulianDay } from '../services/engine/ephemeris';
 import { getAllGrahaPositions } from '../services/engine/ephemeris';
 import { getVedicLagna } from '../services/engine/houses';
 import { analytics } from '../services/analytics';
+import { getRemedyContent, getGrahaContent } from '../data';
 
-// ── Remedy lookup for afflicted grahas ───────────────────────────────────────
-
-const GRAHA_REMEDIES: Record<string, string> = {
-  Sun: 'Offer water to the rising Sun and chant Surya mantra.',
-  Moon: 'Wear a pearl or moonstone; drink water from a silver vessel.',
-  Mars: 'Donate red lentils on Tuesdays; chant Hanuman Chalisa.',
-  Mercury: 'Feed green grass to a cow; wear an emerald.',
-  Jupiter: 'Donate yellow items on Thursdays; chant Guru mantra.',
-  Venus: 'Offer white flowers on Fridays; wear a diamond or opal.',
-  Saturn: 'Light a sesame oil lamp on Saturdays; donate black items.',
-  Rahu: 'Donate coconut or blue cloth; chant Rahu mantra.',
-  Ketu: 'Donate a blanket to the needy; chant Ketu mantra.',
+const getGrahaRemedy = (grahaName: string): string => {
+  const remedy = getRemedyContent(grahaName.toLowerCase());
+  if (!remedy) return 'Consult an astrologer for personalised remedies.';
+  return `${remedy.charity} Chant: ${remedy.mantraTransliteration}`;
 };
 
 // ── Planet Detail Dialog ─────────────────────────────────────────────────────
@@ -80,6 +73,24 @@ const PlanetDetailDialog: React.FC<PlanetDetailDialogProps> = ({ planet, visible
         </Dialog.Actions>
       </Dialog>
     </Portal>
+  );
+};
+
+// ── South Indian Chart Placeholder ───────────────────────────────────────────
+
+const SouthIndianChartFallback = ({ theme }: { theme: any }) => {
+  return (
+    <Card mode="elevated" elevation={1} style={[styles.card, { backgroundColor: theme.colors.surfaceVariant, paddingVertical: 32 }]}>
+      <Text variant="titleMedium" style={{ textAlign: 'center', color: theme.colors.onSurfaceVariant }}>
+        South Indian Chart Grid
+      </Text>
+      <Text variant="bodySmall" style={{ textAlign: 'center', color: theme.colors.onSurfaceVariant, marginTop: 8 }}>
+        Visual rendering of planetary positions
+      </Text>
+      <View style={{ alignSelf: 'center', marginTop: 16 }}>
+        <List.Icon icon="grid" color={theme.colors.primary} />
+      </View>
+    </Card>
   );
 };
 
@@ -198,35 +209,43 @@ const JanmaKundliScreen: React.FC = () => {
         {/* Left / top column */}
         <View style={isWide ? styles.column : undefined}>
 
+          {/* South Indian Chart Visual */}
+          <SouthIndianChartFallback theme={theme} />
+
           {/* Key Placements */}
-          <View style={styles.chipRow}>
-            <Chip
-              icon="arrow-up-bold-circle-outline"
-              mode="flat"
-              style={[styles.placementChip, { backgroundColor: theme.colors.primaryContainer }]}
-              textStyle={{ color: theme.colors.onPrimaryContainer }}
-              accessibilityLabel={`Lagna: ${chart.lagnaSign}`}
-            >
-              Lagna: {chart.lagnaSign}
-            </Chip>
-            <Chip
-              icon="moon-waning-crescent"
-              mode="flat"
-              style={[styles.placementChip, { backgroundColor: theme.colors.primaryContainer }]}
-              textStyle={{ color: theme.colors.onPrimaryContainer }}
-              accessibilityLabel={`Rashi: ${chart.moonSign}`}
-            >
-              Rashi: {chart.moonSign}
-            </Chip>
-            <Chip
-              icon="star-four-points"
-              mode="flat"
-              style={[styles.placementChip, { backgroundColor: theme.colors.primaryContainer }]}
-              textStyle={{ color: theme.colors.onPrimaryContainer }}
-              accessibilityLabel={`Nakshatra: ${chart.nakshatra} Pada ${chart.nakshatraPada}`}
-            >
-              {chart.nakshatra} (Pada {chart.nakshatraPada})
-            </Chip>
+          <List.Subheader style={{ color: theme.colors.primary }}>Astrological Profile</List.Subheader>
+          <View style={styles.placementsGrid}>
+            <Card mode="contained" style={[styles.placementCard, { backgroundColor: theme.colors.primaryContainer }]}>
+              <Card.Content style={styles.placementCardContent}>
+                <List.Icon icon="arrow-up-bold-circle-outline" color={theme.colors.primary} />
+                <View>
+                  <Text variant="labelSmall" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.8 }}>LAGNA</Text>
+                  <Text variant="titleMedium" style={{ color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }}>{chart.lagnaSign}</Text>
+                </View>
+              </Card.Content>
+            </Card>
+
+            <Card mode="contained" style={[styles.placementCard, { backgroundColor: theme.colors.primaryContainer }]}>
+              <Card.Content style={styles.placementCardContent}>
+                <List.Icon icon="moon-waning-crescent" color={theme.colors.primary} />
+                <View>
+                  <Text variant="labelSmall" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.8 }}>RASHI</Text>
+                  <Text variant="titleMedium" style={{ color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }}>{chart.moonSign}</Text>
+                </View>
+              </Card.Content>
+            </Card>
+
+            <Card mode="contained" style={[styles.placementCard, { backgroundColor: theme.colors.primaryContainer, width: '100%' }]}>
+              <Card.Content style={styles.placementCardContent}>
+                <List.Icon icon="star-four-points" color={theme.colors.primary} />
+                <View>
+                  <Text variant="labelSmall" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.8 }}>NAKSHATRA</Text>
+                  <Text variant="titleMedium" style={{ color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }}>
+                    {chart.nakshatra} (Pada {chart.nakshatraPada})
+                  </Text>
+                </View>
+              </Card.Content>
+            </Card>
           </View>
 
           {/* Current Dasha */}
@@ -366,7 +385,7 @@ const JanmaKundliScreen: React.FC = () => {
                 >
                   <Card.Title
                     title={`${a.graha} — ${a.reason}`}
-                    subtitle={GRAHA_REMEDIES[a.graha] ?? 'Consult an astrologer for personalised remedies.'}
+                    subtitle={getGrahaRemedy(a.graha)}
                     titleVariant="titleSmall"
                     subtitleNumberOfLines={3}
                     left={props => (
@@ -432,11 +451,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    padding: 16,
+    paddingHorizontal: 16,
     paddingBottom: 8,
   },
   placementChip: {
     marginBottom: 4,
+  },
+  placementsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingHorizontal: 16,
+    marginBottom: 8,
+    justifyContent: 'space-between',
+  },
+  placementCard: {
+    width: '48%',
+    marginBottom: 8,
+  },
+  placementCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    gap: 12,
   },
   card: {
     marginHorizontal: 16,

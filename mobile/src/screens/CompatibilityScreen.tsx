@@ -17,6 +17,8 @@ import { validation } from '../utils/validation';
 import { storage } from '../utils/storage';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { analytics } from '../services/analytics';
+import { ASHTAKOOT_KOOTS } from '../data';
+import type { AshtakootContent } from '../data';
 
 interface CompatibilityHistoryEntry {
   partnerName: string;
@@ -27,20 +29,17 @@ interface CompatibilityHistoryEntry {
 
 const getRatingLabel = (score: number): { label: string; colorKey: 'primary' | 'secondary' | 'error' } => {
   if (score >= 28) return { label: 'Excellent Match ✦', colorKey: 'primary' };
-  if (score >= 19) return { label: 'Good Match',        colorKey: 'secondary' };
-  return                  { label: 'Needs Work',         colorKey: 'error' };
+  if (score >= 19) return { label: 'Good Match', colorKey: 'secondary' };
+  return { label: 'Needs Work', colorKey: 'error' };
 };
 
-const BREAKDOWN_LABELS: Record<string, string> = {
-  varna:        'Varna (1)',
-  vashya:       'Vashya (2)',
-  tara:         'Tara (3)',
-  yoni:         'Yoni (4)',
-  graha_maitri: 'Graha Maitri (5)',
-  gana:         'Gana (6)',
-  bhakoot:      'Bhakoot (7)',
-  nadi:         'Nadi (8)',
+/** Build Koot labels from the data layer */
+const buildBreakdownLabels = (): Record<string, string> => {
+  const labels: Record<string, string> = {};
+  ASHTAKOOT_KOOTS.forEach((k: AshtakootContent) => { labels[k.key] = `${k.name} (${k.maxPoints})`; });
+  return labels;
 };
+const BREAKDOWN_LABELS = buildBreakdownLabels();
 
 const CompatibilityScreen: React.FC = () => {
   const theme = useTheme();

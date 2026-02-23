@@ -1,0 +1,122 @@
+/**
+ * Remedy Content Library — per-graha Vedic remedies
+ * Gemstone, mantra, yantra, charity, fasting, deity, colour.
+ */
+
+import type { RemedyContent } from './types';
+
+export const REMEDIES: RemedyContent[] = [
+    {
+        graha: 'sun',
+        gemstone: 'Ruby (Manik)',
+        gemstoneHindi: 'माणिक',
+        mantraDevanagari: 'ॐ ह्रां ह्रीं ह्रौं सः सूर्याय नमः',
+        mantraTransliteration: 'Om Hraam Hreem Hraum Sah Suryaya Namah',
+        yantra: 'Surya Yantra',
+        charity: 'Donate wheat, jaggery, or red cloth on Sundays.',
+        fastingDay: 'Sunday',
+        deity: 'Lord Surya / Aditya',
+        colour: 'Red / Copper',
+    },
+    {
+        graha: 'moon',
+        gemstone: 'Pearl (Moti)',
+        gemstoneHindi: 'मोती',
+        mantraDevanagari: 'ॐ श्रां श्रीं श्रौं सः चंद्राय नमः',
+        mantraTransliteration: 'Om Shraam Shreem Shraum Sah Chandraya Namah',
+        yantra: 'Chandra Yantra',
+        charity: 'Donate white rice, milk, or white cloth on Mondays.',
+        fastingDay: 'Monday',
+        deity: 'Lord Shiva / Parvati',
+        colour: 'White / Silver',
+    },
+    {
+        graha: 'mars',
+        gemstone: 'Red Coral (Moonga)',
+        gemstoneHindi: 'मूंगा',
+        mantraDevanagari: 'ॐ क्रां क्रीं क्रौं सः भौमाय नमः',
+        mantraTransliteration: 'Om Kraam Kreem Kraum Sah Bhaumaya Namah',
+        yantra: 'Mangal Yantra',
+        charity: 'Donate red lentils, red cloth, or jaggery on Tuesdays.',
+        fastingDay: 'Tuesday',
+        deity: 'Lord Hanuman / Kartikeya',
+        colour: 'Red / Scarlet',
+    },
+    {
+        graha: 'mercury',
+        gemstone: 'Emerald (Panna)',
+        gemstoneHindi: 'पन्ना',
+        mantraDevanagari: 'ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः',
+        mantraTransliteration: 'Om Braam Breem Braum Sah Budhaya Namah',
+        yantra: 'Budh Yantra',
+        charity: 'Donate green gram, green cloth, or books on Wednesdays.',
+        fastingDay: 'Wednesday',
+        deity: 'Lord Vishnu / Saraswati',
+        colour: 'Green',
+    },
+    {
+        graha: 'jupiter',
+        gemstone: 'Yellow Sapphire (Pukhraj)',
+        gemstoneHindi: 'पुखराज',
+        mantraDevanagari: 'ॐ ग्रां ग्रीं ग्रौं सः गुरवे नमः',
+        mantraTransliteration: 'Om Graam Greem Graum Sah Gurave Namah',
+        yantra: 'Guru Yantra',
+        charity: 'Donate turmeric, yellow cloth, bananas, or chana dal on Thursdays.',
+        fastingDay: 'Thursday',
+        deity: 'Lord Brihaspati / Vishnu',
+        colour: 'Yellow / Gold',
+    },
+    {
+        graha: 'venus',
+        gemstone: 'Diamond (Heera)',
+        gemstoneHindi: 'हीरा',
+        mantraDevanagari: 'ॐ द्रां द्रीं द्रौं सः शुक्राय नमः',
+        mantraTransliteration: 'Om Draam Dreem Draum Sah Shukraya Namah',
+        yantra: 'Shukra Yantra',
+        charity: 'Donate white items, rice, sugar, or white cloth on Fridays.',
+        fastingDay: 'Friday',
+        deity: 'Goddess Lakshmi / Mahalakshmi',
+        colour: 'White / Pastel',
+    },
+    {
+        graha: 'saturn',
+        gemstone: 'Blue Sapphire (Neelam)',
+        gemstoneHindi: 'नीलम',
+        mantraDevanagari: 'ॐ प्रां प्रीं प्रौं सः शनैश्चराय नमः',
+        mantraTransliteration: 'Om Praam Preem Praum Sah Shanaischaraya Namah',
+        yantra: 'Shani Yantra',
+        charity: 'Donate black sesame, mustard oil, iron utensils, or dark cloth on Saturdays.',
+        fastingDay: 'Saturday',
+        deity: 'Lord Shani Dev / Hanuman',
+        colour: 'Black / Dark Blue',
+    },
+    {
+        graha: 'rahu',
+        gemstone: 'Hessonite Garnet (Gomed)',
+        gemstoneHindi: 'गोमेद',
+        mantraDevanagari: 'ॐ भ्रां भ्रीं भ्रौं सः राहवे नमः',
+        mantraTransliteration: 'Om Bhraam Bhreem Bhraum Sah Rahave Namah',
+        yantra: 'Rahu Yantra',
+        charity: 'Donate dark blue or black cloth, radishes, or sandalwood on Saturdays.',
+        fastingDay: 'Saturday',
+        deity: 'Goddess Durga / Saraswati',
+        colour: 'Dark Blue / Smoky Grey',
+    },
+    {
+        graha: 'ketu',
+        gemstone: 'Cat\'s Eye (Lehsunia)',
+        gemstoneHindi: 'लहसुनिया',
+        mantraDevanagari: 'ॐ स्रां स्रीं स्रौं सः केतवे नमः',
+        mantraTransliteration: 'Om Sraam Sreem Sraum Sah Ketave Namah',
+        yantra: 'Ketu Yantra',
+        charity: 'Donate multi-coloured blankets, seven grains, or grey items on Tuesdays.',
+        fastingDay: 'Tuesday',
+        deity: 'Lord Ganesha / Chitragupta',
+        colour: 'Grey / Multi-coloured',
+    },
+];
+
+/** Lookup remedy content by graha key */
+export function getRemedyContent(graha: string): RemedyContent | undefined {
+    return REMEDIES.find((r) => r.graha === graha.toLowerCase());
+}

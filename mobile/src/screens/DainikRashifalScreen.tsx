@@ -14,6 +14,7 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { horoscopeService } from '../services/horoscope';
 import { analytics } from '../services/analytics';
+import { getDashaContent } from '../data';
 
 const RATING_LABELS: Record<number, string> = {
   3: 'Average',
@@ -26,16 +27,6 @@ const RATING_ICONS: Record<number, string> = {
   4: 'emoticon-happy-outline',
   5: 'emoticon-excited-outline',
 };
-
-const DAILY_REMEDIES = [
-  'Chant "Om Namah Shivaya" 11 times for inner peace.',
-  'Donate food to someone in need for positive karma.',
-  'Light a ghee lamp at sunset for prosperity.',
-  'Offer water to a Tulsi plant in the morning.',
-  'Recite Hanuman Chalisa for strength and protection.',
-  'Wear white on this day for calm and clarity.',
-  'Meditate for 10 minutes at sunrise for spiritual growth.',
-];
 
 const formatDate = (d: Date): string =>
   d.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -69,7 +60,17 @@ const DainikRashifalScreen: React.FC = () => {
     return horoscopeService.getLuckyFactors(chartInfo.nakshatra, date);
   }, [chartInfo, date]);
 
-  const dailyRemedy = DAILY_REMEDIES[date.getDay()];
+  const dashaRemedy = useMemo(() => {
+    if (!profile?.birth_date || !profile?.birth_time || !profile?.birth_place) return null;
+    try {
+      const dasha = astrologyEngine.calculateDasha(profile);
+      return getDashaContent(dasha.currentMahadasha.lord.toLowerCase());
+    } catch {
+      return null;
+    }
+  }, [profile?.birth_date, profile?.birth_time, profile?.birth_place]);
+
+  const dailyRemedy = dashaRemedy?.spiritualPractice ?? 'Meditate for 10 minutes at sunrise for spiritual growth.';
 
   const goToPrevDay = () => {
     setDate(d => {
