@@ -53,7 +53,6 @@ const getMoonPhaseEmoji = (tithiNumber: number): { emoji: string; label: string 
   if (tithiNumber <= 7) return { emoji: '🌓', label: 'First Quarter' };
   if (tithiNumber <= 11) return { emoji: '🌔', label: 'Waxing Gibbous' };
   if (tithiNumber === 15) return { emoji: '🌕', label: 'Full Moon' };
-  if (tithiNumber <= 14) return { emoji: '🌔', label: 'Waxing Gibbous' };
   if (tithiNumber <= 18) return { emoji: '🌖', label: 'Waning Gibbous' };
   if (tithiNumber <= 22) return { emoji: '🌗', label: 'Last Quarter' };
   return { emoji: '🌘', label: 'Waning Crescent' };

@@ -52,7 +52,7 @@ const KundliMilanScreen: React.FC = () => {
   const [result, setResult] = useState<AshtakootResult | null>(null);
 
   useEffect(() => {
-    analytics.compatibilityChecked();
+    analytics.screenView('KundliMilan');
   }, []);
 
   const handleCalculate = () => {
