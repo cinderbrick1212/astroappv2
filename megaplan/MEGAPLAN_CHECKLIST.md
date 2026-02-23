@@ -24,9 +24,9 @@
 - [x] C06 — `frontend-rework/prompt-C06-daily-feed-screen.md`
 - [x] C07 — `frontend-rework/prompt-C07-feed-components.md`
 - [x] C08 — `frontend-rework/prompt-C08-tools-screen.md`
-- [ ] C09 — `frontend-rework/prompt-C09-home-screen.md`
-- [ ] C10 — `frontend-rework/prompt-C10-profile-part-a.md`
-- [ ] C11 — `frontend-rework/prompt-C11-profile-part-b.md`
+- [x] C09 — `frontend-rework/prompt-C09-home-screen.md`
+- [x] C10 — `frontend-rework/prompt-C10-profile-part-a.md`
+- [x] C11 — `frontend-rework/prompt-C11-profile-part-b.md`
 - [ ] C12 — `frontend-rework/prompt-C12-kundli-screen.md`
 - [ ] C13 — `frontend-rework/prompt-C13-compatibility-screen.md`
 - [ ] C14 — `frontend-rework/prompt-C14-panchang-screen.md`

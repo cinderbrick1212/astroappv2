@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { StyleSheet, ScrollView, View, Alert } from 'react-native';
 import {
-  View,
   Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  Modal,
   TextInput,
-  KeyboardAvoidingView,
-  Platform,
+  Card,
+  Avatar,
+  List,
   Switch,
-} from 'react-native';
+  Button,
+  Chip,
+  Divider,
+  SegmentedButtons,
+  useTheme,
+  Portal,
+  Modal,
+} from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
 import { useAuth } from '../hooks/useAuth';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { kundliService } from '../services/kundli';
@@ -35,6 +36,7 @@ interface EditForm {
 }
 
 const ProfileScreen: React.FC = () => {
+  const theme = useTheme();
   const { user, signOut } = useAuth();
   const { profile, isLoading, updateProfile, isUpdating } = useUserProfile();
   const { t, i18n } = useTranslation();
@@ -126,230 +128,249 @@ const ProfileScreen: React.FC = () => {
     );
   };
 
-  const birthDetails = [
-    {
-      label: 'Date of Birth',
-      value: profile?.birth_date ?? 'Not set',
-      icon: '🎂',
-    },
-    {
-      label: 'Time of Birth',
-      value: profile?.birth_time ? dateHelpers.formatTimeAmPm(profile.birth_time) : 'Not set',
-      icon: '🕐',
-    },
-    {
-      label: 'Place of Birth',
-      value: profile?.birth_place ?? 'Not set',
-      icon: '📍',
-    },
-  ];
-
   return (
     <>
-      <ScrollView style={styles.container}>
+      <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+
         {/* Profile Header */}
-        <View style={styles.profileHeader}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials}</Text>
-          </View>
-          <Text style={styles.displayName}>{displayName}</Text>
-          {user?.email ? <Text style={styles.contactInfo}>{user.email}</Text> : null}
-        </View>
+        <Card
+          mode="contained"
+          style={[styles.headerCard, { backgroundColor: theme.colors.primaryContainer }]}
+        >
+          <Card.Content style={styles.headerContent}>
+            <Avatar.Text
+              size={72}
+              label={initials}
+              style={{ backgroundColor: theme.colors.primary }}
+              labelStyle={{ color: theme.colors.onPrimary }}
+              accessibilityLabel={`Avatar for ${displayName}`}
+            />
+            <Text
+              variant="titleLarge"
+              style={{ color: theme.colors.onPrimaryContainer, marginTop: 12, textAlign: 'center' }}
+            >
+              {displayName}
+            </Text>
+            {user?.email ? (
+              <Text
+                variant="bodySmall"
+                style={{ color: theme.colors.onPrimaryContainer, opacity: 0.75, textAlign: 'center', marginTop: 4 }}
+              >
+                {user.email}
+              </Text>
+            ) : null}
+            <Chip
+              mode="flat"
+              style={[styles.tierChip, { backgroundColor: theme.colors.secondaryContainer }]}
+              textStyle={{ color: theme.colors.onSecondaryContainer }}
+              icon="star-outline"
+              accessibilityLabel="Free tier"
+            >
+              Free Tier
+            </Chip>
+          </Card.Content>
+        </Card>
 
-        {/* Birth Details Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Birth Details</Text>
-          <View style={styles.card}>
-            {birthDetails.map(detail => (
-              <View key={detail.label} style={styles.detailRow}>
-                <Text style={styles.detailIcon}>{detail.icon}</Text>
-                <View style={styles.detailInfo}>
-                  <Text style={styles.detailLabel}>{detail.label}</Text>
-                  <Text
-                    style={[
-                      styles.detailValue,
-                      detail.value === 'Not set' && styles.detailValueEmpty,
-                    ]}
-                  >
-                    {detail.value}
-                  </Text>
-                </View>
-              </View>
-            ))}
-            <TouchableOpacity style={styles.editButton} onPress={openEditModal}>
-              <Text style={styles.editButtonText}>Edit Birth Details</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        {/* Birth Details */}
+        <List.Subheader style={{ color: theme.colors.primary, marginTop: 8 }}>Birth Details</List.Subheader>
+        <Card mode="outlined" style={styles.card}>
+          <List.Item
+            title={profile?.birth_date ?? 'Not set'}
+            description="Date of Birth"
+            left={props => <List.Icon {...props} icon="cake-variant-outline" color={theme.colors.primary} />}
+            titleStyle={{ color: profile?.birth_date ? theme.colors.onSurface : theme.colors.onSurfaceVariant }}
+          />
+          <Divider />
+          <List.Item
+            title={profile?.birth_time ? dateHelpers.formatTimeAmPm(profile.birth_time) : 'Not set'}
+            description="Time of Birth"
+            left={props => <List.Icon {...props} icon="clock-outline" color={theme.colors.primary} />}
+            titleStyle={{ color: profile?.birth_time ? theme.colors.onSurface : theme.colors.onSurfaceVariant }}
+          />
+          <Divider />
+          <List.Item
+            title={profile?.birth_place ?? 'Not set'}
+            description="Place of Birth"
+            left={props => <List.Icon {...props} icon="map-marker-outline" color={theme.colors.primary} />}
+            titleStyle={{ color: profile?.birth_place ? theme.colors.onSurface : theme.colors.onSurfaceVariant }}
+          />
+          <Card.Actions>
+            <Button
+              mode="contained-tonal"
+              icon="pencil-outline"
+              onPress={openEditModal}
+              accessibilityLabel="Edit birth details"
+            >
+              Edit Details
+            </Button>
+          </Card.Actions>
+        </Card>
 
-        {/* Settings Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.settings')}</Text>
-          <View style={styles.card}>
-            {/* Language toggle */}
-            <TouchableOpacity style={styles.settingRow} onPress={handleLanguageToggle}>
-              <Text style={styles.settingIcon}>🌐</Text>
-              <Text style={styles.settingLabel}>{t('profile.language')}</Text>
-              <View style={styles.settingRight}>
-                <Text style={styles.settingValue}>
-                  {i18n.language === 'hi' ? 'हिंदी' : 'English'}
-                </Text>
-                <Text style={styles.settingArrow}>›</Text>
-              </View>
-            </TouchableOpacity>
-
-            {/* Notifications toggle */}
-            <View style={[styles.settingRow, { borderBottomWidth: 1, borderBottomColor: colors.divider }]}>
-              <Text style={styles.settingIcon}>🔔</Text>
-              <Text style={styles.settingLabel}>{t('profile.notifications')}</Text>
+        {/* Settings */}
+        <List.Subheader style={{ color: theme.colors.primary, marginTop: 8 }}>{t('profile.settings')}</List.Subheader>
+        <Card mode="outlined" style={styles.card}>
+          <List.Item
+            title={t('profile.language')}
+            description={i18n.language === 'hi' ? 'हिंदी' : 'English'}
+            left={props => <List.Icon {...props} icon="translate" color={theme.colors.primary} />}
+            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+            onPress={handleLanguageToggle}
+            accessibilityLabel="Toggle language"
+          />
+          <Divider />
+          <List.Item
+            title={t('profile.notifications')}
+            left={props => <List.Icon {...props} icon="bell-outline" color={theme.colors.primary} />}
+            right={() => (
               <Switch
                 value={notificationsEnabled}
                 onValueChange={handleNotificationsToggle}
-                trackColor={{ false: colors.disabled, true: colors.primaryLight }}
-                thumbColor={notificationsEnabled ? colors.primary : colors.surface}
+                color={theme.colors.primary}
+                accessibilityLabel="Toggle notifications"
               />
-            </View>
-
-            {[
-              { label: 'Privacy Policy', value: '', icon: '🔒' },
-              { label: 'Terms of Service', value: '', icon: '📄' },
-            ].map((item, idx, arr) => (
-              <TouchableOpacity
-                key={item.label}
-                style={[
-                  styles.settingRow,
-                  idx === arr.length - 1 && { borderBottomWidth: 0 },
-                ]}
-              >
-                <Text style={styles.settingIcon}>{item.icon}</Text>
-                <Text style={styles.settingLabel}>{item.label}</Text>
-                <View style={styles.settingRight}>
-                  <Text style={styles.settingArrow}>›</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
+            )}
+          />
+          <Divider />
+          <List.Item
+            title="Privacy Policy"
+            left={props => <List.Icon {...props} icon="lock-outline" color={theme.colors.primary} />}
+            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+            accessibilityLabel="Privacy Policy"
+          />
+          <Divider />
+          <List.Item
+            title="Terms of Service"
+            left={props => <List.Icon {...props} icon="file-document-outline" color={theme.colors.primary} />}
+            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+            accessibilityLabel="Terms of Service"
+          />
+        </Card>
 
         {/* Logout */}
-        <View style={styles.section}>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutButtonText}>Logout</Text>
-          </TouchableOpacity>
+        <View style={styles.logoutSection}>
+          <Button
+            mode="outlined"
+            icon="logout"
+            onPress={handleLogout}
+            textColor={theme.colors.error}
+            style={{ borderColor: theme.colors.error }}
+            contentStyle={styles.buttonContent}
+            accessibilityLabel="Sign out"
+          >
+            Sign Out
+          </Button>
         </View>
       </ScrollView>
 
-      {/* Edit Birth Details Modal */}
-      <Modal
-        visible={editVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setEditVisible(false)}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.modalContainer}
+      {/* Edit modal */}
+      <Portal>
+        <Modal
+          visible={editVisible}
+          onDismiss={() => setEditVisible(false)}
+          contentContainerStyle={[
+            styles.modalContainer,
+            { backgroundColor: theme.colors.surface },
+          ]}
         >
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setEditVisible(false)}>
-              <Text style={styles.modalCancel}>Cancel</Text>
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Edit Birth Details</Text>
-            <TouchableOpacity onPress={handleSave} disabled={isUpdating}>
-              <Text style={[styles.modalSave, isUpdating && { opacity: 0.5 }]}>
-                {isUpdating ? 'Saving…' : 'Save'}
-              </Text>
-            </TouchableOpacity>
+          {/* Modal header */}
+          <View style={[styles.modalHeader, { borderBottomColor: theme.colors.outlineVariant }]}>
+            <Button
+              mode="text"
+              onPress={() => setEditVisible(false)}
+              accessibilityLabel="Cancel edit"
+            >
+              Cancel
+            </Button>
+            <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>
+              Edit Birth Details
+            </Text>
+            <Button
+              mode="text"
+              onPress={handleSave}
+              loading={isUpdating}
+              disabled={isUpdating}
+              accessibilityLabel="Save birth details"
+            >
+              Save
+            </Button>
           </View>
 
+          {/* Modal body */}
           <ScrollView style={styles.modalBody} keyboardShouldPersistTaps="handled">
-            <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Date of Birth</Text>
-              <TouchableOpacity
-                style={styles.pickerButton}
-                onPress={() => setDatePickerVisible(true)}
-              >
-                <Text style={styles.pickerButtonIcon}>🗓️</Text>
-                <Text
-                  style={[
-                    styles.pickerButtonText,
-                    !form.birth_date && styles.pickerButtonPlaceholder,
-                  ]}
-                >
-                  {form.birth_date || 'Select date of birth'}
-                </Text>
-                <Text style={styles.pickerButtonArrow}>›</Text>
-              </TouchableOpacity>
-            </View>
+            {/* Date of birth */}
+            <Text variant="labelLarge" style={[styles.formLabel, { color: theme.colors.onSurface }]}>
+              Date of Birth
+            </Text>
+            <Button
+              mode="outlined"
+              icon="calendar"
+              onPress={() => setDatePickerVisible(true)}
+              style={styles.pickerButton}
+              contentStyle={styles.pickerButtonContent}
+              accessibilityLabel="Select date of birth"
+            >
+              {form.birth_date || 'Select date of birth'}
+            </Button>
 
-            <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Time of Birth</Text>
-              <TouchableOpacity
-                style={styles.pickerButton}
-                onPress={() => setTimePickerVisible(true)}
-              >
-                <Text style={styles.pickerButtonIcon}>🕐</Text>
-                <Text
-                  style={[
-                    styles.pickerButtonText,
-                    !form.birth_time && styles.pickerButtonPlaceholder,
-                  ]}
-                >
-                  {form.birth_time ? dateHelpers.formatTimeAmPm(form.birth_time) : 'Select time of birth'}
-                </Text>
-                <Text style={styles.pickerButtonArrow}>›</Text>
-              </TouchableOpacity>
-            </View>
+            {/* Time of birth */}
+            <Text variant="labelLarge" style={[styles.formLabel, { color: theme.colors.onSurface }]}>
+              Time of Birth
+            </Text>
+            <Button
+              mode="outlined"
+              icon="clock-outline"
+              onPress={() => setTimePickerVisible(true)}
+              style={styles.pickerButton}
+              contentStyle={styles.pickerButtonContent}
+              accessibilityLabel="Select time of birth"
+            >
+              {form.birth_time ? dateHelpers.formatTimeAmPm(form.birth_time) : 'Select time of birth'}
+            </Button>
 
-            <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Place of Birth</Text>
-              <TextInput
-                style={styles.formInput}
-                placeholder="City, Country"
-                placeholderTextColor={colors.textTertiary}
-                value={form.birth_place}
-                onChangeText={v => setForm(f => ({ ...f, birth_place: v }))}
-              />
-            </View>
+            {/* Place of birth */}
+            <TextInput
+              mode="outlined"
+              label="Place of Birth"
+              placeholder="City, Country"
+              value={form.birth_place}
+              onChangeText={v => setForm(f => ({ ...f, birth_place: v }))}
+              style={styles.formInput}
+              theme={theme}
+              accessibilityLabel="Enter place of birth"
+            />
 
-            <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Timezone</Text>
-              <TextInput
-                style={styles.formInput}
-                placeholder="e.g. Asia/Kolkata"
-                placeholderTextColor={colors.textTertiary}
-                value={form.timezone}
-                onChangeText={v => setForm(f => ({ ...f, timezone: v }))}
-              />
-            </View>
+            {/* Timezone */}
+            <TextInput
+              mode="outlined"
+              label="Timezone"
+              placeholder="e.g. Asia/Kolkata"
+              value={form.timezone}
+              onChangeText={v => setForm(f => ({ ...f, timezone: v }))}
+              style={styles.formInput}
+              theme={theme}
+              accessibilityLabel="Enter timezone"
+            />
 
-            <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Gender</Text>
-              <View style={styles.genderRow}>
-                {GENDERS.map(g => (
-                  <TouchableOpacity
-                    key={g}
-                    style={[
-                      styles.genderPill,
-                      form.gender === g && styles.genderPillActive,
-                    ]}
-                    onPress={() => setForm(f => ({ ...f, gender: g }))}
-                  >
-                    <Text
-                      style={[
-                        styles.genderPillText,
-                        form.gender === g && styles.genderPillTextActive,
-                      ]}
-                    >
-                      {g.charAt(0).toUpperCase() + g.slice(1)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
+            {/* Gender */}
+            <Text variant="labelLarge" style={[styles.formLabel, { color: theme.colors.onSurface }]}>
+              Gender
+            </Text>
+            <SegmentedButtons
+              value={form.gender}
+              onValueChange={v => setForm(f => ({ ...f, gender: v as EditForm['gender'] }))}
+              buttons={GENDERS.map(g => ({
+                value: g,
+                label: g.charAt(0).toUpperCase() + g.slice(1),
+                accessibilityLabel: g,
+              }))}
+              style={styles.genderButtons}
+              theme={theme}
+            />
+
+            <View style={styles.modalBottomPad} />
           </ScrollView>
-        </KeyboardAvoidingView>
-      </Modal>
+        </Modal>
+      </Portal>
 
       <DatePickerModal
         visible={datePickerVisible}
@@ -376,250 +397,66 @@ const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
-  profileHeader: {
-    backgroundColor: colors.primary,
+  headerCard: {
+    margin: 16,
+    marginBottom: 0,
+  },
+  headerContent: {
     alignItems: 'center',
-    paddingVertical: spacing.xl,
-    paddingHorizontal: spacing.lg,
+    paddingVertical: 20,
   },
-  avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-    borderWidth: 2,
-    borderColor: colors.textOnPrimary,
-  },
-  avatarText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: colors.textOnPrimary,
-  },
-  displayName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: colors.textOnPrimary,
-    marginBottom: spacing.xs,
-  },
-  contactInfo: {
-    fontSize: 14,
-    color: colors.textOnPrimary,
-    opacity: 0.8,
-  },
-  guestBadge: {
-    marginTop: spacing.sm,
-    backgroundColor: colors.secondary,
-    borderRadius: 12,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  guestBadgeText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: colors.textOnPrimary,
-  },
-  section: {
-    marginHorizontal: spacing.md,
-    marginTop: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginBottom: spacing.sm,
+  tierChip: {
+    marginTop: 12,
   },
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
+    marginHorizontal: 16,
+    marginBottom: 8,
   },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.divider,
+  logoutSection: {
+    margin: 16,
+    marginBottom: 32,
   },
-  detailIcon: {
-    fontSize: 20,
-    marginRight: spacing.md,
+  buttonContent: {
+    paddingVertical: 4,
   },
-  detailInfo: {
-    flex: 1,
-  },
-  detailLabel: {
-    fontSize: 12,
-    color: colors.textTertiary,
-    marginBottom: 2,
-  },
-  detailValue: {
-    fontSize: 15,
-    color: colors.textPrimary,
-  },
-  detailValueEmpty: {
-    color: colors.textSecondary,
-    fontStyle: 'italic',
-    fontWeight: 'normal',
-  },
-  editButton: {
-    margin: spacing.md,
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    padding: spacing.md,
-    alignItems: 'center',
-  },
-  editButtonText: {
-    color: colors.textOnPrimary,
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  settingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.divider,
-  },
-  settingIcon: {
-    fontSize: 20,
-    marginRight: spacing.md,
-  },
-  settingLabel: {
-    flex: 1,
-    fontSize: 15,
-    color: colors.textPrimary,
-  },
-  settingRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  settingValue: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginRight: spacing.xs,
-  },
-  settingArrow: {
-    fontSize: 20,
-    color: colors.textTertiary,
-  },
-  logoutButton: {
-    backgroundColor: colors.error,
-    borderRadius: 8,
-    padding: spacing.md,
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  logoutButtonText: {
-    color: colors.textOnPrimary,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  // Modal styles
   modalContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
+    margin: 20,
+    borderRadius: 16,
+    maxHeight: '90%',
+    overflow: 'hidden',
   },
   modalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  modalTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  modalCancel: {
-    fontSize: 16,
-    color: colors.textSecondary,
-  },
-  modalSave: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.primary,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   modalBody: {
-    padding: spacing.md,
-  },
-  formGroup: {
-    marginBottom: spacing.lg,
+    padding: 16,
   },
   formLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  formInput: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: spacing.md,
-    fontSize: 16,
-    color: colors.textPrimary,
+    marginTop: 16,
+    marginBottom: 8,
   },
   pickerButton: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
+    marginBottom: 4,
   },
-  pickerButtonIcon: {
-    fontSize: 18,
-    marginRight: spacing.sm,
+  pickerButtonContent: {
+    justifyContent: 'flex-start',
+    paddingVertical: 4,
   },
-  pickerButtonText: {
-    flex: 1,
-    fontSize: 16,
-    color: colors.textPrimary,
+  formInput: {
+    marginTop: 16,
+    marginBottom: 4,
   },
-  pickerButtonPlaceholder: {
-    color: colors.textTertiary,
+  genderButtons: {
+    marginBottom: 8,
   },
-  pickerButtonArrow: {
-    fontSize: 20,
-    color: colors.textTertiary,
-  },
-  genderRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  genderPill: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  genderPillActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  genderPillText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  genderPillTextActive: {
-    color: colors.textOnPrimary,
-    fontWeight: '600',
+  modalBottomPad: {
+    height: 32,
   },
 });
 
