@@ -1,27 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const STORAGE_KEYS = {
-  AUTH_TOKEN: 'auth_token',
-  USER_DATA: 'user_data',
-  USER_PROFILE: 'user_profile',
-  FEED_CACHE: 'feed_cache',
-  LAST_SYNC: 'last_sync',
-  // Phase 2 keys
-  KUNDLI_CACHE: 'kundli_cache',
-  COMPATIBILITY_HISTORY: 'compatibility_history',
-  STREAK_DATA: 'streak_data',
-  THEME_PREFERENCE: 'theme_preference',
-  LANGUAGE_PREFERENCE: 'language_preference',
-  // Phase 3 keys
-  PUSH_TOKEN: 'push_token',
-  NOTIFICATIONS_ENABLED: 'notifications_enabled',
-  STREAK_REMINDER_ID: 'streak_reminder_id',
-  // Onboarding
-  ONBOARDING_COMPLETE: 'onboarding_complete',
-  ONBOARDING_PROFILE: 'onboarding_profile',
-};
+import {
+  StorageKey,
+  type StorageValueMap,
+  type PrashnaHistoryEntry,
+  type CacheEntry,
+  TTL,
+  CACHE_VERSION,
+  isCacheValid,
+} from './storageTypes';
 
 export const storage = {
+  keys: StorageKey,
+
   // Save data
   async set(key: string, value: any): Promise<void> {
     try {
@@ -61,5 +51,52 @@ export const storage = {
     }
   },
 
-  keys: STORAGE_KEYS,
+  async getTyped<K extends StorageKey>(key: K): Promise<StorageValueMap[K] | null> {
+    return this.get<StorageValueMap[K]>(key);
+  },
+
+  async setTyped<K extends StorageKey>(key: K, value: StorageValueMap[K]): Promise<void> {
+    return this.set(key, value);
+  },
+
+  async getPrashnaHistory(): Promise<PrashnaHistoryEntry[]> {
+    const history = await this.get<PrashnaHistoryEntry[]>(StorageKey.PRASHNA_HISTORY);
+    return history ?? [];
+  },
+
+  async savePrashnaHistory(entry: PrashnaHistoryEntry): Promise<void> {
+    const history = await this.getPrashnaHistory();
+    const updated = [entry, ...history].slice(0, 20);
+    await this.set(StorageKey.PRASHNA_HISTORY, updated);
+  },
+
+  async getFeedCache<T>(): Promise<{ data: T[] | null; isStale: boolean }> {
+    const entry = await this.get<CacheEntry<T[]>>(StorageKey.FEED_CACHE);
+    if (!entry) return { data: null, isStale: true };
+    return { data: entry.data, isStale: !isCacheValid(entry, TTL.FEED) };
+  },
+
+  async setFeedCache<T>(items: T[]): Promise<void> {
+    const entry: CacheEntry<T[]> = {
+      data: items,
+      storedAt: Date.now(),
+      version: CACHE_VERSION,
+    };
+    await this.set(StorageKey.FEED_CACHE, entry);
+  },
+
+  async getPanchangCache<T>(): Promise<{ data: T | null; isStale: boolean }> {
+    const entry = await this.get<CacheEntry<T>>(StorageKey.PANCHANG_CACHE);
+    if (!entry) return { data: null, isStale: true };
+    return { data: entry.data, isStale: !isCacheValid(entry, TTL.PANCHANG) };
+  },
+
+  async setPanchangCache<T>(data: T): Promise<void> {
+    const entry: CacheEntry<T> = {
+      data,
+      storedAt: Date.now(),
+      version: CACHE_VERSION,
+    };
+    await this.set(StorageKey.PANCHANG_CACHE, entry);
+  },
 };

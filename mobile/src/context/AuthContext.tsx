@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { storage } from '../utils/storage';
+import { clearUserCache } from '../utils/chartCache';
 
 export interface StrapiUser {
   id: number;
@@ -54,6 +55,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const signOut = async () => {
+    if (user) {
+      await clearUserCache(String(user.id));
+    }
     await storage.remove(storage.keys.AUTH_TOKEN);
     await storage.remove(storage.keys.USER_DATA);
     setUser(null);
