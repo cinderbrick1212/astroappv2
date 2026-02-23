@@ -6,11 +6,13 @@ import ToolsScreen from '../screens/ToolsScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
+type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+
 type Route = {
   key: string;
   title: string;
-  focusedIcon: string;
-  unfocusedIcon?: string;
+  focusedIcon: IconName;
+  unfocusedIcon?: IconName;
 };
 
 const renderScene = BottomNavigation.SceneMap({
@@ -36,7 +38,7 @@ const MainNavigator: React.FC = () => {
       const iconName = focused ? route.focusedIcon : (route.unfocusedIcon ?? route.focusedIcon);
       return (
         <MaterialCommunityIcons
-          name={iconName as any}
+          name={iconName}
           size={24}
           color={color}
           accessibilityLabel={route.title}
