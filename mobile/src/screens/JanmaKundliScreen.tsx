@@ -76,23 +76,7 @@ const PlanetDetailDialog: React.FC<PlanetDetailDialogProps> = ({ planet, visible
   );
 };
 
-// ── South Indian Chart Placeholder ───────────────────────────────────────────
-
-const SouthIndianChartFallback = ({ theme }: { theme: any }) => {
-  return (
-    <Card mode="elevated" elevation={1} style={[styles.card, { backgroundColor: theme.colors.surfaceVariant, paddingVertical: 32 }]}>
-      <Text variant="titleMedium" style={{ textAlign: 'center', color: theme.colors.onSurfaceVariant }}>
-        South Indian Chart Grid
-      </Text>
-      <Text variant="bodySmall" style={{ textAlign: 'center', color: theme.colors.onSurfaceVariant, marginTop: 8 }}>
-        Visual rendering of planetary positions
-      </Text>
-      <View style={{ alignSelf: 'center', marginTop: 16 }}>
-        <List.Icon icon="grid" color={theme.colors.primary} />
-      </View>
-    </Card>
-  );
-};
+import { LagnaChart } from '../components/LagnaChart';
 
 // ── Main Screen ──────────────────────────────────────────────────────────────
 
@@ -209,8 +193,8 @@ const JanmaKundliScreen: React.FC = () => {
         {/* Left / top column */}
         <View style={isWide ? styles.column : undefined}>
 
-          {/* South Indian Chart Visual */}
-          <SouthIndianChartFallback theme={theme} />
+          {/* North Indian Lagna Chart Visual */}
+          <LagnaChart chartData={chart} />
 
           {/* Key Placements */}
           <List.Subheader style={{ color: theme.colors.primary }}>Astrological Profile</List.Subheader>

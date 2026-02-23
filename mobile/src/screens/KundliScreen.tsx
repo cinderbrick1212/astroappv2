@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, ScrollView, View } from 'react-native';
+import { StyleSheet, ScrollView, View, useWindowDimensions } from 'react-native';
 import {
   Text,
   Card,
@@ -16,6 +16,7 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { kundliService, KundliData } from '../services/kundli';
 import { analytics } from '../services/analytics';
+import { LagnaChart } from '../components/LagnaChart';
 
 const KundliScreen: React.FC = () => {
   const theme = useTheme();
@@ -23,6 +24,7 @@ const KundliScreen: React.FC = () => {
   const [kundli, setKundli] = useState<KundliData | null>(null);
   const [calculating, setCalculating] = useState(false);
   const [calcError, setCalcError] = useState(false);
+  const { width } = useWindowDimensions();
 
   useEffect(() => {
     analytics.kundliViewed();
@@ -129,6 +131,10 @@ const KundliScreen: React.FC = () => {
           {kundli.nakshatra}
         </Chip>
       </View>
+
+      {/* Lagna Chart Component */}
+      <List.Subheader style={{ color: theme.colors.primary }}>Lagna Chart</List.Subheader>
+      <LagnaChart chartData={kundli.chartData} size={Math.min(320, width - 32)} />
 
       {/* Current Dasha */}
       <List.Subheader style={{ color: theme.colors.primary }}>Current Mahadasha</List.Subheader>

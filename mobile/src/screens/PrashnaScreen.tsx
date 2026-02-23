@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { StyleSheet, ScrollView, View } from 'react-native';
+import { StyleSheet, ScrollView, View, useWindowDimensions } from 'react-native';
 import {
   Text,
   Card,
@@ -16,6 +16,7 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
 import { storage } from '../utils/storage';
+import { LagnaChart } from '../components/LagnaChart';
 import type { ChartData } from '../services/astrologyEngine';
 import type { PrashnaHistoryEntry } from '../utils/storageTypes';
 import { getRashiByIndex } from '../data';
@@ -33,7 +34,9 @@ type ScreenState = 'form' | 'calculating' | 'result';
 
 const PrashnaScreen: React.FC = () => {
   const theme = useTheme();
-  const { profile } = useUserProfile();
+  const { profile, isLoading } = useUserProfile();
+  const { width } = useWindowDimensions();
+
   const [question, setQuestion] = useState('');
   const [category, setCategory] = useState<string>('General');
   const [screenState, setScreenState] = useState<ScreenState>('form');
@@ -152,6 +155,11 @@ const PrashnaScreen: React.FC = () => {
             {chartResult.nakshatra}
           </Chip>
         </View>
+
+        {/* Prashna Chart Visual */}
+        <List.Subheader style={{ color: theme.colors.primary }}>Prashna Chart</List.Subheader>
+        <LagnaChart chartData={chartResult} size={Math.min(320, width - 32)} />
+
 
         {/* Interpretation */}
         <List.Subheader style={{ color: theme.colors.primary }}>Interpretation</List.Subheader>
