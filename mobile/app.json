@@ -44,6 +44,19 @@
         "projectId": "45414511-5dbe-4c59-8d7d-5e2f8ce643e3"
       }
     },
-    "owner": "cinderbricks-organization"
+    "owner": "cinderbricks-organization",
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "minSdkVersion": 24,
+            "buildToolsVersion": "35.0.0"
+          }
+        }
+      ]
+    ]
   }
 }
