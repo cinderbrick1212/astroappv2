@@ -98,14 +98,14 @@ const REMEDY_DATA: Record<string, RemedyInfo> = {
   },
 };
 
-const getSeverityStyle = (severity: string, theme: ReturnType<typeof useTheme>) => {
+const getSeverityStyle = (severity: string, colors: Record<string, unknown>) => {
   switch (severity) {
     case 'high':
-      return { bg: theme.colors.errorContainer, text: theme.colors.onErrorContainer };
+      return { bg: colors.errorContainer as string, text: colors.onErrorContainer as string };
     case 'medium':
-      return { bg: theme.colors.secondaryContainer, text: theme.colors.onSecondaryContainer };
+      return { bg: colors.secondaryContainer as string, text: colors.onSecondaryContainer as string };
     default:
-      return { bg: theme.colors.surfaceVariant, text: theme.colors.onSurfaceVariant };
+      return { bg: colors.surfaceVariant as string, text: colors.onSurfaceVariant as string };
   }
 };
 
@@ -213,7 +213,7 @@ const GrahaShantScreen: React.FC = () => {
       {/* Affliction Summary Chips */}
       <View style={styles.chipRow}>
         {afflicted.map((a, i) => {
-          const severity = getSeverityStyle(a.severity, theme);
+          const severity = getSeverityStyle(a.severity, theme.colors as unknown as Record<string, unknown>);
           return (
             <Chip
               key={`${a.graha}-${a.reason}-${i}`}
@@ -235,8 +235,7 @@ const GrahaShantScreen: React.FC = () => {
       {afflicted.map((a, i) => {
         const remedy = REMEDY_DATA[a.graha];
         if (!remedy) return null;
-        const severity = getSeverityStyle(a.severity, theme);
-
+        const severity = getSeverityStyle(a.severity, theme.colors as unknown as Record<string, unknown>);
         return (
           <Card key={`${a.graha}-${a.reason}-${i}`} mode="outlined" style={styles.card}>
             <List.Accordion

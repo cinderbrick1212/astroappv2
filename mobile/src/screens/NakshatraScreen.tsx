@@ -235,7 +235,7 @@ const NakshatraScreen: React.FC = () => {
         return (
           <Card
             key={padaNum}
-            mode={isUserPada ? 'elevated' : 'outlined'}
+            mode={(isUserPada ? 'elevated' : 'outlined') as 'elevated'}
             elevation={isUserPada ? 2 : 0}
             style={[
               styles.card,

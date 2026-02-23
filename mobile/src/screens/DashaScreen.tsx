@@ -172,8 +172,8 @@ const DashaScreen: React.FC = () => {
       {sequence.map((maha) => {
         const isPast = nowMs >= maha.endDate.getTime();
         const isCurrent = maha.isCurrent;
-        const cardMode = isCurrent ? 'elevated' : 'outlined';
-        const cardElevation = isCurrent ? 2 : 0;
+        const cardMode = isCurrent ? 'elevated' as const : 'outlined' as const;
+        const cardElevation = isCurrent ? 2 as const : 0 as const;
         const cardBg = isPast
           ? theme.colors.surfaceVariant
           : isCurrent
@@ -192,7 +192,7 @@ const DashaScreen: React.FC = () => {
         return (
           <Card
             key={mahaKey}
-            mode={cardMode}
+            mode={cardMode as 'elevated'}
             elevation={cardElevation}
             style={[styles.card, cardBg ? { backgroundColor: cardBg } : undefined]}
           >

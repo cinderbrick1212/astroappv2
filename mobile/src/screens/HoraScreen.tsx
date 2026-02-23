@@ -224,7 +224,7 @@ const HoraScreen: React.FC = () => {
       {horas.filter(h => h.isDay).map(hora => (
         <Card
           key={hora.index}
-          mode={hora.isCurrent ? 'elevated' : 'outlined'}
+          mode={(hora.isCurrent ? 'elevated' : 'outlined') as 'elevated'}
           elevation={hora.isCurrent ? 2 : 0}
           style={[
             styles.card,
@@ -260,7 +260,7 @@ const HoraScreen: React.FC = () => {
       {horas.filter(h => !h.isDay).map(hora => (
         <Card
           key={hora.index}
-          mode={hora.isCurrent ? 'elevated' : 'outlined'}
+          mode={(hora.isCurrent ? 'elevated' : 'outlined') as 'elevated'}
           elevation={hora.isCurrent ? 2 : 0}
           style={[
             styles.card,

@@ -17,6 +17,7 @@ import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
 import { storage } from '../utils/storage';
 import type { ChartData } from '../services/astrologyEngine';
+import type { PrashnaHistoryEntry } from '../utils/storageTypes';
 
 const CATEGORIES = [
   'Career', 'Relationship', 'Health', 'Finance', 'Travel', 'Education', 'Spiritual', 'General',
@@ -36,15 +37,6 @@ const PRASHNA_LAGNA_INTERPRETATIONS: Record<string, string> = {
   Aquarius: 'Unconventional solutions work best. Group efforts favored. Innovation leads to success.',
   Pisces: 'Intuition is your greatest guide. Spiritual matters highlighted. Compassion brings resolution.',
 };
-
-interface PrashnaHistoryEntry {
-  question: string;
-  category: string;
-  timestamp: string;
-  lagnaSign: string;
-  moonSign: string;
-  nakshatra: string;
-}
 
 type ScreenState = 'form' | 'calculating' | 'result';
 
@@ -77,12 +69,11 @@ const PrashnaScreen: React.FC = () => {
       setChartResult(chart);
 
       const entry: PrashnaHistoryEntry = {
+        id: now.getTime().toString(),
         question: question.trim(),
         category,
-        timestamp: now.toISOString(),
-        lagnaSign: chart.lagnaSign,
-        moonSign: chart.moonSign,
-        nakshatra: chart.nakshatra,
+        verdict: chart.lagnaSign,
+        askedAt: now.getTime(),
       };
       await storage.savePrashnaHistory(entry);
       const updated = await storage.getPrashnaHistory();
@@ -230,10 +221,10 @@ const PrashnaScreen: React.FC = () => {
           <>
             <List.Subheader style={{ color: theme.colors.primary }}>Past Questions</List.Subheader>
             {history.map((entry, i) => (
-              <Card key={`${entry.timestamp}-${i}`} mode="outlined" style={styles.card}>
+              <Card key={`${entry.askedAt}-${i}`} mode="outlined" style={styles.card}>
                 <List.Item
                   title={entry.question}
-                  description={`${entry.category} • Lagna: ${entry.lagnaSign} • ${new Date(entry.timestamp).toLocaleDateString('en-IN')}`}
+                  description={`${entry.category} • Lagna: ${entry.verdict} • ${new Date(entry.askedAt).toLocaleDateString('en-IN')}`}
                   titleNumberOfLines={2}
                   titleStyle={{ color: theme.colors.onSurface }}
                   descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
@@ -333,10 +324,10 @@ const PrashnaScreen: React.FC = () => {
         <>
           <List.Subheader style={{ color: theme.colors.primary }}>Past Questions</List.Subheader>
           {history.map((entry, i) => (
-            <Card key={`${entry.timestamp}-${i}`} mode="outlined" style={styles.card}>
+            <Card key={`${entry.askedAt}-${i}`} mode="outlined" style={styles.card}>
               <List.Item
                 title={entry.question}
-                description={`${entry.category} • Lagna: ${entry.lagnaSign} • ${new Date(entry.timestamp).toLocaleDateString('en-IN')}`}
+                description={`${entry.category} • Lagna: ${entry.verdict} • ${new Date(entry.askedAt).toLocaleDateString('en-IN')}`}
                 titleNumberOfLines={2}
                 titleStyle={{ color: theme.colors.onSurface }}
                 descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
