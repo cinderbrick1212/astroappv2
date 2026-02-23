@@ -1,0 +1,139 @@
+name: Build Android APK
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Builds a release APK using Expo prebuild + Gradle.
+# Uploads the APK as a GitHub Actions artifact in a timestamped folder.
+# ──────────────────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mobile/**"
+      - ".github/workflows/build-apk.yml"
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: "Build type (release or debug)"
+        required: false
+        default: "release"
+        type: choice
+        options:
+          - release
+          - debug
+
+env:
+  NODE_VERSION: "20"
+  JAVA_VERSION: "17"
+
+jobs:
+  build-apk:
+    name: "🔨 Build Android APK"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      # ── Setup ────────────────────────────────────────────────────────────────
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🕐 Generate timestamp
+        id: timestamp
+        run: |
+          TIMESTAMP=$(date -u +'%Y-%m-%d_%H-%M-%S')
+          echo "value=$TIMESTAMP" >> "$GITHUB_OUTPUT"
+          echo "📅 Build timestamp: $TIMESTAMP"
+
+      - name: 🟢 Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: ☕ Set up Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: "gradle"
+
+      - name: ⚙️ Configure Gradle properties
+        run: |
+          mkdir -p ~/.gradle
+          cat >> ~/.gradle/gradle.properties <<'EOF'
+          org.gradle.daemon=true
+          org.gradle.parallel=true
+          org.gradle.caching=true
+          org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError
+          EOF
+
+      # ── Build ────────────────────────────────────────────────────────────────
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Expo prebuild (Android)
+        run: npx expo prebuild --platform android --clean
+
+      - name: 🔨 Build APK (${{ github.event.inputs.build_type || 'release' }})
+        run: |
+          BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
+          cd android
+
+          if [ "$BUILD_TYPE" = "debug" ]; then
+            ./gradlew assembleDebug --build-cache --parallel
+          else
+            ./gradlew assembleRelease --build-cache --parallel
+          fi
+
+      # ── Collect & Upload ─────────────────────────────────────────────────────
+      - name: 📂 Collect APK into timestamped folder
+        run: |
+          BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
+          TIMESTAMP="${{ steps.timestamp.outputs.value }}"
+          OUTPUT_DIR="apk-output/${TIMESTAMP}"
+          mkdir -p "$OUTPUT_DIR"
+
+          if [ "$BUILD_TYPE" = "debug" ]; then
+            APK_SRC="android/app/build/outputs/apk/debug/app-debug.apk"
+            APK_NAME="astrowitt-debug-${TIMESTAMP}.apk"
+          else
+            APK_SRC="android/app/build/outputs/apk/release/app-release.apk"
+            APK_NAME="astrowitt-release-${TIMESTAMP}.apk"
+          fi
+
+          cp "$APK_SRC" "$OUTPUT_DIR/$APK_NAME"
+          echo "✅ APK: $OUTPUT_DIR/$APK_NAME"
+          echo "APK_PATH=$OUTPUT_DIR/$APK_NAME" >> "$GITHUB_ENV"
+          echo "APK_NAME=$APK_NAME" >> "$GITHUB_ENV"
+          echo "OUTPUT_DIR=$OUTPUT_DIR" >> "$GITHUB_ENV"
+
+          # Also output the file size
+          ls -lh "$OUTPUT_DIR/$APK_NAME"
+
+      - name: 📤 Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "astrowitt-apk-${{ steps.timestamp.outputs.value }}"
+          path: "mobile/apk-output/${{ steps.timestamp.outputs.value }}/"
+          retention-days: 30
+          if-no-files-found: error
+
+      # ── Summary ──────────────────────────────────────────────────────────────
+      - name: 📋 Build summary
+        run: |
+          echo "## 🎉 APK Build Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Build Type** | ${{ github.event.inputs.build_type || 'release' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Timestamp** | ${{ steps.timestamp.outputs.value }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Artifact** | astrowitt-apk-${{ steps.timestamp.outputs.value }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **APK** | ${{ env.APK_NAME }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Retention** | 30 days |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Download from the **Artifacts** section of this workflow run." >> $GITHUB_STEP_SUMMARY
