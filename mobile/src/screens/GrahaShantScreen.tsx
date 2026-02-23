@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
@@ -160,7 +161,7 @@ const GrahaShantScreen: React.FC = () => {
               description={`${a.reason} • ${a.severity} severity`}
               titleStyle={{ color: theme.colors.onSurface, fontWeight: '700' }}
               descriptionStyle={{ color: severity.text }}
-              left={props => <List.Icon {...props} icon="shield-sun-outline" color={theme.colors.primary} />}
+              left={props => <PhIcon name="shield-sun-outline" size={24} color={theme.colors.primary} />}
               right={() => (
                 <Chip
                   mode="flat"
@@ -175,7 +176,7 @@ const GrahaShantScreen: React.FC = () => {
               <List.Item
                 title={remedy.gemstone}
                 description="Gemstone"
-                left={props => <List.Icon {...props} icon="diamond-stone" color={theme.colors.primary} />}
+                left={props => <PhIcon name="diamond-stone" size={24} color={theme.colors.primary} />}
                 titleStyle={{ color: theme.colors.onSurface }}
                 descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
               />
@@ -184,7 +185,7 @@ const GrahaShantScreen: React.FC = () => {
                 title={remedy.mantraTransliteration}
                 description="Mantra"
                 titleNumberOfLines={2}
-                left={props => <List.Icon {...props} icon="hands-pray" color={theme.colors.primary} />}
+                left={props => <PhIcon name="hands-pray" size={24} color={theme.colors.primary} />}
                 titleStyle={{ color: theme.colors.onSurface }}
                 descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
               />
@@ -193,7 +194,7 @@ const GrahaShantScreen: React.FC = () => {
                 title={remedy.charity}
                 description="Charity"
                 titleNumberOfLines={2}
-                left={props => <List.Icon {...props} icon="gift-outline" color={theme.colors.primary} />}
+                left={props => <PhIcon name="gift-outline" size={24} color={theme.colors.primary} />}
                 titleStyle={{ color: theme.colors.onSurface }}
                 descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
               />
@@ -201,7 +202,7 @@ const GrahaShantScreen: React.FC = () => {
               <List.Item
                 title={remedy.fastingDay}
                 description="Fasting Day"
-                left={props => <List.Icon {...props} icon="calendar-blank" color={theme.colors.primary} />}
+                left={props => <PhIcon name="calendar-blank" size={24} color={theme.colors.primary} />}
                 titleStyle={{ color: theme.colors.onSurface }}
                 descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
               />
@@ -209,7 +210,7 @@ const GrahaShantScreen: React.FC = () => {
               <List.Item
                 title={remedy.deity}
                 description="Deity"
-                left={props => <List.Icon {...props} icon="account-heart-outline" color={theme.colors.primary} />}
+                left={props => <PhIcon name="account-heart-outline" size={24} color={theme.colors.primary} />}
                 titleStyle={{ color: theme.colors.onSurface }}
                 descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
               />
@@ -217,7 +218,7 @@ const GrahaShantScreen: React.FC = () => {
               <List.Item
                 title={remedy.colour}
                 description="Auspicious Color"
-                left={props => <List.Icon {...props} icon="palette-outline" color={theme.colors.primary} />}
+                left={props => <PhIcon name="palette-outline" size={24} color={theme.colors.primary} />}
                 titleStyle={{ color: theme.colors.onSurface }}
                 descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
               />

@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { panchangService } from '../services/panchang';
 import { analytics } from '../services/analytics';
@@ -190,11 +191,7 @@ const MuhurtaScreen: React.FC = () => {
               titleVariant="titleMedium"
               titleStyle={{ color: verdictColors[result.verdict].fg }}
               left={props => (
-                <List.Icon
-                  {...props}
-                  icon={VERDICT_ICONS[result.verdict]}
-                  color={verdictColors[result.verdict].fg}
-                />
+                <PhIcon name={VERDICT_ICONS[result.verdict]} size={24} color={verdictColors[result.verdict].fg} />
               )}
             />
             <Card.Content>

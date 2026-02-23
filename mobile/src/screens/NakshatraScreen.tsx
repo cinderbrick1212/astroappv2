@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
@@ -148,7 +149,7 @@ const NakshatraScreen: React.FC = () => {
             <List.Item
               title={item.value}
               description={item.label}
-              left={(props) => <List.Icon {...props} icon={item.icon} color={theme.colors.primary} />}
+              left={(props) => <PhIcon name={item.icon} size={24} color={theme.colors.primary} />}
               titleStyle={{ color: theme.colors.onSurface, fontWeight: '600' }}
               descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
               accessibilityLabel={`${item.label}: ${item.value}`}
@@ -187,11 +188,7 @@ const NakshatraScreen: React.FC = () => {
               }}
               descriptionNumberOfLines={3}
               left={(props) => (
-                <List.Icon
-                  {...props}
-                  icon={isUserPada ? 'check-circle' : 'circle-outline'}
-                  color={isUserPada ? theme.colors.onPrimaryContainer : theme.colors.onSurfaceVariant}
-                />
+                <PhIcon name={isUserPada ? 'check-circle' : 'circle-outline'} size={24} color={isUserPada ? theme.colors.onPrimaryContainer : theme.colors.onSurfaceVariant} />
               )}
             />
           </Card>

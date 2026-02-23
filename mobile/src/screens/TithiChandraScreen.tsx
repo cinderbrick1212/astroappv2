@@ -9,6 +9,7 @@ import {
   Button,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { panchangService } from '../services/panchang';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { analytics } from '../services/analytics';
@@ -214,17 +215,13 @@ const TithiChandraScreen: React.FC = () => {
                   : theme.colors.onSecondaryContainer,
           }}
           left={(props) => (
-            <List.Icon
-              {...props}
-              icon={auspiciousness.level === 'Highly Auspicious' ? 'star' : 'information-outline'}
-              color={
+            <PhIcon name={auspiciousness.level === 'Highly Auspicious' ? 'star' : 'information-outline'} size={24} color={
                 auspiciousness.level === 'Highly Auspicious'
                   ? theme.colors.onPrimaryContainer
                   : auspiciousness.level === 'Mixed'
                     ? theme.colors.onErrorContainer
                     : theme.colors.onSecondaryContainer
-              }
-            />
+              } />
           )}
         />
         <Card.Content>
@@ -254,7 +251,7 @@ const TithiChandraScreen: React.FC = () => {
             <List.Item
               title={day.name}
               description={`~${day.daysAway} tithi${day.daysAway !== 1 ? 's' : ''} away`}
-              left={(props) => <List.Icon {...props} icon="calendar-star" color={theme.colors.primary} />}
+              left={(props) => <PhIcon name="calendar-star" size={24} color={theme.colors.primary} />}
               titleStyle={{ color: theme.colors.onSurface, fontWeight: '600' }}
               descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
               accessibilityLabel={`${day.name} in approximately ${day.daysAway} tithis`}

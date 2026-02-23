@@ -8,6 +8,7 @@ import {
   Divider,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { panchangService } from '../services/panchang';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { analytics } from '../services/analytics';
@@ -186,11 +187,7 @@ const HoraScreen: React.FC = () => {
               titleStyle={{ color: theme.colors.onPrimaryContainer }}
               subtitleStyle={{ color: theme.colors.onPrimaryContainer }}
               left={props => (
-                <List.Icon
-                  {...props}
-                  icon={HORA_ICONS[currentHora.ruler] ?? 'circle'}
-                  color={theme.colors.onPrimaryContainer}
-                />
+                <PhIcon name={HORA_ICONS[currentHora.ruler] ?? 'circle'} size={24} color={theme.colors.onPrimaryContainer} />
               )}
             />
             <Card.Content>
@@ -232,11 +229,7 @@ const HoraScreen: React.FC = () => {
               color: hora.isCurrent ? theme.colors.onPrimaryContainer : theme.colors.onSurfaceVariant,
             }}
             left={props => (
-              <List.Icon
-                {...props}
-                icon={HORA_ICONS[hora.ruler] ?? 'circle'}
-                color={hora.isCurrent ? theme.colors.onPrimaryContainer : theme.colors.primary}
-              />
+              <PhIcon name={HORA_ICONS[hora.ruler] ?? 'circle'} size={24} color={hora.isCurrent ? theme.colors.onPrimaryContainer : theme.colors.primary} />
             )}
             accessibilityLabel={`Hora ${hora.index}: ${hora.ruler}, ${hora.startTime} to ${hora.endTime}`}
           />
@@ -268,11 +261,7 @@ const HoraScreen: React.FC = () => {
               color: hora.isCurrent ? theme.colors.onPrimaryContainer : theme.colors.onSurfaceVariant,
             }}
             left={props => (
-              <List.Icon
-                {...props}
-                icon={HORA_ICONS[hora.ruler] ?? 'circle'}
-                color={hora.isCurrent ? theme.colors.onPrimaryContainer : theme.colors.primary}
-              />
+              <PhIcon name={HORA_ICONS[hora.ruler] ?? 'circle'} size={24} color={hora.isCurrent ? theme.colors.onPrimaryContainer : theme.colors.primary} />
             )}
             accessibilityLabel={`Hora ${hora.index}: ${hora.ruler}, ${hora.startTime} to ${hora.endTime}`}
           />

@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { Text, Chip, useTheme } from 'react-native-paper';
+import { LinearGradient } from 'expo-linear-gradient';
+import { gradients } from '../theme/md3Theme';
 
 interface FeedHeaderProps {
   date: Date;
@@ -18,17 +20,35 @@ const FeedHeader: React.FC<FeedHeaderProps> = ({ date, userName, streak }) => {
     year: 'numeric',
   });
 
-  // Vedic greeting for the astrology theme
   const greeting = 'Namaste';
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.primaryContainer }]}>
+    <LinearGradient
+      colors={gradients.cosmicHero as [string, string, string]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
       <View style={styles.row}>
         <View style={styles.textBlock}>
-          <Text variant="headlineSmall" style={{ color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }}>
-            {greeting}{userName ? `, ${userName}` : ''}! ✨
+          <Text
+            variant="headlineSmall"
+            style={{
+              color: '#FFFFFF',
+              fontWeight: '700',
+              letterSpacing: -0.3,
+            }}
+          >
+            {greeting}{userName ? `, ${userName}` : ''} ✨
           </Text>
-          <Text variant="bodySmall" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.75, marginTop: 2 }}>
+          <Text
+            variant="bodySmall"
+            style={{
+              color: 'rgba(255,255,255,0.7)',
+              marginTop: 4,
+              letterSpacing: 0.3,
+            }}
+          >
             {dateStr}
           </Text>
         </View>
@@ -36,22 +56,25 @@ const FeedHeader: React.FC<FeedHeaderProps> = ({ date, userName, streak }) => {
           <Chip
             icon="fire"
             mode="flat"
-            style={{ backgroundColor: theme.colors.secondaryContainer, borderRadius: 16 }}
-            textStyle={{ color: theme.colors.onSecondaryContainer, fontWeight: '600' }}
+            style={styles.streakChip}
+            textStyle={styles.streakText}
             accessibilityLabel={`${streak} day streak`}
           >
             {streak} day{streak !== 1 ? 's' : ''}
           </Chip>
         )}
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    borderRadius: 20,
+    marginHorizontal: 0,
+    marginTop: Platform.OS === 'web' ? 8 : 0,
   },
   row: {
     flexDirection: 'row',
@@ -61,6 +84,16 @@ const styles = StyleSheet.create({
   textBlock: {
     flex: 1,
     marginRight: 12,
+  },
+  streakChip: {
+    backgroundColor: 'rgba(255,192,68,0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,192,68,0.35)',
+    borderRadius: 16,
+  },
+  streakText: {
+    color: '#FFC044',
+    fontWeight: '700',
   },
 });
 

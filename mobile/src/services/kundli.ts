@@ -7,6 +7,7 @@ import { astrologyEngine, ChartData } from './astrologyEngine';
 import { storage } from '../utils/storage';
 import { getCachedChart, setCachedChart, clearUserCache } from '../utils/chartCache';
 import { StorageKey, TTL } from '../utils/storageTypes';
+import { DASHAS, NAKSHATRAS } from '../data';
 
 /** Return UTC offset in hours for a timezone name (e.g. 'Asia/Kolkata' → 5.5) */
 const getTimezoneOffset = (timezone: string): number => {
@@ -57,11 +58,11 @@ export interface KundliData {
   };
 }
 
-// Vimshottari Dasha: nakshatra lord → dasha duration in years
-const DASHA_YEARS: Record<string, number> = {
-  Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7,
-  Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17,
-};
+// Vimshottari Dasha: derived from centralized content
+const DASHA_YEARS: Record<string, number> = DASHAS.reduce((acc, d) => ({
+  ...acc,
+  [d.lord]: d.durationYears,
+}), {});
 
 const NAKSHATRA_LORDS_CYCLE = [
   'Ketu', 'Venus', 'Sun', 'Moon', 'Mars', 'Rahu', 'Jupiter', 'Saturn', 'Mercury',
@@ -131,14 +132,8 @@ const getLagnaInsight = (lagna: string): string => {
 
 /** Compute current Mahadasha planet from birth nakshatra and birth date */
 const getCurrentDasha = (nakshatra: string, birthDate: Date): { planet: string; endYear: number } => {
-  const NAKSHATRAS = [
-    'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra',
-    'Punarvasu', 'Pushya', 'Ashlesha', 'Magha', 'Purva Phalguni', 'Uttara Phalguni',
-    'Hasta', 'Chitra', 'Swati', 'Vishakha', 'Anuradha', 'Jyeshtha',
-    'Mula', 'Purva Ashadha', 'Uttara Ashadha', 'Shravana', 'Dhanishtha',
-    'Shatabhisha', 'Purva Bhadrapada', 'Uttara Bhadrapada', 'Revati',
-  ];
-  const nIdx = NAKSHATRAS.indexOf(nakshatra);
+  const nNames = NAKSHATRAS.map(n => n.name);
+  const nIdx = nNames.indexOf(nakshatra);
   const lordIdx = nIdx >= 0 ? nIdx % 9 : 0;
 
   // Build dasha sequence starting from birth nakshatra lord
@@ -176,18 +171,18 @@ interface KundliCacheEntry {
 
 // Traditional insights keyed by rashi
 const RASHI_INSIGHTS: Record<string, string[]> = {
-  Aries:       ['Strong Mars bestows natural leadership and courage.', 'First house placement amplifies your drive for success.'],
-  Taurus:      ['Venus blesses you with artistic sensibility and steadiness.', 'Earth sign stability supports long-term wealth accumulation.'],
-  Gemini:      ['Mercury sharpens your intellect and communication skills.', 'Dual nature grants versatility in career and relationships.'],
-  Cancer:      ['The Moon governs deep intuition and emotional intelligence.', 'Nurturing instincts make you a pillar of family strength.'],
-  Leo:         ['Sun in your chart radiates confidence and natural authority.', 'Creative talents are a source of recognition and joy.'],
-  Virgo:       ['Mercury in an earthy sign sharpens analytical precision.', 'Service orientation leads to meaningful professional fulfillment.'],
-  Libra:       ['Venus blesses relationships with harmony and beauty.', 'Diplomatic gifts help you resolve conflict with grace.'],
-  Scorpio:     ['Mars and Ketu grant transformative depth and resilience.', 'Hidden strengths emerge under pressure — trust the process.'],
+  Aries: ['Strong Mars bestows natural leadership and courage.', 'First house placement amplifies your drive for success.'],
+  Taurus: ['Venus blesses you with artistic sensibility and steadiness.', 'Earth sign stability supports long-term wealth accumulation.'],
+  Gemini: ['Mercury sharpens your intellect and communication skills.', 'Dual nature grants versatility in career and relationships.'],
+  Cancer: ['The Moon governs deep intuition and emotional intelligence.', 'Nurturing instincts make you a pillar of family strength.'],
+  Leo: ['Sun in your chart radiates confidence and natural authority.', 'Creative talents are a source of recognition and joy.'],
+  Virgo: ['Mercury in an earthy sign sharpens analytical precision.', 'Service orientation leads to meaningful professional fulfillment.'],
+  Libra: ['Venus blesses relationships with harmony and beauty.', 'Diplomatic gifts help you resolve conflict with grace.'],
+  Scorpio: ['Mars and Ketu grant transformative depth and resilience.', 'Hidden strengths emerge under pressure — trust the process.'],
   Sagittarius: ['Jupiter bestows wisdom, optimism, and expansive vision.', 'Philosophy and travel are natural paths of growth for you.'],
-  Capricorn:   ['Saturn rewards disciplined effort with enduring success.', 'Ambition and patience together build lasting achievements.'],
-  Aquarius:    ['Saturn and Rahu spark original thinking and innovation.', 'Humanitarian ideals guide your most important decisions.'],
-  Pisces:      ['Jupiter and Neptune deepen spirituality and compassion.', 'Intuitive gifts and artistic vision set you apart.'],
+  Capricorn: ['Saturn rewards disciplined effort with enduring success.', 'Ambition and patience together build lasting achievements.'],
+  Aquarius: ['Saturn and Rahu spark original thinking and innovation.', 'Humanitarian ideals guide your most important decisions.'],
+  Pisces: ['Jupiter and Neptune deepen spirituality and compassion.', 'Intuitive gifts and artistic vision set you apart.'],
 };
 
 export const kundliService = {

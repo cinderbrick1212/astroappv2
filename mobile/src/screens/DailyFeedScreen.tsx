@@ -7,6 +7,7 @@ import {
   Surface,
   useTheme,
 } from 'react-native-paper';
+import { LinearGradient } from 'expo-linear-gradient';
 import FeedHeader from '../components/FeedHeader';
 import FeedItemCard from '../components/FeedItemCard';
 import LoadingSkeleton from '../components/LoadingSkeleton';
@@ -99,6 +100,8 @@ const DailyFeedScreen: React.FC = () => {
             {
               backgroundColor: theme.dark ? theme.colors.elevation.level2 : theme.colors.surface,
               maxWidth,
+              borderColor: theme.dark ? 'rgba(203,190,255,0.12)' : 'rgba(91,79,196,0.08)',
+              borderWidth: 1,
             },
           ]}
           elevation={2}
@@ -107,11 +110,16 @@ const DailyFeedScreen: React.FC = () => {
             DAILY HOROSCOPE
           </Text>
           <View style={styles.rashiRow}>
-            <View style={[styles.rashiEmojiWrap, { backgroundColor: theme.colors.primaryContainer }]}>
+            <LinearGradient
+              colors={theme.dark
+                ? ['rgba(54,45,138,0.6)', 'rgba(91,79,196,0.3)']
+                : [theme.colors.primaryContainer, 'rgba(230,222,255,0.5)']}
+              style={styles.rashiEmojiWrap}
+            >
               <Text style={styles.rashiEmoji}>{ZODIAC_EMOJI[rashi] || '✨'}</Text>
-            </View>
+            </LinearGradient>
             <View style={{ flex: 1 }}>
-              <Text variant="headlineSmall" style={{ color: theme.colors.onSurface, fontWeight: '700' }}>
+              <Text variant="headlineSmall" style={{ color: theme.colors.onSurface, fontWeight: '700', letterSpacing: -0.3 }}>
                 {rashi}
               </Text>
               <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: 2 }}>
@@ -129,8 +137,8 @@ const DailyFeedScreen: React.FC = () => {
             <Chip
               icon="numeric"
               mode="flat"
-              style={[styles.luckyChip, { backgroundColor: theme.colors.secondaryContainer }]}
-              textStyle={{ color: theme.colors.onSecondaryContainer, fontWeight: '600' }}
+              style={[styles.luckyChip, { backgroundColor: theme.dark ? 'rgba(94,66,0,0.5)' : theme.colors.secondaryContainer }]}
+              textStyle={{ color: theme.dark ? '#FFC044' : theme.colors.onSecondaryContainer, fontWeight: '600' }}
               accessibilityLabel={`Lucky number ${horoscope.luckyNumber}`}
             >
               {horoscope.luckyNumber}
@@ -138,8 +146,8 @@ const DailyFeedScreen: React.FC = () => {
             <Chip
               icon="palette"
               mode="flat"
-              style={[styles.luckyChip, { backgroundColor: theme.colors.secondaryContainer }]}
-              textStyle={{ color: theme.colors.onSecondaryContainer, fontWeight: '600' }}
+              style={[styles.luckyChip, { backgroundColor: theme.dark ? 'rgba(94,66,0,0.5)' : theme.colors.secondaryContainer }]}
+              textStyle={{ color: theme.dark ? '#FFC044' : theme.colors.onSecondaryContainer, fontWeight: '600' }}
               accessibilityLabel={`Lucky color ${horoscope.luckyColor}`}
             >
               {horoscope.luckyColor}
@@ -150,20 +158,27 @@ const DailyFeedScreen: React.FC = () => {
         {/* ── Today's Focus ───────────────────────────────────── */}
         <Card
           mode="contained"
-          style={[styles.focusCard, { backgroundColor: theme.colors.primaryContainer, maxWidth }]}
+          style={[styles.focusCard, { maxWidth, backgroundColor: 'transparent', overflow: 'hidden' }]}
           accessibilityLabel={`Today's focus: ${focus.label}`}
         >
-          <Card.Content style={styles.focusContent}>
+          <LinearGradient
+            colors={theme.dark
+              ? ['rgba(54,45,138,0.4)', 'rgba(91,79,196,0.15)']
+              : [theme.colors.primaryContainer, 'rgba(230,222,255,0.6)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.focusGradient}
+          >
             <Text style={styles.focusEmoji}>{focus.emoji}</Text>
             <View style={{ flex: 1 }}>
-              <Text variant="titleMedium" style={{ color: theme.colors.onPrimaryContainer, fontWeight: '700' }}>
+              <Text variant="titleMedium" style={{ color: theme.dark ? '#CBBEFF' : theme.colors.onPrimaryContainer, fontWeight: '700' }}>
                 {focus.label} Focus
               </Text>
-              <Text variant="bodySmall" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.85, marginTop: 4 }}>
+              <Text variant="bodySmall" style={{ color: theme.dark ? 'rgba(203,190,255,0.8)' : theme.colors.onPrimaryContainer, marginTop: 4 }}>
                 {focus.message}
               </Text>
             </View>
-          </Card.Content>
+          </LinearGradient>
         </Card>
 
         {/* ── Remedy of the Day ───────────────────────────────── */}
@@ -189,16 +204,30 @@ const DailyFeedScreen: React.FC = () => {
               </React.Fragment>
             ))
           ) : (
-            <Card mode="outlined" style={{ borderRadius: 16 }}>
-              <Card.Content style={{ paddingVertical: 24 }}>
-                <Text
-                  variant="bodyMedium"
-                  style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}
-                >
-                  No feed items today. Pull to refresh.
-                </Text>
-              </Card.Content>
-            </Card>
+            <Surface
+              style={[
+                styles.emptyState,
+                {
+                  backgroundColor: theme.dark ? theme.colors.elevation.level2 : theme.colors.surface,
+                  borderColor: theme.dark ? 'rgba(203,190,255,0.08)' : theme.colors.outlineVariant,
+                },
+              ]}
+              elevation={0}
+            >
+              <Text style={styles.emptyIcon}>🌌</Text>
+              <Text
+                variant="bodyMedium"
+                style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center', marginTop: 8 }}
+              >
+                The cosmic feed is quiet today.
+              </Text>
+              <Text
+                variant="bodySmall"
+                style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center', opacity: 0.6, marginTop: 4 }}
+              >
+                Pull down to refresh
+              </Text>
+            </Surface>
           )}
         </View>
       </ScrollView>
@@ -217,13 +246,13 @@ const styles = StyleSheet.create({
   horoscopeCard: {
     borderRadius: 24,
     padding: 20,
-    marginTop: 12,
+    marginTop: 14,
     width: '100%',
   },
   sectionLabel: {
     letterSpacing: 1.5,
     fontWeight: '700',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   rashiRow: {
     flexDirection: 'row',
@@ -232,14 +261,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   rashiEmojiWrap: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+    width: 60,
+    height: 60,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
   rashiEmoji: {
-    fontSize: 28,
+    fontSize: 30,
   },
   chipRow: {
     flexDirection: 'row',
@@ -249,14 +278,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   focusCard: {
-    marginTop: 12,
+    marginTop: 14,
     borderRadius: 20,
     width: '100%',
   },
-  focusContent: {
+  focusGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
+    padding: 18,
+    borderRadius: 20,
   },
   focusEmoji: {
     fontSize: 36,
@@ -265,6 +296,16 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 16,
     width: '100%',
+  },
+  emptyState: {
+    borderRadius: 20,
+    borderWidth: 1,
+    paddingVertical: 40,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+  },
+  emptyIcon: {
+    fontSize: 48,
   },
 });
 

@@ -9,6 +9,7 @@ import {
   Button,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
 import type { EclipseEvent } from '../services/astrologyEngine';
@@ -138,11 +139,7 @@ const GrahanScreen: React.FC = () => {
                   titleStyle={{ color: theme.colors.onSurface }}
                   subtitleStyle={{ color: theme.colors.onSurfaceVariant }}
                   left={(props) => (
-                    <List.Icon
-                      {...props}
-                      icon={isSolar ? 'white-balance-sunny' : 'moon-full'}
-                      color={theme.colors.primary}
-                    />
+                    <PhIcon name={isSolar ? 'white-balance-sunny' : 'moon-full'} size={24} color={theme.colors.primary} />
                   )}
                 />
                 <Card.Content>

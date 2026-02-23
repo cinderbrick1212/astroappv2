@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
@@ -112,7 +113,7 @@ const DashaScreen: React.FC = () => {
           titleVariant="titleMedium"
           titleStyle={{ color: theme.colors.onPrimaryContainer }}
           subtitleStyle={{ color: theme.colors.onPrimaryContainer }}
-          left={props => <List.Icon {...props} icon="orbit" color={theme.colors.onPrimaryContainer} />}
+          left={props => <PhIcon name="orbit" size={24} color={theme.colors.onPrimaryContainer} />}
         />
         <Card.Content>
           <View style={styles.dateRow}>
@@ -146,7 +147,7 @@ const DashaScreen: React.FC = () => {
           titleVariant="titleSmall"
           titleStyle={{ color: theme.colors.onSecondaryContainer }}
           subtitleStyle={{ color: theme.colors.onSecondaryContainer, opacity: 0.8 }}
-          left={props => <List.Icon {...props} icon="star-four-points" color={theme.colors.onSecondaryContainer} />}
+          left={props => <PhIcon name="star-four-points" size={24} color={theme.colors.onSecondaryContainer} />}
         />
         <Card.Content>
           <Text variant="labelSmall" style={{ color: theme.colors.onSecondaryContainer, opacity: 0.9 }}>
@@ -192,11 +193,7 @@ const DashaScreen: React.FC = () => {
               titleStyle={{ color: textColor, fontWeight: isCurrent ? '700' : '400' }}
               descriptionStyle={{ color: textColor, opacity: isPast ? 0.7 : 1 }}
               left={props => (
-                <List.Icon
-                  {...props}
-                  icon={isCurrent ? 'circle-slice-8' : isPast ? 'check-circle-outline' : 'circle-outline'}
-                  color={isCurrent ? theme.colors.primary : textColor}
-                />
+                <PhIcon name={isCurrent ? 'circle-slice-8' : isPast ? 'check-circle-outline' : 'circle-outline'} size={24} color={isCurrent ? theme.colors.primary : textColor} />
               )}
               expanded={isExpanded}
               onPress={() => setExpandedMaha(isExpanded ? null : mahaKey)}
@@ -216,11 +213,7 @@ const DashaScreen: React.FC = () => {
                       }}
                       descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
                       left={props => (
-                        <List.Icon
-                          {...props}
-                          icon={antarIsCurrent ? 'arrow-right-bold' : 'minus'}
-                          color={antarIsCurrent ? theme.colors.primary : theme.colors.onSurfaceVariant}
-                        />
+                        <PhIcon name={antarIsCurrent ? 'arrow-right-bold' : 'minus'} size={24} color={antarIsCurrent ? theme.colors.primary : theme.colors.onSurfaceVariant} />
                       )}
                       style={{ paddingLeft: 16 }}
                     />
@@ -251,7 +244,7 @@ const DashaScreen: React.FC = () => {
           title={`${currentMahadasha.lord} Dasha Recommendation`}
           titleVariant="titleSmall"
           titleStyle={{ color: theme.colors.onTertiaryContainer }}
-          left={props => <List.Icon {...props} icon="hands-pray" color={theme.colors.onTertiaryContainer} />}
+          left={props => <PhIcon name="hands-pray" size={24} color={theme.colors.onTertiaryContainer} />}
         />
         <Card.Content>
           <Text variant="bodyMedium" style={{ color: theme.colors.onTertiaryContainer }}>

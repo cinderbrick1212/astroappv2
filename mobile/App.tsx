@@ -1,6 +1,13 @@
 import React from 'react';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, ActivityIndicator, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
+import {
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+} from '@expo-google-fonts/plus-jakarta-sans';
 import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
@@ -44,6 +51,21 @@ function AppContent() {
 export default function App() {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? md3DarkTheme : md3LightTheme;
+
+  const [fontsLoaded] = useFonts({
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.background }}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <PaperProvider theme={theme}>

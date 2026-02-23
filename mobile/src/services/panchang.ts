@@ -4,6 +4,7 @@
  */
 
 import { astrologyEngine, calcSunLongitude, calcMoonLongitude, toJulianDay, tropicalToVedic } from './astrologyEngine';
+import { TITHIS, PANCHANG_YOGAS, KARANAS } from '../data';
 
 export interface PanchangData {
   tithi: string;
@@ -21,31 +22,6 @@ export interface PanchangData {
     time: string;
   }>;
 }
-
-// 30 tithis
-const TITHI_NAMES = [
-  'Pratipada', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami',
-  'Shashthi', 'Saptami', 'Ashtami', 'Navami', 'Dashami',
-  'Ekadashi', 'Dwadashi', 'Trayodashi', 'Chaturdashi', 'Purnima',
-  'Pratipada (K)', 'Dwitiya (K)', 'Tritiya (K)', 'Chaturthi (K)', 'Panchami (K)',
-  'Shashthi (K)', 'Saptami (K)', 'Ashtami (K)', 'Navami (K)', 'Dashami (K)',
-  'Ekadashi (K)', 'Dwadashi (K)', 'Trayodashi (K)', 'Chaturdashi (K)', 'Amavasya',
-];
-
-// 27 yogas (sun + moon longitude / 13.333°)
-const YOGA_NAMES = [
-  'Vishkambha', 'Priti', 'Ayushman', 'Saubhagya', 'Shobhana', 'Atiganda',
-  'Sukarman', 'Dhriti', 'Shula', 'Ganda', 'Vriddhi', 'Dhruva',
-  'Vyaghata', 'Harshana', 'Vajra', 'Siddhi', 'Vyatipata', 'Variyan',
-  'Parigha', 'Shiva', 'Siddha', 'Sadhya', 'Shubha', 'Shukla',
-  'Brahma', 'Indra', 'Vaidhriti',
-];
-
-// 11 karanas
-const KARANA_NAMES = [
-  'Bava', 'Balava', 'Kaulava', 'Taitula', 'Garaja',
-  'Vanija', 'Vishti', 'Shakuni', 'Chatushpada', 'Naga', 'Kimstughna',
-];
 
 // Rahu Kaal slot (1–8) by day of week (0=Sun)
 // Each slot is 1/8th of the day's length, not a fixed 1.5h period
@@ -101,18 +77,18 @@ export const panchangService = {
     let moonSunDiff = moonVedic - sunVedic;
     if (moonSunDiff < 0) moonSunDiff += 360;
     const tithiIndex = Math.floor(moonSunDiff / 12) % 30;
-    const tithi = TITHI_NAMES[tithiIndex];
+    const tithi = TITHIS[tithiIndex]?.name || 'Unknown';
 
     // Nakshatra: from moon longitude
     const nakshatra = astrologyEngine.getNakshatra(moonVedic);
 
     // Yoga: (sun + moon longitude) / 13.333°
     const yogaIndex = Math.floor(((sunVedic + moonVedic) % 360) / (360 / 27)) % 27;
-    const yoga = YOGA_NAMES[yogaIndex];
+    const yoga = PANCHANG_YOGAS[yogaIndex]?.name || 'Unknown';
 
     // Karana: half-tithi (each tithi has 2 karanas)
     const karanaIndex = Math.floor(moonSunDiff / 6) % 11;
-    const karana = KARANA_NAMES[karanaIndex];
+    const karana = KARANAS[karanaIndex]?.name || 'Unknown';
 
     // Sunrise / Sunset
     const { sunriseMin, sunsetMin } = calcSunriseSunset(jd, latitude);

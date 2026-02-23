@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
@@ -109,7 +110,7 @@ const VarshaphalScreen: React.FC = () => {
           title="Solar Return"
           subtitle={formatDate(varshaphal.returnDate)}
           titleVariant="titleMedium"
-          left={props => <List.Icon {...props} icon="white-balance-sunny" color={theme.colors.primary} />}
+          left={props => <PhIcon name="white-balance-sunny" size={24} color={theme.colors.primary} />}
         />
       </Card>
 

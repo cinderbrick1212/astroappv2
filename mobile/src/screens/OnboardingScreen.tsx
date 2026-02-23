@@ -17,6 +17,7 @@ import {
   useTheme,
   List,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { storage } from '../utils/storage';
 import { dateHelpers } from '../utils/dateHelpers';
 import DatePickerModal from '../components/DatePickerModal';
@@ -163,7 +164,7 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
                   title={f.text}
                   titleVariant="bodyLarge"
                   left={props => (
-                    <List.Icon {...props} icon={f.icon} color={theme.colors.primary} />
+                    <PhIcon name={f.icon} size={24} color={theme.colors.primary} />
                   )}
                 />
               </Card>
@@ -307,7 +308,7 @@ const OnboardingScreen: React.FC<Props> = ({ onComplete }) => {
                     key={item.label}
                     title={item.value}
                     description={item.label}
-                    left={props => <List.Icon {...props} icon={item.icon} color={theme.colors.primary} />}
+                    left={props => <PhIcon name={item.icon} size={24} color={theme.colors.primary} />}
                     style={i < arr.length - 1 ? { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.colors.outlineVariant } : undefined}
                   />
                 ))}

@@ -12,6 +12,7 @@ import {
   Banner,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { compatibilityService, CompatibilityResult } from '../services/compatibility';
 import { validation } from '../utils/validation';
 import { storage } from '../utils/storage';
@@ -221,7 +222,7 @@ const CompatibilityScreen: React.FC = () => {
               title="View Ashtakoot Breakdown"
               expanded={showBreakdown}
               onPress={() => setShowBreakdown(v => !v)}
-              left={props => <List.Icon {...props} icon="chart-bar" color={theme.colors.primary} />}
+              left={props => <PhIcon name="chart-bar" size={24} color={theme.colors.primary} />}
               titleStyle={{ color: theme.colors.primary }}
             >
               {Object.entries(result.breakdown).map(([key, val], i, arr) => (

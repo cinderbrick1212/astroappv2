@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { panchangService } from '../services/panchang';
 import { analytics } from '../services/analytics';
@@ -170,7 +171,7 @@ const PanchangVisheshScreen: React.FC = () => {
                 title={m.activity}
                 subtitle={m.time}
                 titleVariant="titleSmall"
-                left={props => <List.Icon {...props} icon="clock-check-outline" color={theme.colors.primary} />}
+                left={props => <PhIcon name="clock-check-outline" size={24} color={theme.colors.primary} />}
               />
             </Card>
           ))}

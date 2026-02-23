@@ -61,8 +61,12 @@ export const LagnaChart: React.FC<LagnaChartProps> = ({ chartData, size = 320 })
     // Diagonals: (0,0) to (100,100), and (100,0) to (0,100)
     // Diamonds: (50,0) to (100,50) to (50,100) to (0,50) to (50,0)
 
-    const strokeColor = theme.colors.primary;
-    const strokeWidth = 1.5;
+    // Premium cosmic theme colors similar to industry standard (AstroSage dark theme)
+    const chartBg = theme.dark ? theme.colors.elevation.level2 : '#302E38';
+    const strokeColor = theme.dark ? theme.colors.primary : '#A695E5';
+    const strokeWidth = 2; // Slightly thicker for a premium feel
+    const textColor = '#FFFFFF';
+    const signColor = '#A695E5';
 
     const getHouseContent = (houseNum: number) => {
         // get all planets in this house
@@ -77,74 +81,78 @@ export const LagnaChart: React.FC<LagnaChartProps> = ({ chartData, size = 320 })
     };
 
     return (
-            />
+        <View style={[styles.container, { width: size, height: size, backgroundColor: chartBg }]}>
+            <Svg width="100%" height="100%" viewBox="0 0 100 100">
+                {/* Outer Bound Square */}
+                <Polygon
+                    points="0,0 100,0 100,100 0,100"
+                    fill="none"
+                    stroke={strokeColor}
+                    strokeWidth={strokeWidth}
+                />
 
-            {/* Main Full Diagonals (X) */ }
-            <Line x1="0" y1="0" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
-            <Line x1="100" y1="0" x2="0" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
+                {/* Main Full Diagonals (X) */}
+                <Line x1="0" y1="0" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
+                <Line x1="100" y1="0" x2="0" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
 
-    {/* Inner Diamond (Connecting 4 midpoints of the outer square) */ }
-    <Polygon
-        points="50,0 100,50 50,100 0,50"
-        fill="none"
-        stroke={strokeColor}
-        strokeWidth={strokeWidth}
-    />
-        </Svg >
+                {/* Inner Diamond (Connecting 4 midpoints of the outer square) */}
+                <Polygon
+                    points="50,0 100,50 50,100 0,50"
+                    fill="none"
+                    stroke={strokeColor}
+                    strokeWidth={strokeWidth}
+                />
+            </Svg>
 
-    {/* Text overlays for each of the 12 houses */ }
-{
-    HOUSE_CENTERS.map((center, index) => {
-        const houseNum = index + 1;
-        const { planetLabels, signNum } = getHouseContent(houseNum);
+            {/* Text overlays for each of the 12 houses */}
+            {HOUSE_CENTERS.map((center, index) => {
+                const houseNum = index + 1;
+                const { planetLabels, signNum } = getHouseContent(houseNum);
 
-        return (
-            <React.Fragment key={`house-${houseNum}`}>
-                {/* Planets */}
-                <View
-                    style={[
-                        styles.houseCenter,
-                        { left: `${center.x}%`, top: `${center.y}%`, transform: [{ translateX: '-50%' }, { translateY: '-50%' }] }
-                    ]}
-                    pointerEvents="none"
-                >
-                    <Text
-                        variant="labelSmall"
-                        style={{
-                            color: theme.colors.onSurface,
-                            fontWeight: 'bold',
-                            textAlign: 'center',
-                            fontSize: Math.max(10, size * 0.032)
-                        }}
-                    >
-                        {planetLabels}
-                    </Text>
-                </View>
+                return (
+                    <React.Fragment key={`house-${houseNum}`}>
+                        {/* Planets */}
+                        <View
+                            style={[
+                                styles.houseCenter,
+                                { left: `${center.x}%`, top: `${center.y}%`, transform: [{ translateX: '-50%' }, { translateY: '-50%' }] }
+                            ]}
+                            pointerEvents="none"
+                        >
+                            <Text
+                                style={{
+                                    color: textColor,
+                                    fontWeight: '700',
+                                    textAlign: 'center',
+                                    fontSize: Math.max(11, size * 0.035)
+                                }}
+                            >
+                                {planetLabels}
+                            </Text>
+                        </View>
 
-                {/* Zodiac Sign Number */}
-                <View
-                    style={[
-                        styles.signNumPos,
-                        { left: `${SIGN_POSITIONS[index].x}%`, top: `${SIGN_POSITIONS[index].y}%`, transform: [{ translateX: '-50%' }, { translateY: '-50%' }] }
-                    ]}
-                    pointerEvents="none"
-                >
-                    <Text
-                        variant="labelSmall"
-                        style={{
-                            color: theme.colors.primary,
-                            opacity: 0.8,
-                            fontSize: Math.max(9, size * 0.028)
-                        }}
-                    >
-                        {signNum}
-                    </Text>
-                </View>
-            </React.Fragment>
-        );
-    })
-}
-        </View >
+                        {/* Zodiac Sign Number */}
+                        <View
+                            style={[
+                                styles.signNumPos,
+                                { left: `${SIGN_POSITIONS[index].x}%`, top: `${SIGN_POSITIONS[index].y}%`, transform: [{ translateX: '-50%' }, { translateY: '-50%' }] }
+                            ]}
+                            pointerEvents="none"
+                        >
+                            <Text
+                                style={{
+                                    color: signColor,
+                                    fontWeight: '600',
+                                    fontSize: Math.max(9, size * 0.028)
+                                }}
+                            >
+                                {signNum}
+                            </Text>
+                        </View>
+                    </React.Fragment>
+                );
+            })}
+        </View>
     );
 };
 
@@ -158,7 +166,7 @@ const styles = StyleSheet.create({
         ...Platform.select({
             web: {
                 borderWidth: 1,
-                borderColor: 'rgba(0,0,0,0.1)'
+                borderColor: 'rgba(255,255,255,0.1)'
             }
         })
     },

@@ -12,6 +12,7 @@ import {
   TextInput,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
@@ -229,7 +230,7 @@ const PrashnaScreen: React.FC = () => {
                   titleNumberOfLines={2}
                   titleStyle={{ color: theme.colors.onSurface }}
                   descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
-                  left={props => <List.Icon {...props} icon="help-circle-outline" color={theme.colors.primary} />}
+                  left={props => <PhIcon name="help-circle-outline" size={24} color={theme.colors.primary} />}
                 />
               </Card>
             ))}
@@ -332,7 +333,7 @@ const PrashnaScreen: React.FC = () => {
                 titleNumberOfLines={2}
                 titleStyle={{ color: theme.colors.onSurface }}
                 descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
-                left={props => <List.Icon {...props} icon="help-circle-outline" color={theme.colors.primary} />}
+                left={props => <PhIcon name="help-circle-outline" size={24} color={theme.colors.primary} />}
               />
             </Card>
           ))}

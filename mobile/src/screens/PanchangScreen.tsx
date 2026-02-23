@@ -8,6 +8,7 @@ import {
   Divider,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { panchangService, PanchangData } from '../services/panchang';
 import { useUserProfile } from '../hooks/useUserProfile';
 
@@ -95,7 +96,7 @@ const PanchangScreen: React.FC = () => {
             <List.Item
               title={item.value}
               description={item.label}
-              left={props => <List.Icon {...props} icon={item.icon} color={theme.colors.primary} />}
+              left={props => <PhIcon name={item.icon} size={24} color={theme.colors.primary} />}
               titleStyle={{ color: theme.colors.onSurface, fontWeight: '600' }}
               descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
               accessibilityLabel={`${item.label}: ${item.value}`}
@@ -154,7 +155,7 @@ const PanchangScreen: React.FC = () => {
           titleVariant="titleMedium"
           titleStyle={{ color: theme.colors.error }}
           subtitle="Avoid new ventures during this window."
-          left={props => <List.Icon {...props} icon="alert-circle-outline" color={theme.colors.error} />}
+          left={props => <PhIcon name="alert-circle-outline" size={24} color={theme.colors.error} />}
         />
       </Card>
 
@@ -166,7 +167,7 @@ const PanchangScreen: React.FC = () => {
             <List.Item
               title={m.time}
               description={m.activity}
-              left={props => <List.Icon {...props} icon="star-shooting" color={theme.colors.primary} />}
+              left={props => <PhIcon name="star-shooting" size={24} color={theme.colors.primary} />}
               titleStyle={{ color: theme.colors.onSurface, fontWeight: '600' }}
               descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
               accessibilityLabel={`${m.activity} at ${m.time}`}

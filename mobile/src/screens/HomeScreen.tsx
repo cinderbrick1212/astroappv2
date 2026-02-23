@@ -3,17 +3,17 @@ import { StyleSheet, ScrollView, View, Platform, useWindowDimensions, Pressable 
 import {
   Text,
   Card,
-  List,
-  Divider,
   useTheme,
   Surface,
-  IconButton,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '../hooks/useAuth';
 import { AppStackParamList } from '../types';
 import { analytics } from '../services/analytics';
+import { gradients } from '../theme/md3Theme';
 
 type Nav = NativeStackNavigationProp<AppStackParamList>;
 
@@ -43,18 +43,18 @@ const QUICK_TOOLS: Array<{
   screen: keyof AppStackParamList;
   accent: string;
 }> = [
-    { label: 'Kundli', icon: 'star-david', description: 'Birth chart', screen: 'Kundli', accent: '#7E57C2' },
+    { label: 'Kundli', icon: 'star-david', description: 'Birth chart', screen: 'Kundli', accent: '#7B6FDD' },
     { label: 'Compatibility', icon: 'heart-multiple', description: 'Match analysis', screen: 'Compatibility', accent: '#EC407A' },
-    { label: 'Ask Question', icon: 'help-circle-outline', description: 'Expert advice', screen: 'AskQuestion', accent: '#26A69A' },
-    { label: 'Book Call', icon: 'phone-in-talk-outline', description: 'Live consult', screen: 'BookCall', accent: '#FFA726' },
+    { label: 'Ask Question', icon: 'help-circle-outline', description: 'Expert advice', screen: 'AskQuestion', accent: '#26C6A0' },
+    { label: 'Book Call', icon: 'phone-in-talk-outline', description: 'Live consult', screen: 'BookCall', accent: '#FFC044' },
     { label: 'Panchang', icon: 'calendar-month', description: 'Daily calendar', screen: 'Panchang', accent: '#42A5F5' },
     { label: 'Dasha', icon: 'orbit', description: 'Life timeline', screen: 'Dasha', accent: '#AB47BC' },
   ];
 
 const SERVICES = [
-  { label: 'Ask a Question', icon: 'chat-question-outline', price: '₹49', screen: 'AskQuestion' as const, description: 'Get a personalized answer' },
-  { label: 'Book a Call', icon: 'phone-in-talk-outline', price: '₹999', screen: 'BookCall' as const, description: 'Live consultation' },
-  { label: 'Request Report', icon: 'file-chart-outline', price: '₹299', screen: 'RequestReport' as const, description: 'Detailed PDF analysis' },
+  { label: 'Ask a Question', icon: 'chat-question-outline', price: '₹49', screen: 'AskQuestion' as const, description: 'Get a personalized answer', accent: '#26C6A0' },
+  { label: 'Book a Call', icon: 'phone-in-talk-outline', price: '₹999', screen: 'BookCall' as const, description: 'Live consultation', accent: '#FFC044' },
+  { label: 'Request Report', icon: 'file-chart-outline', price: '₹299', screen: 'RequestReport' as const, description: 'Detailed PDF analysis', accent: '#7B6FDD' },
 ];
 
 const HomeScreen: React.FC = () => {
@@ -87,45 +87,47 @@ const HomeScreen: React.FC = () => {
       contentContainerStyle={[styles.content, isWide && { alignItems: 'center' }]}
     >
       {/* ── Hero Header ────────────────────────────────────── */}
-      <Surface
-        style={[
-          styles.heroSurface,
-          {
-            backgroundColor: theme.colors.primaryContainer,
-            maxWidth,
-            width: '100%',
-          },
-        ]}
-        elevation={0}
+      <LinearGradient
+        colors={gradients.cosmicHero as [string, string, string]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.heroSurface, { maxWidth, width: '100%' }]}
       >
-        <Text variant="headlineMedium" style={[styles.heroTitle, { color: theme.colors.onPrimaryContainer }]}>
+        <Text variant="headlineMedium" style={styles.heroTitle}>
           {getGreeting()}
         </Text>
-        <Text variant="titleLarge" style={{ color: theme.colors.onPrimaryContainer, fontWeight: '700', marginTop: 2 }}>
+        <Text variant="titleLarge" style={styles.heroName}>
           {userName}
         </Text>
-        <Text variant="bodyMedium" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.75, marginTop: 6 }}>
+        <Text variant="bodyMedium" style={styles.heroDate}>
           {dateStr}
         </Text>
-      </Surface>
+      </LinearGradient>
 
       {/* ── Today's Focus ──────────────────────────────────── */}
       <Card
         mode="contained"
-        style={[styles.card, { backgroundColor: theme.colors.secondaryContainer, maxWidth }]}
+        style={[styles.card, { backgroundColor: 'transparent', maxWidth, overflow: 'hidden' }]}
         accessibilityLabel={`Today's focus: ${focus.label}`}
       >
-        <Card.Content style={styles.focusContent}>
+        <LinearGradient
+          colors={theme.dark
+            ? ['rgba(54,45,138,0.4)', 'rgba(91,79,196,0.15)']
+            : [theme.colors.secondaryContainer, 'rgba(255,221,179,0.5)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.focusGradient}
+        >
           <Text style={styles.focusEmoji}>{focus.emoji}</Text>
           <View style={{ flex: 1 }}>
-            <Text variant="titleMedium" style={{ color: theme.colors.onSecondaryContainer, fontWeight: '700' }}>
+            <Text variant="titleMedium" style={{ color: theme.dark ? '#CBBEFF' : theme.colors.onSecondaryContainer, fontWeight: '700' }}>
               {focus.label} Focus
             </Text>
-            <Text variant="bodySmall" style={{ color: theme.colors.onSecondaryContainer, opacity: 0.85, marginTop: 4 }}>
+            <Text variant="bodySmall" style={{ color: theme.dark ? 'rgba(203,190,255,0.8)' : theme.colors.onSecondaryContainer, marginTop: 4 }}>
               {focus.message}
             </Text>
           </View>
-        </Card.Content>
+        </LinearGradient>
       </Card>
 
       {/* ── Quick Tools Grid ───────────────────────────────── */}
@@ -139,22 +141,25 @@ const HomeScreen: React.FC = () => {
             style={({ pressed }) => [
               styles.toolItem,
               {
-                backgroundColor: pressed
-                  ? theme.colors.surfaceVariant
-                  : theme.dark
-                    ? theme.colors.elevation.level2
-                    : theme.colors.surface,
-                borderColor: theme.colors.outlineVariant,
-                opacity: pressed ? 0.85 : 1,
+                backgroundColor: theme.dark
+                  ? theme.colors.elevation.level2
+                  : theme.colors.surface,
+                borderColor: pressed
+                  ? tool.accent + '50'
+                  : theme.dark ? 'rgba(203,190,255,0.08)' : theme.colors.outlineVariant,
+                transform: [{ scale: pressed ? 0.97 : 1 }],
               },
             ]}
             onPress={() => navigation.navigate(tool.screen as any)}
             accessibilityLabel={`${tool.label} — ${tool.description}`}
           >
-            <View style={[styles.toolIconWrap, { backgroundColor: tool.accent + '18' }]}>
-              <List.Icon icon={tool.icon} color={tool.accent} style={{ margin: 0, width: 28, height: 28 }} />
-            </View>
-            <Text variant="labelLarge" style={{ color: theme.colors.onSurface, fontWeight: '600', marginTop: 8 }}>
+            <LinearGradient
+              colors={[tool.accent + '25', tool.accent + '08']}
+              style={styles.toolIconWrap}
+            >
+              <PhIcon name={tool.icon} size={28} color={tool.accent} />
+            </LinearGradient>
+            <Text variant="labelLarge" style={{ color: theme.colors.onSurface, fontWeight: '600', marginTop: 10 }}>
               {tool.label}
             </Text>
             <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: 2 }}>
@@ -174,7 +179,13 @@ const HomeScreen: React.FC = () => {
             key={service.label}
             mode="elevated"
             elevation={1}
-            style={[styles.serviceCard]}
+            style={[
+              styles.serviceCard,
+              {
+                borderLeftWidth: 3,
+                borderLeftColor: service.accent,
+              },
+            ]}
             onPress={() => navigation.navigate(service.screen)}
             accessibilityLabel={`${service.label}, ${service.price}`}
           >
@@ -185,13 +196,16 @@ const HomeScreen: React.FC = () => {
               titleVariant="titleMedium"
               titleStyle={{ fontWeight: '600' }}
               left={props => (
-                <View style={[styles.serviceIconWrap, { backgroundColor: theme.colors.primaryContainer }]}>
-                  <List.Icon {...props} icon={service.icon} color={theme.colors.primary} style={{ margin: 0 }} />
-                </View>
+                <LinearGradient
+                  colors={[service.accent + '25', service.accent + '08']}
+                  style={styles.serviceIconWrap}
+                >
+                  <PhIcon name={service.icon} size={24} color={service.accent} />
+                </LinearGradient>
               )}
               right={() => (
-                <View style={[styles.priceBadge, { backgroundColor: theme.colors.secondaryContainer }]}>
-                  <Text variant="labelMedium" style={{ color: theme.colors.onSecondaryContainer, fontWeight: '700' }}>
+                <View style={[styles.priceBadge, { backgroundColor: theme.dark ? 'rgba(94,66,0,0.5)' : theme.colors.secondaryContainer }]}>
+                  <Text variant="labelMedium" style={{ color: theme.dark ? '#FFC044' : theme.colors.onSecondaryContainer, fontWeight: '700' }}>
                     {service.price}
                   </Text>
                 </View>
@@ -216,32 +230,45 @@ const styles = StyleSheet.create({
   },
   heroSurface: {
     borderRadius: 24,
-    padding: 24,
+    padding: 28,
     marginTop: 16,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   heroTitle: {
     fontWeight: '800',
     letterSpacing: -0.5,
+    color: '#FFFFFF',
+  },
+  heroName: {
+    color: '#CBBEFF',
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  heroDate: {
+    color: 'rgba(255,255,255,0.6)',
+    marginTop: 6,
   },
   card: {
     marginBottom: 12,
     borderRadius: 20,
     width: '100%',
   },
-  focusContent: {
+  focusGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
+    padding: 18,
+    borderRadius: 20,
   },
   focusEmoji: {
     fontSize: 36,
   },
   sectionTitle: {
     fontWeight: '700',
-    marginTop: 20,
-    marginBottom: 12,
+    marginTop: 22,
+    marginBottom: 14,
     width: '100%',
+    letterSpacing: -0.2,
   },
   toolGrid: {
     flexDirection: 'row',
@@ -253,36 +280,36 @@ const styles = StyleSheet.create({
     width: '31%',
     flexGrow: 1,
     minWidth: 100,
-    borderRadius: 16,
+    borderRadius: 18,
     borderWidth: 1,
-    padding: 14,
+    padding: 16,
     alignItems: 'center',
     ...Platform.select({
-      web: { cursor: 'pointer' as any },
+      web: { cursor: 'pointer' as any, transition: 'transform 0.15s ease' as any },
     }),
   },
   toolIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   serviceCard: {
     marginBottom: 10,
-    borderRadius: 16,
+    borderRadius: 18,
   },
   serviceIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+    width: 46,
+    height: 46,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   priceBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 14,
     marginRight: 12,
     alignSelf: 'center',
   },

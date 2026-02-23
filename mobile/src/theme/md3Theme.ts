@@ -1,11 +1,32 @@
-import { MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
+import { MD3LightTheme, MD3DarkTheme, configureFonts } from 'react-native-paper';
 import type { MD3Theme } from 'react-native-paper';
 
-// ── Cosmic Indigo + Amber "Vedic Luxe" palette ──────────────────────────────
+// ── Premium "Mystic Modern" font configuration ───────────────────────────────
+
+const fontConfig = {
+  displayLarge: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 57, lineHeight: 64, letterSpacing: -0.25 },
+  displayMedium: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 45, lineHeight: 52, letterSpacing: 0 },
+  displaySmall: { fontFamily: 'PlusJakartaSans_600SemiBold', fontSize: 36, lineHeight: 44, letterSpacing: 0 },
+  headlineLarge: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 32, lineHeight: 40, letterSpacing: 0 },
+  headlineMedium: { fontFamily: 'PlusJakartaSans_600SemiBold', fontSize: 28, lineHeight: 36, letterSpacing: 0 },
+  headlineSmall: { fontFamily: 'PlusJakartaSans_600SemiBold', fontSize: 24, lineHeight: 32, letterSpacing: 0 },
+  titleLarge: { fontFamily: 'PlusJakartaSans_600SemiBold', fontSize: 22, lineHeight: 28, letterSpacing: 0 },
+  titleMedium: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 16, lineHeight: 24, letterSpacing: 0.15 },
+  titleSmall: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 14, lineHeight: 20, letterSpacing: 0.1 },
+  bodyLarge: { fontFamily: 'PlusJakartaSans_400Regular', fontSize: 16, lineHeight: 24, letterSpacing: 0.5 },
+  bodyMedium: { fontFamily: 'PlusJakartaSans_400Regular', fontSize: 14, lineHeight: 20, letterSpacing: 0.25 },
+  bodySmall: { fontFamily: 'PlusJakartaSans_400Regular', fontSize: 12, lineHeight: 16, letterSpacing: 0.4 },
+  labelLarge: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 14, lineHeight: 20, letterSpacing: 0.1 },
+  labelMedium: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 12, lineHeight: 16, letterSpacing: 0.5 },
+  labelSmall: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 11, lineHeight: 16, letterSpacing: 0.5 },
+} as const;
+
+// ── Cosmic Indigo + Amber "Vedic Luxe" palette (refined) ─────────────────────
 
 export const md3LightTheme: MD3Theme = {
   ...MD3LightTheme,
   roundness: 16,
+  fonts: configureFonts({ config: fontConfig }),
   colors: {
     ...MD3LightTheme.colors,
     primary: '#5B4FC4',            // Indigo-violet
@@ -54,17 +75,18 @@ export const md3LightTheme: MD3Theme = {
 export const md3DarkTheme: MD3Theme = {
   ...MD3DarkTheme,
   roundness: 16,
+  fonts: configureFonts({ config: fontConfig }),
   colors: {
     ...MD3DarkTheme.colors,
-    primary: '#CBBEFF',            // Soft lavender
+    primary: '#CBBEFF',             // Soft lavender
     onPrimary: '#2D1B7A',
-    primaryContainer: '#443AAB',   // Deep indigo
+    primaryContainer: '#362D8A',    // Deep indigo ← enriched
     onPrimaryContainer: '#E6DEFF',
-    secondary: '#FFB951',          // Warm amber
+    secondary: '#FFC044',           // Warm rich gold ← brightened
     onSecondary: '#422C00',
-    secondaryContainer: '#5E4200', // Dark amber
+    secondaryContainer: '#5E4200',  // Dark amber
     onSecondaryContainer: '#FFDDB3',
-    tertiary: '#FFB0D0',           // Soft pink
+    tertiary: '#FFB0D0',            // Soft pink
     onTertiary: '#5E1045',
     tertiaryContainer: '#7C295C',
     onTertiaryContainer: '#FFD8E8',
@@ -72,32 +94,42 @@ export const md3DarkTheme: MD3Theme = {
     onError: '#690005',
     errorContainer: '#93000A',
     onErrorContainer: '#FFDAD6',
-    background: '#141218',         // Deep space
-    onBackground: '#E6E1E6',
-    surface: '#141218',
-    onSurface: '#E6E1E6',
+    background: '#0D0B14',          // Deepened cosmic black ← richer
+    onBackground: '#E8E2EC',
+    surface: '#0D0B14',
+    onSurface: '#E8E2EC',
     surfaceVariant: '#49454E',
     onSurfaceVariant: '#CBC5D0',
     outline: '#958F9A',
     outlineVariant: '#49454E',
-    inverseSurface: '#E6E1E6',
+    inverseSurface: '#E8E2EC',
     inverseOnSurface: '#322F35',
     inversePrimary: '#5B4FC4',
     shadow: '#000000',
     scrim: '#000000',
-    surfaceDisabled: 'rgba(230, 225, 230, 0.12)',
-    onSurfaceDisabled: 'rgba(230, 225, 230, 0.38)',
+    surfaceDisabled: 'rgba(232, 226, 236, 0.12)',
+    onSurfaceDisabled: 'rgba(232, 226, 236, 0.38)',
     backdrop: 'rgba(50, 47, 55, 0.4)',
     elevation: {
       level0: 'transparent',
-      level1: '#1D1A25',
-      level2: '#22202D',
-      level3: '#272434',
-      level4: '#282637',
-      level5: '#2C293C',
+      level1: '#17142150',          // Subtle tonal lift
+      level2: '#1E1A2C',           // Visible card surface
+      level3: '#252139',           // Higher elevation
+      level4: '#282441',           // Modal/drawer surface
+      level5: '#2F2A4A',           // Highest surface
     },
   },
 };
+
+// ── Gradient presets for "Mystic Modern" aesthetic ──────────────────────────
+
+export const gradients = {
+  cosmicHero: ['#0D0B14', '#1A1140', '#2D1B6E'],          // Deep space → indigo
+  primaryGlow: ['#362D8A', '#5B4FC4', '#7B6FDD'],          // Indigo shimmer
+  goldenAccent: ['#5E4200', '#C77D00', '#FFC044'],          // Amber warmth
+  mysticRose: ['#3E002D', '#7C295C', '#9C4175'],          // Rose journey
+  cardSubtle: ['rgba(54,45,138,0.15)', 'rgba(54,45,138,0.05)'], // For card overlays
+} as const;
 
 export const planetColors = {
   sun: '#FFB300',

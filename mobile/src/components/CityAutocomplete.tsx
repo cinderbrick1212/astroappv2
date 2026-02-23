@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, FlatList, StyleSheet, Platform } from 'react-native';
 import { TextInput, List, Surface, useTheme, Button, Text } from 'react-native-paper';
+import { PhIcon } from './PhIcon';
 import { City, ICity } from 'country-state-city';
 
 interface Props {
@@ -95,7 +96,7 @@ const CityAutocomplete: React.FC<Props> = ({
                                 title={item.name}
                                 description={`${item.stateCode}, ${item.countryCode}`}
                                 onPress={() => handleSelect(item)}
-                                left={props => <List.Icon {...props} icon="map-marker-outline" />}
+                                left={() => <PhIcon name="map-pin" size={24} color="#7B6FDD" />}
                             />
                         )}
                         ListEmptyComponent={() => (

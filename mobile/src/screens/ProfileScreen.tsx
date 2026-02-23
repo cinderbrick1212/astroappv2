@@ -15,6 +15,7 @@ import {
   Portal,
   Modal,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useUserProfile } from '../hooks/useUserProfile';
@@ -203,21 +204,21 @@ const ProfileScreen: React.FC = () => {
           <List.Item
             title={profile?.birth_date ?? 'Not set'}
             description="Date of Birth"
-            left={props => <List.Icon {...props} icon="cake-variant-outline" color={theme.colors.primary} />}
+            left={props => <PhIcon name="cake-variant-outline" size={24} color={theme.colors.primary} />}
             titleStyle={{ color: profile?.birth_date ? theme.colors.onSurface : theme.colors.onSurfaceVariant }}
           />
           <Divider />
           <List.Item
             title={profile?.birth_time ? dateHelpers.formatTimeAmPm(profile.birth_time) : 'Not set'}
             description="Time of Birth"
-            left={props => <List.Icon {...props} icon="clock-outline" color={theme.colors.primary} />}
+            left={props => <PhIcon name="clock-outline" size={24} color={theme.colors.primary} />}
             titleStyle={{ color: profile?.birth_time ? theme.colors.onSurface : theme.colors.onSurfaceVariant }}
           />
           <Divider />
           <List.Item
             title={profile?.birth_place ?? 'Not set'}
             description="Place of Birth"
-            left={props => <List.Icon {...props} icon="map-marker-outline" color={theme.colors.primary} />}
+            left={props => <PhIcon name="map-marker-outline" size={24} color={theme.colors.primary} />}
             titleStyle={{ color: profile?.birth_place ? theme.colors.onSurface : theme.colors.onSurfaceVariant }}
           />
           {astProps && (
@@ -226,19 +227,19 @@ const ProfileScreen: React.FC = () => {
               <List.Item
                 title={`${astProps.lagna}`}
                 description="Lagna (Ascendant)"
-                left={props => <List.Icon {...props} icon="arrow-up-circle-outline" color={theme.colors.primary} />}
+                left={props => <PhIcon name="arrow-up-circle-outline" size={24} color={theme.colors.primary} />}
               />
               <Divider />
               <List.Item
                 title={`${astProps.rashi}`}
                 description="Moon Sign (Rashi)"
-                left={props => <List.Icon {...props} icon="moon-waning-crescent" color={theme.colors.primary} />}
+                left={props => <PhIcon name="moon-waning-crescent" size={24} color={theme.colors.primary} />}
               />
               <Divider />
               <List.Item
                 title={`${astProps.nakshatra}`}
                 description="Nakshatra"
-                left={props => <List.Icon {...props} icon="star-four-points-outline" color={theme.colors.primary} />}
+                left={props => <PhIcon name="star-four-points-outline" size={24} color={theme.colors.primary} />}
               />
             </>
           )}
@@ -275,15 +276,15 @@ const ProfileScreen: React.FC = () => {
           <List.Item
             title={t('profile.language')}
             description={i18n.language === 'hi' ? 'हिंदी' : 'English'}
-            left={props => <List.Icon {...props} icon="translate" color={theme.colors.primary} />}
-            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+            left={props => <PhIcon name="translate" size={24} color={theme.colors.primary} />}
+            right={props => <PhIcon name="chevron-right" size={24} color={theme.colors.onSurfaceVariant} />}
             onPress={handleLanguageToggle}
             accessibilityLabel="Toggle language"
           />
           <Divider />
           <List.Item
             title={t('profile.notifications') || 'Notifications'}
-            left={props => <List.Icon {...props} icon="bell-outline" color={theme.colors.primary} />}
+            left={props => <PhIcon name="bell-outline" size={24} color={theme.colors.primary} />}
             right={() => (
               <Switch
                 value={notificationsEnabled}
@@ -296,7 +297,7 @@ const ProfileScreen: React.FC = () => {
           <Divider />
           <List.Item
             title="Dark Mode"
-            left={props => <List.Icon {...props} icon="theme-light-dark" color={theme.colors.primary} />}
+            left={props => <PhIcon name="theme-light-dark" size={24} color={theme.colors.primary} />}
             right={() => (
               <Switch
                 value={true}
@@ -310,8 +311,8 @@ const ProfileScreen: React.FC = () => {
           <List.Item
             title="Chart Style"
             description="South Indian"
-            left={props => <List.Icon {...props} icon="chart-box-outline" color={theme.colors.primary} />}
-            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+            left={props => <PhIcon name="chart-box-outline" size={24} color={theme.colors.primary} />}
+            right={props => <PhIcon name="chevron-right" size={24} color={theme.colors.onSurfaceVariant} />}
             accessibilityLabel="Select chart style"
           />
         </Card>
@@ -321,29 +322,29 @@ const ProfileScreen: React.FC = () => {
         <Card mode="outlined" style={styles.card}>
           <List.Item
             title="Privacy Policy"
-            left={props => <List.Icon {...props} icon="lock-outline" color={theme.colors.primary} />}
-            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+            left={props => <PhIcon name="lock-outline" size={24} color={theme.colors.primary} />}
+            right={props => <PhIcon name="chevron-right" size={24} color={theme.colors.onSurfaceVariant} />}
             accessibilityLabel="Privacy Policy"
           />
           <Divider />
           <List.Item
             title="Terms of Service"
-            left={props => <List.Icon {...props} icon="file-document-outline" color={theme.colors.primary} />}
-            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+            left={props => <PhIcon name="file-document-outline" size={24} color={theme.colors.primary} />}
+            right={props => <PhIcon name="chevron-right" size={24} color={theme.colors.onSurfaceVariant} />}
             accessibilityLabel="Terms of Service"
           />
           <Divider />
           <List.Item
             title="Rate AstroWitt"
-            left={props => <List.Icon {...props} icon="star-outline" color={theme.colors.primary} />}
-            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+            left={props => <PhIcon name="star-outline" size={24} color={theme.colors.primary} />}
+            right={props => <PhIcon name="chevron-right" size={24} color={theme.colors.onSurfaceVariant} />}
             accessibilityLabel="Rate on App Store"
           />
           <Divider />
           <List.Item
             title="Version"
             description="2.1.0"
-            left={props => <List.Icon {...props} icon="information-outline" color={theme.colors.primary} />}
+            left={props => <PhIcon name="information-outline" size={24} color={theme.colors.primary} />}
           />
         </Card>
 

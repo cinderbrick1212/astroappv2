@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
@@ -144,7 +145,7 @@ const AshtakavargaScreen: React.FC = () => {
                   titleVariant="titleSmall"
                   titleStyle={{ color: theme.colors.onSurface }}
                   subtitleStyle={{ color: theme.colors.onSurfaceVariant }}
-                  left={(props) => <List.Icon {...props} icon="orbit" color={theme.colors.primary} />}
+                  left={(props) => <PhIcon name="orbit" size={24} color={theme.colors.primary} />}
                 />
                 <Card.Content>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>

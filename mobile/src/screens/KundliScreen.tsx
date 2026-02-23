@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { kundliService, KundliData } from '../services/kundli';
@@ -143,7 +144,7 @@ const KundliScreen: React.FC = () => {
           title={`${kundli.dasha.planet} Dasha`}
           subtitle={`Ends approx. ${kundli.dasha.endYear}`}
           titleVariant="titleMedium"
-          left={props => <List.Icon {...props} icon="orbit" color={theme.colors.primary} />}
+          left={props => <PhIcon name="orbit" size={24} color={theme.colors.primary} />}
         />
         <Card.Content>
           <ProgressBar
@@ -174,7 +175,7 @@ const KundliScreen: React.FC = () => {
             titleVariant="bodyMedium"
             titleNumberOfLines={3}
             left={props => (
-              <List.Icon {...props} icon="star-shooting" color={theme.colors.primary} />
+              <PhIcon name="star-shooting" size={24} color={theme.colors.primary} />
             )}
           />
         </Card>

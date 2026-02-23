@@ -1,18 +1,22 @@
 import React, { useCallback, useState } from 'react';
 import { BottomNavigation, useTheme } from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+  CalendarDots,
+  Compass,
+  House,
+  UserCircle,
+} from 'phosphor-react-native';
+import type { IconWeight } from 'phosphor-react-native';
 import DailyFeedScreen from '../screens/DailyFeedScreen';
 import ToolsScreen from '../screens/ToolsScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
-type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
-
 type Route = {
   key: string;
   title: string;
-  focusedIcon: IconName;
-  unfocusedIcon?: IconName;
+  focusedIcon: string;   // kept for Paper API compat
+  unfocusedIcon?: string;
 };
 
 const renderScene = BottomNavigation.SceneMap({
@@ -23,11 +27,19 @@ const renderScene = BottomNavigation.SceneMap({
 });
 
 const routes: Route[] = [
-  { key: 'feed', title: 'Today', focusedIcon: 'calendar-today', unfocusedIcon: 'calendar-today-outline' },
-  { key: 'tools', title: 'Tools', focusedIcon: 'compass', unfocusedIcon: 'compass-outline' },
-  { key: 'home', title: 'Home', focusedIcon: 'home', unfocusedIcon: 'home-outline' },
-  { key: 'profile', title: 'Profile', focusedIcon: 'account-circle', unfocusedIcon: 'account-circle-outline' },
+  { key: 'feed', title: 'Today', focusedIcon: 'calendar-dots', unfocusedIcon: 'calendar-dots' },
+  { key: 'tools', title: 'Tools', focusedIcon: 'compass', unfocusedIcon: 'compass' },
+  { key: 'home', title: 'Home', focusedIcon: 'house', unfocusedIcon: 'house' },
+  { key: 'profile', title: 'Profile', focusedIcon: 'user-circle', unfocusedIcon: 'user-circle' },
 ];
+
+// Map route keys → Phosphor components
+const ROUTE_ICONS: Record<string, React.ComponentType<any>> = {
+  feed: CalendarDots,
+  tools: Compass,
+  home: House,
+  profile: UserCircle,
+};
 
 const MainNavigator: React.FC = () => {
   const [index, setIndex] = useState(0);
@@ -35,12 +47,13 @@ const MainNavigator: React.FC = () => {
 
   const renderIcon = useCallback(
     ({ route, focused, color }: { route: Route; focused: boolean; color: string }) => {
-      const iconName = focused ? route.focusedIcon : (route.unfocusedIcon ?? route.focusedIcon);
+      const Icon = ROUTE_ICONS[route.key] || House;
+      const weight: IconWeight = focused ? 'fill' : 'regular';
       return (
-        <MaterialCommunityIcons
-          name={iconName}
+        <Icon
           size={24}
           color={color}
+          weight={weight}
           accessibilityLabel={route.title}
         />
       );

@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { analytics } from '../services/analytics';
@@ -97,7 +98,7 @@ const GocharScreen: React.FC = () => {
             titleVariant="titleMedium"
             titleStyle={{ color: theme.colors.onErrorContainer }}
             subtitleStyle={{ color: theme.colors.onErrorContainer }}
-            left={props => <List.Icon {...props} icon="alert-circle" color={theme.colors.onErrorContainer} />}
+            left={props => <PhIcon name="alert-circle" size={24} color={theme.colors.onErrorContainer} />}
           />
           <Card.Content>
             <Text variant="bodySmall" style={{ color: theme.colors.onErrorContainer }}>
@@ -120,7 +121,7 @@ const GocharScreen: React.FC = () => {
             titleVariant="titleMedium"
             titleStyle={{ color: theme.colors.onErrorContainer }}
             subtitleStyle={{ color: theme.colors.onErrorContainer }}
-            left={props => <List.Icon {...props} icon="alert" color={theme.colors.onErrorContainer} />}
+            left={props => <PhIcon name="alert" size={24} color={theme.colors.onErrorContainer} />}
           />
         </Card>
       )}

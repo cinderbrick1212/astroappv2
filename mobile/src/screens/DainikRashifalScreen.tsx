@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   useTheme,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { astrologyEngine } from '../services/astrologyEngine';
 import { horoscopeService } from '../services/horoscope';
@@ -262,7 +263,7 @@ const DainikRashifalScreen: React.FC = () => {
           title="Daily Recommendation"
           titleVariant="titleSmall"
           titleStyle={{ color: theme.colors.onSecondaryContainer }}
-          left={props => <List.Icon {...props} icon="hands-pray" color={theme.colors.onSecondaryContainer} />}
+          left={props => <PhIcon name="hands-pray" size={24} color={theme.colors.onSecondaryContainer} />}
         />
         <Card.Content>
           <Text variant="bodyMedium" style={{ color: theme.colors.onSecondaryContainer }}>

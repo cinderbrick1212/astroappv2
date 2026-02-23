@@ -14,6 +14,7 @@ import {
   Dialog,
   Portal,
 } from 'react-native-paper';
+import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import {
   astrologyEngine,
@@ -201,7 +202,7 @@ const JanmaKundliScreen: React.FC = () => {
           <View style={styles.placementsGrid}>
             <Card mode="contained" style={[styles.placementCard, { backgroundColor: theme.colors.primaryContainer }]}>
               <Card.Content style={styles.placementCardContent}>
-                <List.Icon icon="arrow-up-bold-circle-outline" color={theme.colors.primary} />
+                <PhIcon name="arrow-up-bold-circle-outline" size={24} color={theme.colors.primary} />
                 <View>
                   <Text variant="labelSmall" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.8 }}>LAGNA</Text>
                   <Text variant="titleMedium" style={{ color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }}>{chart.lagnaSign}</Text>
@@ -211,7 +212,7 @@ const JanmaKundliScreen: React.FC = () => {
 
             <Card mode="contained" style={[styles.placementCard, { backgroundColor: theme.colors.primaryContainer }]}>
               <Card.Content style={styles.placementCardContent}>
-                <List.Icon icon="moon-waning-crescent" color={theme.colors.primary} />
+                <PhIcon name="moon-waning-crescent" size={24} color={theme.colors.primary} />
                 <View>
                   <Text variant="labelSmall" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.8 }}>RASHI</Text>
                   <Text variant="titleMedium" style={{ color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }}>{chart.moonSign}</Text>
@@ -221,7 +222,7 @@ const JanmaKundliScreen: React.FC = () => {
 
             <Card mode="contained" style={[styles.placementCard, { backgroundColor: theme.colors.primaryContainer, width: '100%' }]}>
               <Card.Content style={styles.placementCardContent}>
-                <List.Icon icon="star-four-points" color={theme.colors.primary} />
+                <PhIcon name="star-four-points" size={24} color={theme.colors.primary} />
                 <View>
                   <Text variant="labelSmall" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.8 }}>NAKSHATRA</Text>
                   <Text variant="titleMedium" style={{ color: theme.colors.onPrimaryContainer, fontWeight: 'bold' }}>
@@ -241,7 +242,7 @@ const JanmaKundliScreen: React.FC = () => {
                   title={`${dasha.currentMahadasha.lord} Mahadasha`}
                   subtitle={`Ends ${dasha.currentMahadasha.endDate.toLocaleDateString()}`}
                   titleVariant="titleMedium"
-                  left={props => <List.Icon {...props} icon="orbit" color={theme.colors.primary} />}
+                  left={props => <PhIcon name="orbit" size={24} color={theme.colors.primary} />}
                 />
                 <Card.Content>
                   <ProgressBar
@@ -263,7 +264,7 @@ const JanmaKundliScreen: React.FC = () => {
                   title={`${dasha.currentAntardasha.antarLord} Antardasha`}
                   subtitle={`Ends ${dasha.currentAntardasha.endDate.toLocaleDateString()}`}
                   titleVariant="titleMedium"
-                  left={props => <List.Icon {...props} icon="circle-double" color={theme.colors.secondary} />}
+                  left={props => <PhIcon name="circle-double" size={24} color={theme.colors.secondary} />}
                 />
               </Card>
             </>
@@ -373,17 +374,13 @@ const JanmaKundliScreen: React.FC = () => {
                     titleVariant="titleSmall"
                     subtitleNumberOfLines={3}
                     left={props => (
-                      <List.Icon
-                        {...props}
-                        icon={a.severity === 'high' ? 'alert-circle' : 'alert'}
-                        color={
+                      <PhIcon name={a.severity === 'high' ? 'alert-circle' : 'alert'} size={24} color={
                           a.severity === 'high'
                             ? theme.colors.error
                             : a.severity === 'medium'
                               ? theme.colors.tertiary
                               : theme.colors.onSurfaceVariant
-                        }
-                      />
+                        } />
                     )}
                   />
                   <Card.Content>
