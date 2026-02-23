@@ -97,6 +97,22 @@ export type AppStackParamList = {
   BlogList: { category?: string };
   BlogPost: { id: string };
   BookCall: undefined;
+  JanmaKundli: undefined;
+  KundliMilan: undefined;
+  Dasha: undefined;
+  Gochar: undefined;
+  Varshaphal: undefined;
+  VargaCharts: undefined;
+  PanchangVishesh: undefined;
+  Muhurta: undefined;
+  TithiChandra: undefined;
+  NakshatraVishesh: undefined;
+  Grahan: undefined;
+  Ashtakavarga: undefined;
+  Prashna: undefined;
+  Hora: undefined;
+  GrahaShanti: undefined;
+  DainikRashifal: undefined;
 };
 
 export type MainTabParamList = {
