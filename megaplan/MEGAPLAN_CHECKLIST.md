@@ -18,9 +18,9 @@
 ## Phase C — Frontend Rework
 - [x] C01 — `frontend-rework/prompt-C01-theme-setup.md`
 - [x] C02 — `frontend-rework/prompt-C02-navigation.md`
-- [ ] C03 — `frontend-rework/prompt-C03-login-screen.md`
-- [ ] C04 — `frontend-rework/prompt-C04-onboarding-part-a.md`
-- [ ] C05 — `frontend-rework/prompt-C05-onboarding-part-b.md`
+- [x] C03 — `frontend-rework/prompt-C03-login-screen.md`
+- [x] C04 — `frontend-rework/prompt-C04-onboarding-part-a.md`
+- [x] C05 — `frontend-rework/prompt-C05-onboarding-part-b.md`
 - [ ] C06 — `frontend-rework/prompt-C06-daily-feed-screen.md`
 - [ ] C07 — `frontend-rework/prompt-C07-feed-components.md`
 - [ ] C08 — `frontend-rework/prompt-C08-tools-screen.md`

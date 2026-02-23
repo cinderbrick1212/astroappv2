@@ -1,24 +1,29 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Alert,
 } from 'react-native';
+import {
+  Text,
+  TextInput,
+  Button,
+  SegmentedButtons,
+  HelperText,
+  Divider,
+  useTheme,
+} from 'react-native-paper';
 import api from '../api';
 import { useAuth } from '../hooks/useAuth';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
 import { validation } from '../utils/validation';
 
 type AuthMode = 'login' | 'register';
 
 const LoginScreen: React.FC = () => {
+  const theme = useTheme();
   const { login, loginAsGuest } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
@@ -27,6 +32,7 @@ const LoginScreen: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const clearErrors = () => {
     setEmailError('');
@@ -103,116 +109,138 @@ const LoginScreen: React.FC = () => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Logo + Tagline */}
         <View style={styles.logoSection}>
-          <Text style={styles.logo}>🌟</Text>
-          <Text style={styles.appName}>AstroApp</Text>
-          <Text style={styles.tagline}>Your daily cosmic guide</Text>
+          <Text variant="displaySmall" style={{ color: theme.colors.primary, textAlign: 'center' }}>
+            ✦ AstroApp
+          </Text>
+          <Text
+            variant="bodyLarge"
+            style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center', marginTop: 8 }}
+          >
+            Your daily cosmic guide
+          </Text>
         </View>
 
         {/* Mode toggle */}
-        <View style={styles.modeToggle}>
-          <TouchableOpacity
-            style={[styles.modeButton, authMode === 'login' && styles.modeButtonActive]}
-            onPress={() => { setAuthMode('login'); clearErrors(); }}
-          >
-            <Text style={[styles.modeButtonText, authMode === 'login' && styles.modeButtonTextActive]}>
-              Login
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.modeButton, authMode === 'register' && styles.modeButtonActive]}
-            onPress={() => { setAuthMode('register'); clearErrors(); }}
-          >
-            <Text style={[styles.modeButtonText, authMode === 'register' && styles.modeButtonTextActive]}>
-              Register
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <SegmentedButtons
+          value={authMode}
+          onValueChange={v => { setAuthMode(v as AuthMode); clearErrors(); }}
+          buttons={[
+            { value: 'login', label: 'Sign In' },
+            { value: 'register', label: 'Register' },
+          ]}
+          style={styles.segmented}
+        />
 
-        {/* Display name – register only */}
+        {/* Display name — register only */}
         {authMode === 'register' && (
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Display Name (optional)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Your name"
-              placeholderTextColor={colors.textTertiary}
-              value={displayName}
-              onChangeText={setDisplayName}
-              autoComplete="name"
-            />
-          </View>
+          <TextInput
+            mode="outlined"
+            label="Display name (optional)"
+            value={displayName}
+            onChangeText={setDisplayName}
+            autoComplete="name"
+            style={styles.input}
+            theme={theme}
+          />
         )}
 
-        {/* Email input */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={[styles.input, emailError ? styles.inputError : null]}
-            placeholder="Enter your email"
-            placeholderTextColor={colors.textTertiary}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            autoComplete="email"
-          />
-          {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-        </View>
+        {/* Email */}
+        <TextInput
+          mode="outlined"
+          label="Email address"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          autoComplete="email"
+          error={!!emailError}
+          style={styles.input}
+          theme={theme}
+        />
+        <HelperText type="error" visible={!!emailError} style={styles.helperText}>
+          {emailError}
+        </HelperText>
 
-        {/* Password input */}
-        <View style={styles.inputGroup}>
-          <View style={styles.passwordLabelRow}>
-            <Text style={styles.label}>Password</Text>
-            {authMode === 'login' && (
-              <TouchableOpacity onPress={handleForgotPassword}>
-                <Text style={styles.forgotPasswordLink}>Forgot Password?</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          <TextInput
-            style={[styles.input, passwordError ? styles.inputError : null]}
-            placeholder="Enter your password"
-            placeholderTextColor={colors.textTertiary}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoComplete={authMode === 'register' ? 'new-password' : 'current-password'}
-          />
-          {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-        </View>
+        {/* Password */}
+        <TextInput
+          mode="outlined"
+          label="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!passwordVisible}
+          autoComplete={authMode === 'register' ? 'new-password' : 'current-password'}
+          error={!!passwordError}
+          right={
+            <TextInput.Icon
+              icon={passwordVisible ? 'eye-off' : 'eye'}
+              onPress={() => setPasswordVisible(v => !v)}
+              accessibilityLabel={passwordVisible ? 'Hide password' : 'Show password'}
+            />
+          }
+          style={styles.input}
+          theme={theme}
+        />
+        <HelperText type="error" visible={!!passwordError} style={styles.helperText}>
+          {passwordError}
+        </HelperText>
 
-        {/* Primary action button */}
-        <TouchableOpacity
-          style={[styles.primaryButton, loading && styles.buttonDisabled]}
+        {/* Forgot password */}
+        {authMode === 'login' && (
+          <Button
+            mode="text"
+            onPress={handleForgotPassword}
+            style={styles.forgotButton}
+            accessibilityLabel="Forgot password"
+          >
+            Forgot password?
+          </Button>
+        )}
+
+        {/* Primary action */}
+        <Button
+          mode="contained"
           onPress={handleEmailAuth}
           disabled={loading}
+          loading={loading}
+          style={styles.primaryButton}
+          contentStyle={styles.buttonContent}
+          accessibilityLabel={authMode === 'login' ? 'Sign in' : 'Create account'}
         >
-          <Text style={styles.primaryButtonText}>
-            {loading ? 'Please wait...' : authMode === 'login' ? 'Login' : 'Create Account'}
-          </Text>
-        </TouchableOpacity>
+          {authMode === 'login' ? 'Sign In' : 'Create Account'}
+        </Button>
 
         {/* Divider */}
-        <View style={styles.divider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>or</Text>
-          <View style={styles.dividerLine} />
+        <View style={styles.dividerRow}>
+          <Divider style={styles.dividerLine} />
+          <Text
+            variant="bodySmall"
+            style={[styles.dividerLabel, { color: theme.colors.onSurfaceVariant }]}
+          >
+            or
+          </Text>
+          <Divider style={styles.dividerLine} />
         </View>
 
-        {/* Guest login button */}
-        <TouchableOpacity
-          style={styles.secondaryButton}
+        {/* Guest */}
+        <Button
+          mode="outlined"
           onPress={loginAsGuest}
           disabled={loading}
+          style={styles.guestButton}
+          contentStyle={styles.buttonContent}
+          accessibilityLabel="Continue as guest"
         >
-          <Text style={styles.secondaryButtonText}>Continue as Guest</Text>
-        </TouchableOpacity>
+          Continue as Guest
+        </Button>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -221,140 +249,49 @@ const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   scrollContent: {
     flexGrow: 1,
-    padding: spacing.lg,
+    padding: 24,
     justifyContent: 'center',
   },
   logoSection: {
     alignItems: 'center',
-    marginBottom: spacing['2xl'],
+    marginBottom: 32,
   },
-  logo: {
-    fontSize: 64,
-    marginBottom: spacing.sm,
-  },
-  appName: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: spacing.xs,
-  },
-  tagline: {
-    fontSize: 16,
-    color: colors.textSecondary,
-  },
-  modeToggle: {
-    flexDirection: 'row',
-    backgroundColor: colors.surfaceVariant,
-    borderRadius: 8,
-    padding: 4,
-    marginBottom: spacing.lg,
-  },
-  modeButton: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-    borderRadius: 6,
-  },
-  modeButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  modeButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  modeButtonTextActive: {
-    color: colors.textOnPrimary,
-  },
-  inputGroup: {
-    marginBottom: spacing.md,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  passwordLabelRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  forgotPasswordLink: {
-    fontSize: 13,
-    color: colors.primary,
-    fontWeight: '500',
+  segmented: {
+    marginBottom: 24,
   },
   input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: spacing.md,
-    fontSize: 16,
-    color: colors.textPrimary,
+    marginBottom: 4,
   },
-  inputError: {
-    borderColor: colors.error,
+  helperText: {
+    marginBottom: 4,
   },
-  errorText: {
-    fontSize: 12,
-    color: colors.error,
-    marginTop: spacing.xs,
+  forgotButton: {
+    alignSelf: 'flex-end',
+    marginBottom: 8,
   },
   primaryButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    padding: spacing.md,
-    alignItems: 'center',
-    marginTop: spacing.sm,
+    marginTop: 8,
+    marginBottom: 8,
   },
-  primaryButtonText: {
-    color: colors.textOnPrimary,
-    fontSize: 16,
-    fontWeight: 'bold',
+  buttonContent: {
+    paddingVertical: 6,
   },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  divider: {
+  dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: spacing.lg,
+    marginVertical: 16,
   },
   dividerLine: {
     flex: 1,
-    height: 1,
-    backgroundColor: colors.border,
   },
-  dividerText: {
-    marginHorizontal: spacing.md,
-    color: colors.textSecondary,
-    fontSize: 14,
+  dividerLabel: {
+    marginHorizontal: 12,
   },
-  secondaryButton: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: spacing.md,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  forgotPasswordStandalone: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '500',
-    textAlign: 'center',
+  guestButton: {
+    marginBottom: 8,
   },
 });
 
