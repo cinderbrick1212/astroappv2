@@ -141,37 +141,66 @@ const ToolsScreen: React.FC = () => {
       {/* ── PERSONAL TOOLS ── */}
       <List.Subheader style={{ color: theme.colors.primary }}>Personal Tools</List.Subheader>
 
-      <Card
-        mode="elevated"
-        elevation={1}
-        style={styles.card}
-        onPress={() => navigation.navigate('Kundli')}
-        accessibilityLabel="Kundli Lite — view your birth chart"
-      >
-        <Card.Title
-          title="Kundli Lite"
-          subtitle="Your birth chart summary"
-          titleVariant="titleMedium"
-          left={props => <List.Icon {...props} icon="star-david" color={theme.colors.primary} />}
-          right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
-        />
-      </Card>
+      {[
+        { icon: 'star-david', label: 'Janma Kundli', subtitle: 'Full Vedic birth chart with yogas & remedies', screen: 'JanmaKundli' as const },
+        { icon: 'heart-multiple', label: 'Kundli Milan', subtitle: 'Ashtakoot compatibility (36 Guna)', screen: 'KundliMilan' as const },
+        { icon: 'orbit', label: 'Vimshottari Dasha', subtitle: 'Planetary period timeline', screen: 'Dasha' as const },
+        { icon: 'swap-horizontal', label: 'Gochar — Transits', subtitle: 'Current transits & Sade Sati', screen: 'Gochar' as const },
+        { icon: 'calendar-star', label: 'Varshaphal', subtitle: 'Annual solar return chart', screen: 'Varshaphal' as const },
+        { icon: 'chart-pie', label: 'Varga Charts', subtitle: 'Navamsa & divisional charts', screen: 'VargaCharts' as const },
+        { icon: 'star-four-points', label: 'Nakshatra Vishesh', subtitle: 'Deep nakshatra analysis', screen: 'NakshatraVishesh' as const },
+        { icon: 'grid', label: 'Ashtakavarga', subtitle: 'Planetary strength grid', screen: 'Ashtakavarga' as const },
+        { icon: 'shield-sun', label: 'Graha Shanti', subtitle: 'Remedies for afflicted planets', screen: 'GrahaShanti' as const },
+        { icon: 'zodiac-aries', label: 'Dainik Rashifal', subtitle: 'Daily Vedic horoscope', screen: 'DainikRashifal' as const },
+      ].map(tool => (
+        <Card
+          key={tool.label}
+          mode="elevated"
+          elevation={1}
+          style={styles.card}
+          onPress={() => navigation.navigate(tool.screen)}
+          accessibilityLabel={`${tool.label} — ${tool.subtitle}`}
+        >
+          <Card.Title
+            title={tool.label}
+            subtitle={tool.subtitle}
+            titleVariant="titleMedium"
+            left={props => <List.Icon {...props} icon={tool.icon} color={theme.colors.primary} />}
+            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+          />
+        </Card>
+      ))}
 
-      <Card
-        mode="elevated"
-        elevation={1}
-        style={styles.card}
-        onPress={() => navigation.navigate('Compatibility')}
-        accessibilityLabel="Compatibility — check relationship match"
-      >
-        <Card.Title
-          title="Compatibility"
-          subtitle="Relationship match score"
-          titleVariant="titleMedium"
-          left={props => <List.Icon {...props} icon="heart-multiple" color={theme.colors.primary} />}
-          right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
-        />
-      </Card>
+      <Divider style={styles.divider} />
+
+      {/* ── CALENDAR & TIMING TOOLS ── */}
+      <List.Subheader style={{ color: theme.colors.primary }}>Calendar & Timing</List.Subheader>
+
+      {[
+        { icon: 'calendar-text', label: 'Panchang Vishesh', subtitle: 'Extended daily Panchang', screen: 'PanchangVishesh' as const },
+        { icon: 'clock-check', label: 'Muhurta', subtitle: 'Auspicious timing calculator', screen: 'Muhurta' as const },
+        { icon: 'moon-waning-crescent', label: 'Tithi & Chandra', subtitle: 'Moon phase & lunar calendar', screen: 'TithiChandra' as const },
+        { icon: 'weather-night', label: 'Grahan — Eclipses', subtitle: 'Eclipse calendar & impact', screen: 'Grahan' as const },
+        { icon: 'clock-outline', label: 'Hora', subtitle: 'Vedic planetary hours', screen: 'Hora' as const },
+        { icon: 'help-circle', label: 'Prashna — Horary', subtitle: 'Ask a question to the stars', screen: 'Prashna' as const },
+      ].map(tool => (
+        <Card
+          key={tool.label}
+          mode="elevated"
+          elevation={1}
+          style={styles.card}
+          onPress={() => navigation.navigate(tool.screen)}
+          accessibilityLabel={`${tool.label} — ${tool.subtitle}`}
+        >
+          <Card.Title
+            title={tool.label}
+            subtitle={tool.subtitle}
+            titleVariant="titleMedium"
+            left={props => <List.Icon {...props} icon={tool.icon} color={theme.colors.primary} />}
+            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+          />
+        </Card>
+      ))}
 
       <Divider style={styles.divider} />
 

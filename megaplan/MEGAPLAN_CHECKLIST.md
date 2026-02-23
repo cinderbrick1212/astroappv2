@@ -34,19 +34,19 @@
 - [x] C16 — `frontend-rework/prompt-C16-service-screens.md`
 
 ## Phase D — Tool Rework
-- [ ] D01 — `tool-rework/prompt-D01-natal-birth-chart.md`
-- [ ] D02 — `tool-rework/prompt-D02-kundli-milan.md`
-- [ ] D03 — `tool-rework/prompt-D03-vimshottari-dasha.md`
-- [ ] D04 — `tool-rework/prompt-D04-gochar-transits.md`
-- [ ] D05 — `tool-rework/prompt-D05-varshaphal.md`
-- [ ] D06 — `tool-rework/prompt-D06-navamsa-varga-charts.md`
-- [ ] D07 — `tool-rework/prompt-D07-panchang-vishesh.md`
-- [ ] D08 — `tool-rework/prompt-D08-muhurta.md`
-- [ ] D09 — `tool-rework/prompt-D09-tithi-chandra.md`
-- [ ] D10 — `tool-rework/prompt-D10-nakshatra-vishesh.md`
-- [ ] D11 — `tool-rework/prompt-D11-grahan-eclipse.md`
-- [ ] D12 — `tool-rework/prompt-D12-ashtakavarga.md`
-- [ ] D13 — `tool-rework/prompt-D13-prashna-horary.md`
-- [ ] D14 — `tool-rework/prompt-D14-hora-planetary-hours.md`
-- [ ] D15 — `tool-rework/prompt-D15-graha-shanti-remedies.md`
-- [ ] D16 — `tool-rework/prompt-D16-dainik-rashifal.md`
+- [x] D01 — `tool-rework/prompt-D01-natal-birth-chart.md`
+- [x] D02 — `tool-rework/prompt-D02-kundli-milan.md`
+- [x] D03 — `tool-rework/prompt-D03-vimshottari-dasha.md`
+- [x] D04 — `tool-rework/prompt-D04-gochar-transits.md`
+- [x] D05 — `tool-rework/prompt-D05-varshaphal.md`
+- [x] D06 — `tool-rework/prompt-D06-navamsa-varga-charts.md`
+- [x] D07 — `tool-rework/prompt-D07-panchang-vishesh.md`
+- [x] D08 — `tool-rework/prompt-D08-muhurta.md`
+- [x] D09 — `tool-rework/prompt-D09-tithi-chandra.md`
+- [x] D10 — `tool-rework/prompt-D10-nakshatra-vishesh.md`
+- [x] D11 — `tool-rework/prompt-D11-grahan-eclipse.md`
+- [x] D12 — `tool-rework/prompt-D12-ashtakavarga.md`
+- [x] D13 — `tool-rework/prompt-D13-prashna-horary.md`
+- [x] D14 — `tool-rework/prompt-D14-hora-planetary-hours.md`
+- [x] D15 — `tool-rework/prompt-D15-graha-shanti-remedies.md`
+- [x] D16 — `tool-rework/prompt-D16-dainik-rashifal.md`
