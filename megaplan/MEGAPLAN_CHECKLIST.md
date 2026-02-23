@@ -18,20 +18,20 @@
 ## Phase C — Frontend Rework
 - [x] C01 — `frontend-rework/prompt-C01-theme-setup.md`
 - [x] C02 — `frontend-rework/prompt-C02-navigation.md`
-- [ ] C03 — `frontend-rework/prompt-C03-login-screen.md`
-- [ ] C04 — `frontend-rework/prompt-C04-onboarding-part-a.md`
-- [ ] C05 — `frontend-rework/prompt-C05-onboarding-part-b.md`
-- [ ] C06 — `frontend-rework/prompt-C06-daily-feed-screen.md`
-- [ ] C07 — `frontend-rework/prompt-C07-feed-components.md`
-- [ ] C08 — `frontend-rework/prompt-C08-tools-screen.md`
-- [ ] C09 — `frontend-rework/prompt-C09-home-screen.md`
-- [ ] C10 — `frontend-rework/prompt-C10-profile-part-a.md`
-- [ ] C11 — `frontend-rework/prompt-C11-profile-part-b.md`
-- [ ] C12 — `frontend-rework/prompt-C12-kundli-screen.md`
-- [ ] C13 — `frontend-rework/prompt-C13-compatibility-screen.md`
-- [ ] C14 — `frontend-rework/prompt-C14-panchang-screen.md`
-- [ ] C15 — `frontend-rework/prompt-C15-blog-screens.md`
-- [ ] C16 — `frontend-rework/prompt-C16-service-screens.md`
+- [x] C03 — `frontend-rework/prompt-C03-login-screen.md`
+- [x] C04 — `frontend-rework/prompt-C04-onboarding-part-a.md`
+- [x] C05 — `frontend-rework/prompt-C05-onboarding-part-b.md`
+- [x] C06 — `frontend-rework/prompt-C06-daily-feed-screen.md`
+- [x] C07 — `frontend-rework/prompt-C07-feed-components.md`
+- [x] C08 — `frontend-rework/prompt-C08-tools-screen.md`
+- [x] C09 — `frontend-rework/prompt-C09-home-screen.md`
+- [x] C10 — `frontend-rework/prompt-C10-profile-part-a.md`
+- [x] C11 — `frontend-rework/prompt-C11-profile-part-b.md`
+- [x] C12 — `frontend-rework/prompt-C12-kundli-screen.md`
+- [x] C13 — `frontend-rework/prompt-C13-compatibility-screen.md`
+- [x] C14 — `frontend-rework/prompt-C14-panchang-screen.md`
+- [x] C15 — `frontend-rework/prompt-C15-blog-screens.md`
+- [x] C16 — `frontend-rework/prompt-C16-service-screens.md`
 
 ## Phase D — Tool Rework
 - [ ] D01 — `tool-rework/prompt-D01-natal-birth-chart.md`

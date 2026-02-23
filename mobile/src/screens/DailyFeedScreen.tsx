@@ -1,13 +1,11 @@
 import React, { useEffect } from 'react';
+import { StyleSheet, ScrollView, RefreshControl, View } from 'react-native';
 import {
-  View,
   Text,
-  StyleSheet,
-  ScrollView,
-  RefreshControl,
-} from 'react-native';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
+  Card,
+  Chip,
+  useTheme,
+} from 'react-native-paper';
 import FeedHeader from '../components/FeedHeader';
 import FeedItemCard from '../components/FeedItemCard';
 import LoadingSkeleton from '../components/LoadingSkeleton';
@@ -28,30 +26,30 @@ const ZODIAC_EMOJI: Record<string, string> = {
   Sagittarius: '♐', Capricorn: '♑', Aquarius: '♒', Pisces: '♓',
 };
 
-/** Insert an ad placeholder after every nth feed item. */
 const AD_FREQUENCY = 5;
 
 const FOCUS_AREAS = [
-  { label: 'Career', icon: '💼', day: 1 },
-  { label: 'Love', icon: '❤️', day: 2 },
-  { label: 'Health', icon: '🌿', day: 3 },
-  { label: 'Finance', icon: '💰', day: 4 },
-  { label: 'Growth', icon: '🌱', day: 5 },
-  { label: 'Family', icon: '🏡', day: 6 },
+  { label: 'Career',     icon: '💼', day: 1 },
+  { label: 'Love',       icon: '❤️', day: 2 },
+  { label: 'Health',     icon: '🌿', day: 3 },
+  { label: 'Finance',    icon: '💰', day: 4 },
+  { label: 'Growth',     icon: '🌱', day: 5 },
+  { label: 'Family',     icon: '🏡', day: 6 },
   { label: 'Creativity', icon: '🎨', day: 0 },
 ];
 
 const FOCUS_MESSAGES: Record<string, string> = {
-  Career: 'Today favors career initiatives — take bold action.',
-  Love: 'Open your heart; meaningful connections await.',
-  Health: 'Prioritize rest and nourishment today.',
-  Finance: 'A careful review of finances brings clarity.',
-  Growth: 'Step outside your comfort zone to grow.',
-  Family: 'Quality time with loved ones restores energy.',
+  Career:     'Today favors career initiatives — take bold action.',
+  Love:       'Open your heart; meaningful connections await.',
+  Health:     'Prioritize rest and nourishment today.',
+  Finance:    'A careful review of finances brings clarity.',
+  Growth:     'Step outside your comfort zone to grow.',
+  Family:     'Quality time with loved ones restores energy.',
   Creativity: 'Express yourself — inspiration is flowing.',
 };
 
 const DailyFeedScreen: React.FC = () => {
+  const theme = useTheme();
   const { user } = useAuth();
   const { profile } = useUserProfile();
   const { feedItems, isLoading, refetch } = useFeedItems();
@@ -66,16 +64,13 @@ const DailyFeedScreen: React.FC = () => {
   const dayOfWeek = today.getDay();
   const focus = FOCUS_AREAS.find(f => f.day === dayOfWeek) || FOCUS_AREAS[0];
 
-  // Use moon sign from profile if birth_date available, else fall back to current sun sign
   const rashi = profile?.birth_date
     ? horoscopeService.getRashiFromBirthDate(new Date(profile.birth_date))
     : astrologyEngine.getSunSign(new Date());
 
   const horoscope = horoscopeService.getDailyHoroscope(rashi, today);
 
-  const userName =
-    user?.username ||
-    user?.email?.split('@')[0];
+  const userName = user?.username || user?.email?.split('@')[0];
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -87,65 +82,108 @@ const DailyFeedScreen: React.FC = () => {
     <>
       <OfflineBanner />
       <ScrollView
-        style={styles.container}
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
         }
       >
-      {/* Header */}
-      <FeedHeader date={today} userName={userName} streak={streak} />
+        {/* Feed header (greeting + streak) — rewritten separately in Prompt 07 */}
+        <FeedHeader date={today} userName={userName} streak={streak} />
 
-      {/* Daily Horoscope Card */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.cardLabel}>DAILY HOROSCOPE</Text>
+        {/* Daily Horoscope Card */}
+        <Card
+          mode="elevated"
+          elevation={1}
+          style={[styles.card, { backgroundColor: theme.colors.surface }]}
+          accessibilityLabel={`Daily horoscope for ${rashi}`}
+        >
+          <Card.Content>
+            <Text variant="labelSmall" style={{ color: theme.colors.primary, letterSpacing: 1.5, marginBottom: 8 }}>
+              DAILY HOROSCOPE
+            </Text>
+            <View style={styles.rashiRow}>
+              <Text style={styles.rashiEmoji}>{ZODIAC_EMOJI[rashi] || '✨'}</Text>
+              <Text variant="titleLarge" style={{ color: theme.colors.onSurface }}>
+                {rashi}
+              </Text>
+            </View>
+            <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 16, lineHeight: 22 }}>
+              {horoscope.prediction}
+            </Text>
+            <View style={styles.luckyChipRow}>
+              <Chip
+                icon="numeric"
+                mode="flat"
+                style={{ backgroundColor: theme.colors.secondaryContainer }}
+                textStyle={{ color: theme.colors.onSecondaryContainer }}
+                accessibilityLabel={`Lucky number ${horoscope.luckyNumber}`}
+              >
+                {horoscope.luckyNumber}
+              </Chip>
+              <Chip
+                icon="palette"
+                mode="flat"
+                style={{ backgroundColor: theme.colors.secondaryContainer, marginLeft: 8 }}
+                textStyle={{ color: theme.colors.onSecondaryContainer }}
+                accessibilityLabel={`Lucky color ${horoscope.luckyColor}`}
+              >
+                {horoscope.luckyColor}
+              </Chip>
+            </View>
+          </Card.Content>
+        </Card>
+
+        {/* Today's Focus Card */}
+        <Card
+          mode="contained"
+          style={[styles.card, { backgroundColor: theme.colors.primaryContainer }]}
+          accessibilityLabel={`Today's focus: ${focus.label}`}
+        >
+          <Card.Content style={styles.focusContent}>
+            <Text style={styles.focusEmoji}>{focus.icon}</Text>
+            <View style={{ flex: 1 }}>
+              <Text variant="titleMedium" style={{ color: theme.colors.onPrimaryContainer }}>
+                {focus.label} Focus
+              </Text>
+              <Text variant="bodySmall" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.85, marginTop: 4 }}>
+                {FOCUS_MESSAGES[focus.label]}
+              </Text>
+            </View>
+          </Card.Content>
+        </Card>
+
+        {/* Remedy of the Day */}
+        <RemedyCard date={today} />
+
+        {/* Feed Section */}
+        <View style={styles.feedSection}>
+          <Text variant="titleMedium" style={{ color: theme.colors.onBackground, marginBottom: 12 }}>
+            Today's Feed
+          </Text>
+          {isLoading ? (
+            <LoadingSkeleton />
+          ) : feedItems.length > 0 ? (
+            feedItems.map((item, index) => (
+              <React.Fragment key={item.id}>
+                <FeedItemCard item={item} />
+                {(index + 1) % AD_FREQUENCY === 0 && <AdCard />}
+              </React.Fragment>
+            ))
+          ) : (
+            <Card mode="outlined" style={{ marginBottom: 8 }}>
+              <Card.Content>
+                <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}>
+                  No feed items today. Pull to refresh.
+                </Text>
+              </Card.Content>
+            </Card>
+          )}
         </View>
-        <View style={styles.rashiRow}>
-          <Text style={styles.rashiEmoji}>{ZODIAC_EMOJI[rashi] || '✨'}</Text>
-          <Text style={styles.rashiName}>{rashi}</Text>
-        </View>
-        <Text style={styles.horoscopePrediction}>{horoscope.prediction}</Text>
-        <View style={styles.luckyRow}>
-          <View style={styles.luckyItem}>
-            <Text style={styles.luckyLabel}>Lucky Number</Text>
-            <Text style={styles.luckyValue}>{horoscope.luckyNumber}</Text>
-          </View>
-          <View style={styles.luckyDivider} />
-          <View style={styles.luckyItem}>
-            <Text style={styles.luckyLabel}>Lucky Color</Text>
-            <Text style={styles.luckyValue}>{horoscope.luckyColor}</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Today's Focus Card */}
-      <View style={[styles.card, styles.focusCard]}>
-        <Text style={styles.focusIcon}>{focus.icon}</Text>
-        <Text style={styles.focusLabel}>Today's Focus: {focus.label}</Text>
-        <Text style={styles.focusMessage}>{FOCUS_MESSAGES[focus.label]}</Text>
-      </View>
-
-      {/* Remedy of the Day */}
-      <RemedyCard date={today} />
-
-      {/* Feed Items */}
-      <View style={styles.feedSection}>
-        <Text style={styles.sectionTitle}>Today's Feed</Text>
-        {isLoading ? (
-          <LoadingSkeleton />
-        ) : feedItems.length > 0 ? (
-          feedItems.map((item, index) => (
-            <React.Fragment key={item.id}>
-              <FeedItemCard item={item} />
-              {(index + 1) % AD_FREQUENCY === 0 && <AdCard />}
-            </React.Fragment>
-          ))
-        ) : (
-          <View style={styles.emptyFeed}>
-            <Text style={styles.emptyFeedText}>No feed items today. Pull to refresh.</Text>
-          </View>
-        )}
-      </View>
       </ScrollView>
     </>
   );
@@ -154,107 +192,36 @@ const DailyFeedScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    margin: spacing.md,
-    marginBottom: 0,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  cardHeader: {
-    marginBottom: spacing.sm,
-  },
-  cardLabel: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: colors.primary,
-    letterSpacing: 1,
+    marginHorizontal: 16,
+    marginTop: 12,
   },
   rashiRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: 12,
+    gap: 10,
   },
   rashiEmoji: {
     fontSize: 28,
-    marginRight: spacing.sm,
   },
-  rashiName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: colors.textPrimary,
+  luckyChipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
-  horoscopePrediction: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    lineHeight: 22,
-    marginBottom: spacing.md,
-  },
-  luckyRow: {
+  focusContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
   },
-  luckyItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  luckyDivider: {
-    width: 1,
-    height: 32,
-    backgroundColor: colors.divider,
-  },
-  luckyLabel: {
-    fontSize: 12,
-    color: colors.textTertiary,
-    marginBottom: 2,
-  },
-  luckyValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  focusCard: {
-    backgroundColor: colors.primaryLight,
-    borderColor: colors.primary,
-    alignItems: 'center',
-  },
-  focusIcon: {
-    fontSize: 36,
-    marginBottom: spacing.sm,
-  },
-  focusLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.textOnPrimary,
-    marginBottom: spacing.xs,
-  },
-  focusMessage: {
-    fontSize: 14,
-    color: colors.textOnPrimary,
-    textAlign: 'center',
-    opacity: 0.9,
+  focusEmoji: {
+    fontSize: 32,
   },
   feedSection: {
-    margin: spacing.md,
-    marginTop: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  emptyFeed: {
-    alignItems: 'center',
-    paddingVertical: spacing.xl,
-  },
-  emptyFeedText: {
-    fontSize: 14,
-    color: colors.textSecondary,
+    marginHorizontal: 16,
+    marginTop: 20,
+    marginBottom: 16,
   },
 });
 

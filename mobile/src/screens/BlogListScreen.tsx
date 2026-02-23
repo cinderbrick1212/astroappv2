@@ -1,16 +1,16 @@
 import React from 'react';
+import { StyleSheet, View, FlatList } from 'react-native';
 import {
-  View,
   Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
+  Card,
+  Chip,
   ActivityIndicator,
-} from 'react-native';
+  Button,
+  Divider,
+  useTheme,
+} from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import { AppStackParamList } from '../types';
 
@@ -19,77 +19,106 @@ const CATEGORIES = ['All', 'Horoscopes', 'Numerology', 'Vastu', 'Relationships',
 type Nav = NativeStackNavigationProp<AppStackParamList, 'BlogList'>;
 
 const BlogListScreen: React.FC = () => {
+  const theme = useTheme();
   const navigation = useNavigation<Nav>();
   const [activeCategory, setActiveCategory] = React.useState<string | undefined>(undefined);
   const { blogPosts, isLoading, fetchNextPage, hasNextPage } = useBlogPosts(activeCategory);
 
   return (
-    <View style={styles.container}>
-      {/* Category filters */}
-      <FlatList
-        horizontal
-        data={CATEGORIES}
-        keyExtractor={item => item}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoryList}
-        renderItem={({ item }) => {
-          const isActive = (item === 'All' && !activeCategory) || item === activeCategory;
-          return (
-            <TouchableOpacity
-              style={[styles.categoryPill, isActive && styles.categoryPillActive]}
-              onPress={() => setActiveCategory(item === 'All' ? undefined : item)}
-            >
-              <Text style={[styles.categoryPillText, isActive && styles.categoryPillTextActive]}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      {/* Category filter chips — horizontal scroll */}
+      <View style={[styles.categoryBar, { backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.outlineVariant }]}>
+        <FlatList
+          horizontal
+          data={CATEGORIES}
+          keyExtractor={item => item}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoryList}
+          renderItem={({ item }) => {
+            const isActive = (item === 'All' && !activeCategory) || item === activeCategory;
+            return (
+              <Chip
+                mode={isActive ? 'flat' : 'outlined'}
+                selected={isActive}
+                onPress={() => setActiveCategory(item === 'All' ? undefined : item)}
+                style={[
+                  styles.categoryChip,
+                  isActive && { backgroundColor: theme.colors.primaryContainer },
+                ]}
+                textStyle={{ color: isActive ? theme.colors.onPrimaryContainer : theme.colors.onSurfaceVariant }}
+                accessibilityLabel={`Filter by ${item}`}
+                accessibilityState={{ selected: isActive }}
+              >
                 {item}
-              </Text>
-            </TouchableOpacity>
-          );
-        }}
-        style={styles.categoryScroll}
-      />
-
-      {/* Blog posts */}
-      {isLoading ? (
-        <ActivityIndicator
-          size="large"
-          color={colors.primary}
-          style={styles.loader}
+              </Chip>
+            );
+          }}
         />
+      </View>
+
+      {/* Blog post list */}
+      {isLoading ? (
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
       ) : (
         <FlatList
           data={blogPosts}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.listContent}
+          ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.blogCard}
+            <Card
+              mode="elevated"
+              elevation={1}
+              style={{ backgroundColor: theme.colors.surface }}
               onPress={() => navigation.navigate('BlogPost', { id: item.id })}
+              accessibilityLabel={item.title}
             >
-              <View style={styles.blogCardContent}>
-                <Text style={styles.blogTitle} numberOfLines={2}>{item.title}</Text>
-                <Text style={styles.blogExcerpt} numberOfLines={2}>{item.excerpt}</Text>
-                <View style={styles.blogMeta}>
-                  {item.author ? <Text style={styles.blogAuthor}>{item.author}</Text> : null}
-                  <Text style={styles.blogDate}>
+              <Card.Title
+                title={item.title}
+                subtitle={item.excerpt}
+                titleVariant="titleSmall"
+                subtitleVariant="bodySmall"
+                subtitleNumberOfLines={2}
+                titleNumberOfLines={2}
+                titleStyle={{ color: theme.colors.onSurface }}
+                subtitleStyle={{ color: theme.colors.onSurfaceVariant }}
+              />
+              <Card.Content>
+                <View style={styles.metaRow}>
+                  {item.author ? (
+                    <Text variant="labelSmall" style={{ color: theme.colors.primary }}>
+                      {item.author}
+                    </Text>
+                  ) : null}
+                  <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
                     {new Date(item.published_at).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                     })}
                   </Text>
                 </View>
-              </View>
-            </TouchableOpacity>
+              </Card.Content>
+            </Card>
           )}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No blog posts available yet.</Text>
+              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}>
+                No blog posts available yet.
+              </Text>
             </View>
           }
           ListFooterComponent={
             hasNextPage ? (
-              <TouchableOpacity style={styles.loadMoreButton} onPress={() => fetchNextPage()}>
-                <Text style={styles.loadMoreText}>Load More</Text>
-              </TouchableOpacity>
+              <Button
+                mode="outlined"
+                onPress={() => fetchNextPage()}
+                style={styles.loadMoreButton}
+                accessibilityLabel="Load more posts"
+              >
+                Load More
+              </Button>
             ) : null
           }
         />
@@ -101,104 +130,40 @@ const BlogListScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
-  categoryScroll: {
+  categoryBar: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
     flexGrow: 0,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   categoryList: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    gap: spacing.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 8,
   },
-  categoryPill: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: 20,
-    backgroundColor: colors.surfaceVariant,
-    borderWidth: 1,
-    borderColor: colors.border,
+  categoryChip: {
+    marginRight: 4,
   },
-  categoryPillActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  categoryPillText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    fontWeight: '500',
-  },
-  categoryPillTextActive: {
-    color: colors.textOnPrimary,
-  },
-  loader: {
-    marginTop: spacing.xl,
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   listContent: {
-    padding: spacing.md,
+    padding: 16,
+    paddingBottom: 24,
   },
-  blogCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-  },
-  blogCardContent: {
-    padding: spacing.md,
-  },
-  blogTitle: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-    lineHeight: 24,
-  },
-  blogExcerpt: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 20,
-    marginBottom: spacing.sm,
-  },
-  blogMeta: {
+  metaRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  blogAuthor: {
-    fontSize: 12,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  blogDate: {
-    fontSize: 12,
-    color: colors.textTertiary,
+    paddingBottom: 4,
   },
   emptyContainer: {
     alignItems: 'center',
-    paddingVertical: spacing.xl,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: colors.textSecondary,
+    paddingVertical: 48,
   },
   loadMoreButton: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: spacing.md,
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  loadMoreText: {
-    color: colors.primary,
-    fontWeight: '600',
-    fontSize: 15,
+    marginTop: 8,
   },
 });
 

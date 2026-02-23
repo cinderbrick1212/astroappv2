@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
+import { StyleSheet, ScrollView, View } from 'react-native';
 import {
-  View,
   Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+  Card,
+  List,
+  FAB,
+  Divider,
+  useTheme,
+} from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
 import { useAuth } from '../hooks/useAuth';
 import { AppStackParamList } from '../types';
 import { analytics } from '../services/analytics';
@@ -24,33 +24,39 @@ const getGreeting = (): string => {
 };
 
 const FOCUS_AREAS = [
-  { label: 'Career', icon: '💼', day: 1 },
-  { label: 'Love', icon: '❤️', day: 2 },
-  { label: 'Health', icon: '🌿', day: 3 },
-  { label: 'Finance', icon: '💰', day: 4 },
-  { label: 'Growth', icon: '🌱', day: 5 },
-  { label: 'Family', icon: '🏡', day: 6 },
-  { label: 'Creativity', icon: '🎨', day: 0 },
+  { label: 'Career',     icon: 'briefcase-outline',   day: 1 },
+  { label: 'Love',       icon: 'heart-outline',        day: 2 },
+  { label: 'Health',     icon: 'leaf-circle-outline',  day: 3 },
+  { label: 'Finance',    icon: 'currency-inr',         day: 4 },
+  { label: 'Growth',     icon: 'sprout',               day: 5 },
+  { label: 'Family',     icon: 'home-heart',           day: 6 },
+  { label: 'Creativity', icon: 'palette-outline',      day: 0 },
 ];
 
 const FOCUS_MESSAGES: Record<string, string> = {
-  Career: 'Today favors career initiatives — take bold action.',
-  Love: 'Open your heart; meaningful connections await.',
-  Health: 'Prioritize rest and nourishment today.',
-  Finance: 'A careful review of finances brings clarity.',
-  Growth: 'Step outside your comfort zone to grow.',
-  Family: 'Quality time with loved ones restores energy.',
+  Career:     'Today favors career initiatives — take bold action.',
+  Love:       'Open your heart; meaningful connections await.',
+  Health:     'Prioritize rest and nourishment today.',
+  Finance:    'A careful review of finances brings clarity.',
+  Growth:     'Step outside your comfort zone to grow.',
+  Family:     'Quality time with loved ones restores energy.',
   Creativity: 'Express yourself — inspiration is flowing.',
 };
 
-const QUICK_ACTIONS = [
-  { label: 'Kundli', icon: '🔯', description: 'Birth chart', screen: 'Kundli' as const },
-  { label: 'Compatibility', icon: '💞', description: 'Relationship match', screen: 'Compatibility' as const },
-  { label: 'Ask Question', icon: '❓', description: 'Expert advice', screen: 'AskQuestion' as const },
-  { label: 'Book Call', icon: '📞', description: 'Live consultation', screen: 'BookCall' as const },
+const QUICK_ACTIONS: Array<{
+  label: string;
+  icon: string;
+  description: string;
+  screen: keyof AppStackParamList;
+}> = [
+  { label: 'Kundli',       icon: 'star-david',          description: 'Birth chart',       screen: 'Kundli' },
+  { label: 'Compatibility',icon: 'heart-multiple',      description: 'Relationship match', screen: 'Compatibility' },
+  { label: 'Ask Question', icon: 'help-circle-outline', description: 'Expert advice',      screen: 'AskQuestion' },
+  { label: 'Book Call',    icon: 'phone-in-talk-outline',description: 'Live consultation', screen: 'BookCall' },
 ];
 
 const HomeScreen: React.FC = () => {
+  const theme = useTheme();
   const { user } = useAuth();
   const navigation = useNavigation<Nav>();
 
@@ -62,76 +68,97 @@ const HomeScreen: React.FC = () => {
   const dayOfWeek = today.getDay();
   const focus = FOCUS_AREAS.find(f => f.day === dayOfWeek) || FOCUS_AREAS[0];
 
-  const userName =
-    user?.username ||
-    user?.email?.split('@')[0] || 'there';
+  const userName = user?.username || user?.email?.split('@')[0] || 'there';
+
+  const dateStr = today.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Greeting */}
-      <View style={styles.greetingSection}>
-        <Text style={styles.greeting}>
-          {getGreeting()}, {userName}!
-        </Text>
-        <Text style={styles.date}>
-          {today.toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </Text>
-      </View>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      {/* Greeting header */}
+      <Card
+        mode="contained"
+        style={[styles.greetingCard, { backgroundColor: theme.colors.primaryContainer }]}
+      >
+        <Card.Content>
+          <Text variant="headlineSmall" style={{ color: theme.colors.onPrimaryContainer }}>
+            {getGreeting()}, {userName}!
+          </Text>
+          <Text variant="bodySmall" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.75, marginTop: 4 }}>
+            {dateStr}
+          </Text>
+        </Card.Content>
+      </Card>
 
-      {/* Today's Focus Card */}
-      <View style={[styles.card, styles.focusCard]}>
-        <View style={styles.focusCardRow}>
-          <Text style={styles.focusIcon}>{focus.icon}</Text>
-          <View style={styles.focusCardText}>
-            <Text style={styles.focusCardLabel}>Today's Focus: {focus.label}</Text>
-            <Text style={styles.focusCardMessage}>{FOCUS_MESSAGES[focus.label]}</Text>
+      {/* Today's Focus */}
+      <Card
+        mode="elevated"
+        elevation={1}
+        style={styles.card}
+        accessibilityLabel={`Today's focus: ${focus.label}`}
+      >
+        <Card.Title
+          title={`${focus.label} Focus`}
+          subtitle={FOCUS_MESSAGES[focus.label]}
+          subtitleNumberOfLines={2}
+          titleVariant="titleMedium"
+          subtitleVariant="bodySmall"
+          left={props => <List.Icon {...props} icon={focus.icon} color={theme.colors.primary} />}
+        />
+      </Card>
+
+      <Divider style={styles.divider} />
+
+      {/* Quick Tools — 2×2 FAB grid */}
+      <List.Subheader style={{ color: theme.colors.primary }}>Quick Tools</List.Subheader>
+      <View style={styles.fabGrid}>
+        {QUICK_ACTIONS.map(action => (
+          <View key={action.label} style={styles.fabCell}>
+            <FAB
+              icon={action.icon}
+              label={action.label}
+              size="medium"
+              variant="secondary"
+              onPress={() => navigation.navigate(action.screen as any)}
+              style={{ backgroundColor: theme.colors.secondaryContainer }}
+              color={theme.colors.onSecondaryContainer}
+              accessibilityLabel={`${action.label} — ${action.description}`}
+            />
           </View>
-        </View>
-      </View>
-
-      {/* Quick Actions */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Quick Tools</Text>
-        <View style={styles.quickActionsGrid}>
-          {QUICK_ACTIONS.map(action => (
-            <TouchableOpacity
-              key={action.label}
-              style={styles.quickActionCard}
-              onPress={() => navigation.navigate(action.screen)}
-            >
-              <Text style={styles.quickActionIcon}>{action.icon}</Text>
-              <Text style={styles.quickActionLabel}>{action.label}</Text>
-              <Text style={styles.quickActionDescription}>{action.description}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      {/* Services */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Premium Services</Text>
-        {[
-          { label: 'Ask a Question', icon: '❓', price: '₹49', screen: 'AskQuestion' as const },
-          { label: 'Book a Call', icon: '📞', price: '₹999', screen: 'BookCall' as const },
-        ].map(service => (
-          <TouchableOpacity
-            key={service.label}
-            style={styles.serviceCard}
-            onPress={() => navigation.navigate(service.screen)}
-          >
-            <Text style={styles.serviceIcon}>{service.icon}</Text>
-            <View style={styles.serviceInfo}>
-              <Text style={styles.serviceLabel}>{service.label}</Text>
-              <Text style={styles.servicePrice}>{service.price}</Text>
-            </View>
-            <Text style={styles.serviceArrow}>›</Text>
-          </TouchableOpacity>
         ))}
       </View>
+
+      <Divider style={styles.divider} />
+
+      {/* Premium Services */}
+      <List.Subheader style={{ color: theme.colors.primary }}>Premium Services</List.Subheader>
+
+      {[
+        { label: 'Ask a Question', icon: 'help-circle-outline', price: '₹49',  screen: 'AskQuestion' as const },
+        { label: 'Book a Call',    icon: 'phone-in-talk-outline', price: '₹999', screen: 'BookCall' as const },
+      ].map(service => (
+        <Card
+          key={service.label}
+          mode="outlined"
+          style={styles.card}
+          onPress={() => navigation.navigate(service.screen)}
+          accessibilityLabel={`${service.label}, price ${service.price}`}
+        >
+          <Card.Title
+            title={service.label}
+            subtitle={service.price}
+            subtitleStyle={{ color: theme.colors.secondary, fontWeight: '600' }}
+            titleVariant="titleMedium"
+            left={props => <List.Icon {...props} icon={service.icon} color={theme.colors.primary} />}
+            right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+          />
+        </Card>
+      ))}
+
+      <View style={styles.bottomPad} />
     </ScrollView>
   );
 };
@@ -139,131 +166,31 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
-  greetingSection: {
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
-  },
-  greeting: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: spacing.xs,
-  },
-  date: {
-    fontSize: 14,
-    color: colors.textSecondary,
+  greetingCard: {
+    margin: 16,
+    marginBottom: 8,
   },
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    margin: spacing.md,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
+    marginHorizontal: 16,
+    marginBottom: 8,
   },
-  focusCard: {
-    backgroundColor: colors.primaryLight,
-    borderColor: colors.primary,
+  divider: {
+    marginVertical: 8,
+    marginHorizontal: 16,
   },
-  focusCardRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  focusIcon: {
-    fontSize: 36,
-    marginRight: spacing.md,
-  },
-  focusCardText: {
-    flex: 1,
-  },
-  focusCardLabel: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: colors.textOnPrimary,
-    marginBottom: spacing.xs,
-  },
-  focusCardMessage: {
-    fontSize: 13,
-    color: colors.textOnPrimary,
-    opacity: 0.9,
-    lineHeight: 18,
-  },
-  section: {
-    marginHorizontal: spacing.md,
-    marginBottom: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  quickActionsGrid: {
+  fabGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -spacing.xs,
+    paddingHorizontal: 12,
+    gap: 8,
+    marginBottom: 8,
   },
-  quickActionCard: {
-    width: '50%',
-    paddingHorizontal: spacing.xs,
-    marginBottom: spacing.sm,
+  fabCell: {
+    width: '48%',
   },
-  quickActionIcon: {
-    fontSize: 30,
-    marginBottom: spacing.xs,
-    textAlign: 'center',
-    padding: spacing.md,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-    width: '100%',
-  },
-  quickActionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    textAlign: 'center',
-    marginTop: spacing.xs,
-  },
-  quickActionDescription: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  serviceCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  serviceIcon: {
-    fontSize: 24,
-    marginRight: spacing.md,
-  },
-  serviceInfo: {
-    flex: 1,
-  },
-  serviceLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  servicePrice: {
-    fontSize: 13,
-    color: colors.secondary,
-    marginTop: 2,
-  },
-  serviceArrow: {
-    fontSize: 22,
-    color: colors.textSecondary,
+  bottomPad: {
+    height: 24,
   },
 });
 

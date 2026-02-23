@@ -1,16 +1,18 @@
 import React from 'react';
+import { StyleSheet, ScrollView, View } from 'react-native';
 import {
-  View,
   Text,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
+  Card,
+  Chip,
+  List,
+  Divider,
+  useTheme,
+} from 'react-native-paper';
 import { panchangService, PanchangData } from '../services/panchang';
 import { useUserProfile } from '../hooks/useUserProfile';
 
 const PanchangScreen: React.FC = () => {
+  const theme = useTheme();
   const { profile } = useUserProfile();
   const today = new Date();
 
@@ -26,96 +28,155 @@ const PanchangScreen: React.FC = () => {
   });
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.dateHeader}>
-        <Text style={styles.dateText}>{dateStr}</Text>
-        {profile?.birth_place ? (
-          <Text style={styles.locationText}>📍 {profile.birth_place}</Text>
-        ) : (
-          <Text style={styles.locationText}>📍 New Delhi (default)</Text>
-        )}
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+
+      {/* Date hero */}
+      <Card
+        mode="contained"
+        style={[styles.heroCard, { backgroundColor: theme.colors.primaryContainer }]}
+      >
+        <Card.Content style={styles.heroContent}>
+          <Text
+            variant="titleLarge"
+            style={{ color: theme.colors.onPrimaryContainer, textAlign: 'center' }}
+          >
+            {dateStr}
+          </Text>
+          <Text
+            variant="bodySmall"
+            style={{ color: theme.colors.onPrimaryContainer, opacity: 0.75, textAlign: 'center', marginTop: 4 }}
+          >
+            {profile?.birth_place ? `📍 ${profile.birth_place}` : '📍 New Delhi (default)'}
+          </Text>
+        </Card.Content>
+      </Card>
+
+      {/* Key elements as Chips */}
+      <View style={styles.chipRow}>
+        <Chip
+          icon="moon-waning-crescent"
+          mode="flat"
+          style={{ backgroundColor: theme.colors.secondaryContainer }}
+          textStyle={{ color: theme.colors.onSecondaryContainer }}
+          accessibilityLabel={`Tithi: ${panchang.tithi}`}
+        >
+          {panchang.tithi}
+        </Chip>
+        <Chip
+          icon="star-four-points"
+          mode="flat"
+          style={{ backgroundColor: theme.colors.secondaryContainer }}
+          textStyle={{ color: theme.colors.onSecondaryContainer }}
+          accessibilityLabel={`Nakshatra: ${panchang.nakshatra}`}
+        >
+          {panchang.nakshatra}
+        </Chip>
+        <Chip
+          icon="alert"
+          mode="flat"
+          style={{ backgroundColor: theme.colors.errorContainer }}
+          textStyle={{ color: theme.colors.onErrorContainer }}
+          accessibilityLabel={`Rahu Kaal: ${panchang.rahuKaal.start} to ${panchang.rahuKaal.end}`}
+        >
+          Rahu {panchang.rahuKaal.start}–{panchang.rahuKaal.end}
+        </Chip>
       </View>
 
-      {/* Five Elements */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Panchang Elements</Text>
-        <View style={styles.card}>
-          {[
-            { label: 'Tithi', value: panchang.tithi, icon: '🌙' },
-            { label: 'Nakshatra', value: panchang.nakshatra, icon: '⭐' },
-            { label: 'Yoga', value: panchang.yoga, icon: '🔆' },
-            { label: 'Karana', value: panchang.karana, icon: '🌀' },
-          ].map((item, idx, arr) => (
-            <View
-              key={item.label}
-              style={[
-                styles.row,
-                idx < arr.length - 1 && styles.rowBorder,
-              ]}
-            >
-              <Text style={styles.rowIcon}>{item.icon}</Text>
-              <View style={styles.rowContent}>
-                <Text style={styles.rowLabel}>{item.label}</Text>
-                <Text style={styles.rowValue}>{item.value}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-      </View>
+      {/* Panchang Elements */}
+      <List.Subheader style={{ color: theme.colors.primary }}>Panchang Elements</List.Subheader>
+      <Card mode="outlined" style={styles.card}>
+        {[
+          { label: 'Tithi',    value: panchang.tithi,    icon: 'moon-waning-crescent' },
+          { label: 'Nakshatra',value: panchang.nakshatra, icon: 'star-four-points' },
+          { label: 'Yoga',     value: panchang.yoga,     icon: 'sun-wireless-outline' },
+          { label: 'Karana',   value: panchang.karana,   icon: 'rotate-360' },
+        ].map((item, i, arr) => (
+          <React.Fragment key={item.label}>
+            <List.Item
+              title={item.value}
+              description={item.label}
+              left={props => <List.Icon {...props} icon={item.icon} color={theme.colors.primary} />}
+              titleStyle={{ color: theme.colors.onSurface, fontWeight: '600' }}
+              descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+              accessibilityLabel={`${item.label}: ${item.value}`}
+            />
+            {i < arr.length - 1 && <Divider />}
+          </React.Fragment>
+        ))}
+      </Card>
 
-      {/* Sun timings */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Sun Timings</Text>
-        <View style={styles.timingsRow}>
-          <View style={styles.timingCard}>
-            <Text style={styles.timingIcon}>🌅</Text>
-            <Text style={styles.timingLabel}>Sunrise</Text>
-            <Text style={styles.timingValue}>{panchang.sunrise}</Text>
-          </View>
-          <View style={styles.timingCard}>
-            <Text style={styles.timingIcon}>🌇</Text>
-            <Text style={styles.timingLabel}>Sunset</Text>
-            <Text style={styles.timingValue}>{panchang.sunset}</Text>
-          </View>
-        </View>
+      {/* Sun Timings */}
+      <List.Subheader style={{ color: theme.colors.primary }}>Sun Timings</List.Subheader>
+      <View style={styles.timingsRow}>
+        <Card
+          mode="elevated"
+          elevation={1}
+          style={[styles.timingCard, { flex: 1 }]}
+          accessibilityLabel={`Sunrise at ${panchang.sunrise}`}
+        >
+          <Card.Content style={styles.timingContent}>
+            <Text variant="displaySmall" style={{ textAlign: 'center' }}>🌅</Text>
+            <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center', marginTop: 4 }}>
+              Sunrise
+            </Text>
+            <Text variant="titleMedium" style={{ color: theme.colors.primary, textAlign: 'center', marginTop: 2 }}>
+              {panchang.sunrise}
+            </Text>
+          </Card.Content>
+        </Card>
+        <Card
+          mode="elevated"
+          elevation={1}
+          style={[styles.timingCard, { flex: 1, marginLeft: 8 }]}
+          accessibilityLabel={`Sunset at ${panchang.sunset}`}
+        >
+          <Card.Content style={styles.timingContent}>
+            <Text variant="displaySmall" style={{ textAlign: 'center' }}>🌇</Text>
+            <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center', marginTop: 4 }}>
+              Sunset
+            </Text>
+            <Text variant="titleMedium" style={{ color: theme.colors.primary, textAlign: 'center', marginTop: 2 }}>
+              {panchang.sunset}
+            </Text>
+          </Card.Content>
+        </Card>
       </View>
 
       {/* Rahu Kaal */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Rahu Kaal</Text>
-        <View style={[styles.card, styles.rahuCard]}>
-          <Text style={styles.rahuIcon}>⚠️</Text>
-          <View>
-            <Text style={styles.rahuLabel}>Inauspicious Period</Text>
-            <Text style={styles.rahuTime}>
-              {panchang.rahuKaal.start} – {panchang.rahuKaal.end}
-            </Text>
-            <Text style={styles.rahuHint}>Avoid new ventures during this window.</Text>
-          </View>
-        </View>
-      </View>
+      <List.Subheader style={{ color: theme.colors.error }}>Rahu Kaal</List.Subheader>
+      <Card
+        mode="outlined"
+        style={[styles.card, { borderColor: theme.colors.error }]}
+        accessibilityLabel={`Rahu Kaal from ${panchang.rahuKaal.start} to ${panchang.rahuKaal.end}`}
+      >
+        <Card.Title
+          title={`${panchang.rahuKaal.start} – ${panchang.rahuKaal.end}`}
+          titleVariant="titleMedium"
+          titleStyle={{ color: theme.colors.error }}
+          subtitle="Avoid new ventures during this window."
+          left={props => <List.Icon {...props} icon="alert-circle-outline" color={theme.colors.error} />}
+        />
+      </Card>
 
-      {/* Muhurat */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Auspicious Muhurats</Text>
-        <View style={styles.card}>
-          {panchang.muhurat.map((m, idx, arr) => (
-            <View
-              key={m.activity}
-              style={[
-                styles.row,
-                idx < arr.length - 1 && styles.rowBorder,
-              ]}
-            >
-              <Text style={styles.rowIcon}>✨</Text>
-              <View style={styles.rowContent}>
-                <Text style={styles.rowLabel}>{m.activity}</Text>
-                <Text style={styles.rowValue}>{m.time}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-      </View>
+      {/* Auspicious Muhurats */}
+      <List.Subheader style={{ color: theme.colors.primary }}>Auspicious Muhurats</List.Subheader>
+      <Card mode="outlined" style={styles.card}>
+        {panchang.muhurat.map((m, i, arr) => (
+          <React.Fragment key={m.activity}>
+            <List.Item
+              title={m.time}
+              description={m.activity}
+              left={props => <List.Icon {...props} icon="star-shooting" color={theme.colors.primary} />}
+              titleStyle={{ color: theme.colors.onSurface, fontWeight: '600' }}
+              descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+              accessibilityLabel={`${m.activity} at ${m.time}`}
+            />
+            {i < arr.length - 1 && <Divider />}
+          </React.Fragment>
+        ))}
+      </Card>
+
+      <View style={{ height: 24 }} />
     </ScrollView>
   );
 };
@@ -123,123 +184,36 @@ const PanchangScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
-  dateHeader: {
-    backgroundColor: colors.primary,
-    padding: spacing.lg,
-    alignItems: 'center',
+  heroCard: {
+    margin: 16,
+    marginBottom: 0,
   },
-  dateText: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    color: colors.textOnPrimary,
-    marginBottom: spacing.xs,
-    textAlign: 'center',
+  heroContent: {
+    paddingVertical: 16,
   },
-  locationText: {
-    fontSize: 13,
-    color: colors.textOnPrimary,
-    opacity: 0.85,
-  },
-  section: {
-    marginHorizontal: spacing.md,
-    marginTop: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginBottom: spacing.sm,
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    padding: 16,
+    paddingBottom: 8,
   },
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.md,
-  },
-  rowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.divider,
-  },
-  rowIcon: {
-    fontSize: 22,
-    marginRight: spacing.md,
-    width: 30,
-    textAlign: 'center',
-  },
-  rowContent: {
-    flex: 1,
-  },
-  rowLabel: {
-    fontSize: 12,
-    color: colors.textTertiary,
-    marginBottom: 2,
-  },
-  rowValue: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
+    marginHorizontal: 16,
+    marginBottom: 8,
   },
   timingsRow: {
     flexDirection: 'row',
-    gap: spacing.sm,
+    marginHorizontal: 16,
+    marginBottom: 8,
   },
   timingCard: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
+    marginBottom: 0,
+  },
+  timingContent: {
     alignItems: 'center',
-  },
-  timingIcon: {
-    fontSize: 28,
-    marginBottom: spacing.xs,
-  },
-  timingLabel: {
-    fontSize: 12,
-    color: colors.textTertiary,
-    marginBottom: 2,
-  },
-  timingValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.primary,
-  },
-  rahuCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.md,
-  },
-  rahuIcon: {
-    fontSize: 28,
-    marginRight: spacing.md,
-  },
-  rahuLabel: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: 2,
-  },
-  rahuTime: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    color: colors.error,
-    marginBottom: 2,
-  },
-  rahuHint: {
-    fontSize: 12,
-    color: colors.textTertiary,
-    fontStyle: 'italic',
+    paddingVertical: 12,
   },
 });
 

@@ -1,46 +1,44 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
+import { StyleSheet } from 'react-native';
+import { Card, Text, Chip, useTheme } from 'react-native-paper';
 
-/**
- * Placeholder ad card rendered between feed items.
- * Replace the inner content with a real ad SDK (e.g. Google AdMob) when ready.
- */
-const AdCard: React.FC = () => (
-  <View style={styles.card}>
-    <Text style={styles.adLabel}>Ad</Text>
-    <View style={styles.adContent}>
-      <Text style={styles.adText}>Advertisement</Text>
-    </View>
-  </View>
-);
+const AdCard: React.FC = () => {
+  const theme = useTheme();
+  return (
+    <Card
+      mode="outlined"
+      style={[styles.card, { borderColor: theme.colors.outlineVariant }]}
+      accessibilityLabel="Sponsored advertisement"
+    >
+      <Card.Content style={styles.content}>
+        <Text
+          variant="bodySmall"
+          style={{ color: theme.colors.onSurfaceVariant, flex: 1 }}
+        >
+          Advertisement placeholder — native ad will render here.
+        </Text>
+        <Chip
+          mode="outlined"
+          compact
+          style={{ borderColor: theme.colors.outline }}
+          textStyle={{ color: theme.colors.onSurfaceVariant, fontSize: 10 }}
+          accessibilityLabel="Sponsored content"
+        >
+          Sponsored
+        </Chip>
+      </Card.Content>
+    </Card>
+  );
+};
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surfaceVariant,
-    borderRadius: 8,
-    marginHorizontal: spacing.md,
-    marginBottom: spacing.sm,
-    padding: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
+    marginBottom: 8,
   },
-  adLabel: {
-    fontSize: 10,
-    color: colors.textTertiary,
-    marginBottom: spacing.xs,
-    textAlign: 'right',
-  },
-  adContent: {
-    height: 60,
-    justifyContent: 'center',
+  content: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  adText: {
-    fontSize: 13,
-    color: colors.textTertiary,
-    fontStyle: 'italic',
+    gap: 8,
   },
 });
 

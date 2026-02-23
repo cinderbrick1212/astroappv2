@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { StyleSheet, ScrollView, View, Alert } from 'react-native';
 import {
-  View,
   Text,
-  StyleSheet,
-  ScrollView,
+  Card,
   TextInput,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
+  Button,
+  Chip,
+  List,
+  Divider,
+  HelperText,
+  Banner,
+  useTheme,
+} from 'react-native-paper';
 import { compatibilityService, CompatibilityResult } from '../services/compatibility';
 import { validation } from '../utils/validation';
 import { storage } from '../utils/storage';
@@ -23,13 +25,25 @@ interface CompatibilityHistoryEntry {
   savedAt: string;
 }
 
-const getRatingLabel = (score: number): { label: string; color: string } => {
-  if (score >= 28) return { label: 'Excellent Match', color: colors.success };
-  if (score >= 19) return { label: 'Good Match', color: colors.warning };
-  return { label: 'Needs Work', color: colors.error };
+const getRatingLabel = (score: number): { label: string; colorKey: 'primary' | 'secondary' | 'error' } => {
+  if (score >= 28) return { label: 'Excellent Match ✦', colorKey: 'primary' };
+  if (score >= 19) return { label: 'Good Match',        colorKey: 'secondary' };
+  return                  { label: 'Needs Work',         colorKey: 'error' };
+};
+
+const BREAKDOWN_LABELS: Record<string, string> = {
+  varna:        'Varna (1)',
+  vashya:       'Vashya (2)',
+  tara:         'Tara (3)',
+  yoni:         'Yoni (4)',
+  graha_maitri: 'Graha Maitri (5)',
+  gana:         'Gana (6)',
+  bhakoot:      'Bhakoot (7)',
+  nadi:         'Nadi (8)',
 };
 
 const CompatibilityScreen: React.FC = () => {
+  const theme = useTheme();
   const { profile } = useUserProfile();
   const [partnerName, setPartnerName] = useState('');
   const [partnerDate, setPartnerDate] = useState('');
@@ -78,119 +92,173 @@ const CompatibilityScreen: React.FC = () => {
 
   const rating = result ? getRatingLabel(result.score) : null;
 
-  const BREAKDOWN_LABELS: Record<string, string> = {
-    varna: 'Varna (1)',
-    vashya: 'Vashya (2)',
-    tara: 'Tara (3)',
-    yoni: 'Yoni (4)',
-    graha_maitri: 'Graha Maitri (5)',
-    gana: 'Gana (6)',
-    bhakoot: 'Bhakoot (7)',
-    nadi: 'Nadi (8)',
-  };
-
   return (
-    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
-      {/* Input Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Enter Partner Details</Text>
-        {!profile?.birth_date && (
-          <View style={styles.infoBanner}>
-            <Text style={styles.infoBannerText}>
-              ℹ️ Your birth date is required for compatibility calculations. Please add it in your Profile.
-            </Text>
-          </View>
-        )}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Partner's Name (optional)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="e.g. Rahul"
-            placeholderTextColor={colors.textTertiary}
-            value={partnerName}
-            onChangeText={setPartnerName}
-          />
-        </View>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Partner's Date of Birth</Text>
-          <TextInput
-            style={[styles.input, dateError ? styles.inputError : null]}
-            placeholder="YYYY-MM-DD"
-            placeholderTextColor={colors.textTertiary}
-            value={partnerDate}
-            onChangeText={setPartnerDate}
-            keyboardType="numbers-and-punctuation"
-          />
-          {dateError ? <Text style={styles.errorText}>{dateError}</Text> : null}
-        </View>
-        <TouchableOpacity style={styles.primaryButton} onPress={handleCheck}>
-          <Text style={styles.primaryButtonText}>Check Compatibility</Text>
-        </TouchableOpacity>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      keyboardShouldPersistTaps="handled"
+    >
+      {/* No birth date banner */}
+      <Banner
+        visible={!profile?.birth_date}
+        icon="information-outline"
+        actions={[]}
+        style={{ backgroundColor: theme.colors.surfaceVariant }}
+      >
+        Your birth date is required for compatibility. Please add it in your Profile.
+      </Banner>
+
+      {/* Input */}
+      <List.Subheader style={{ color: theme.colors.primary }}>Enter Partner Details</List.Subheader>
+
+      <View style={styles.inputSection}>
+        <TextInput
+          mode="outlined"
+          label="Partner's name (optional)"
+          value={partnerName}
+          onChangeText={setPartnerName}
+          style={styles.input}
+          theme={theme}
+          accessibilityLabel="Enter partner's name"
+        />
+
+        <TextInput
+          mode="outlined"
+          label="Partner's date of birth"
+          placeholder="YYYY-MM-DD"
+          value={partnerDate}
+          onChangeText={setPartnerDate}
+          keyboardType="numbers-and-punctuation"
+          error={!!dateError}
+          style={styles.input}
+          theme={theme}
+          accessibilityLabel="Enter partner's date of birth"
+        />
+        <HelperText type="error" visible={!!dateError}>
+          {dateError}
+        </HelperText>
+
+        <Button
+          mode="contained"
+          onPress={handleCheck}
+          style={styles.checkButton}
+          contentStyle={styles.buttonContent}
+          accessibilityLabel="Check compatibility"
+        >
+          Check Compatibility
+        </Button>
       </View>
 
-      {/* Results Section */}
+      {/* Results */}
       {result && rating && (
         <>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Result</Text>
-            <View style={styles.scoreCard}>
-              <Text style={[styles.scoreText, { color: rating.color }]}>
+          <Divider style={styles.divider} />
+          <List.Subheader style={{ color: theme.colors.primary }}>Result</List.Subheader>
+
+          {/* Score card */}
+          <Card
+            mode="contained"
+            style={[styles.card, { backgroundColor: theme.colors.primaryContainer }]}
+            accessibilityLabel={`Compatibility score: ${result.score} out of ${result.maxScore}. ${rating.label}`}
+          >
+            <Card.Content style={styles.scoreContent}>
+              <Text
+                variant="displayMedium"
+                style={{ color: theme.colors.onPrimaryContainer, textAlign: 'center' }}
+              >
                 {result.score}/{result.maxScore}
               </Text>
-              <Text style={[styles.ratingLabel, { color: rating.color }]}>{rating.label}</Text>
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Strengths</Text>
-            {result.strengths.map((s, i) => (
-              <View key={i} style={styles.bulletRow}>
-                <Text style={styles.bulletIcon}>✓</Text>
-                <Text style={styles.bulletText}>{s}</Text>
-              </View>
-            ))}
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Cautions</Text>
-            {result.cautions.map((c, i) => (
-              <View key={i} style={styles.bulletRow}>
-                <Text style={[styles.bulletIcon, { color: colors.warning }]}>⚠</Text>
-                <Text style={styles.bulletText}>{c}</Text>
-              </View>
-            ))}
-            <Text style={styles.adviceText}>{result.advice}</Text>
-          </View>
-
-          {/* Breakdown toggle */}
-          <View style={styles.section}>
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => setShowBreakdown(v => !v)}
-            >
-              <Text style={styles.secondaryButtonText}>
-                {showBreakdown ? 'Hide Breakdown' : 'View Detailed Breakdown'}
+              <Text
+                variant="titleMedium"
+                style={{ color: theme.colors.onPrimaryContainer, textAlign: 'center', marginTop: 4 }}
+              >
+                {rating.label}
               </Text>
-            </TouchableOpacity>
-            {showBreakdown && (
-              <View style={styles.breakdownCard}>
-                {Object.entries(result.breakdown).map(([key, val]) => (
-                  <View key={key} style={styles.breakdownRow}>
-                    <Text style={styles.breakdownLabel}>{BREAKDOWN_LABELS[key] ?? key}</Text>
-                    <Text style={styles.breakdownValue}>{val}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
+            </Card.Content>
+          </Card>
+
+          {/* Strengths */}
+          <List.Subheader style={{ color: theme.colors.primary }}>Strengths</List.Subheader>
+          <View style={styles.chipRow}>
+            {result.strengths.map((s, i) => (
+              <Chip
+                key={i}
+                icon="check-circle-outline"
+                mode="flat"
+                style={[styles.strengthChip, { backgroundColor: theme.colors.secondaryContainer }]}
+                textStyle={{ color: theme.colors.onSecondaryContainer }}
+                accessibilityLabel={`Strength: ${s}`}
+              >
+                {s}
+              </Chip>
+            ))}
           </View>
 
-          <View style={styles.section}>
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Save This Check</Text>
-            </TouchableOpacity>
+          {/* Cautions */}
+          <List.Subheader style={{ color: theme.colors.error }}>Cautions</List.Subheader>
+          <View style={styles.chipRow}>
+            {result.cautions.map((c, i) => (
+              <Chip
+                key={i}
+                icon="alert-outline"
+                mode="flat"
+                style={[styles.strengthChip, { backgroundColor: theme.colors.errorContainer }]}
+                textStyle={{ color: theme.colors.onErrorContainer }}
+                accessibilityLabel={`Caution: ${c}`}
+              >
+                {c}
+              </Chip>
+            ))}
+          </View>
+          <Text
+            variant="bodySmall"
+            style={[styles.advice, { color: theme.colors.onSurfaceVariant }]}
+          >
+            {result.advice}
+          </Text>
+
+          {/* Breakdown accordion */}
+          <Card mode="outlined" style={[styles.card, { marginTop: 8 }]}>
+            <List.Accordion
+              title="View Ashtakoot Breakdown"
+              expanded={showBreakdown}
+              onPress={() => setShowBreakdown(v => !v)}
+              left={props => <List.Icon {...props} icon="chart-bar" color={theme.colors.primary} />}
+              titleStyle={{ color: theme.colors.primary }}
+            >
+              {Object.entries(result.breakdown).map(([key, val], i, arr) => (
+                <React.Fragment key={key}>
+                  <List.Item
+                    title={BREAKDOWN_LABELS[key] ?? key}
+                    right={() => (
+                      <Text
+                        variant="bodyMedium"
+                        style={{ color: theme.colors.primary, fontWeight: '600', alignSelf: 'center', marginRight: 16 }}
+                      >
+                        {val}
+                      </Text>
+                    )}
+                  />
+                  {i < arr.length - 1 && <Divider />}
+                </React.Fragment>
+              ))}
+            </List.Accordion>
+          </Card>
+
+          {/* Save */}
+          <View style={styles.saveSection}>
+            <Button
+              mode="outlined"
+              onPress={handleSave}
+              icon="content-save-outline"
+              accessibilityLabel="Save this compatibility check"
+            >
+              Save This Check
+            </Button>
           </View>
         </>
       )}
+
+      <View style={{ height: 32 }} />
     </ScrollView>
   );
 };
@@ -198,159 +266,52 @@ const CompatibilityScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
-  section: {
-    marginHorizontal: spacing.md,
-    marginTop: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginBottom: spacing.sm,
-  },
-  infoBanner: {
-    backgroundColor: colors.surfaceVariant,
-    borderRadius: 8,
-    padding: spacing.sm,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  infoBannerText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    lineHeight: 18,
-  },
-  inputGroup: {
-    marginBottom: spacing.md,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
+  inputSection: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
   },
   input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: spacing.md,
-    fontSize: 16,
-    color: colors.textPrimary,
+    marginBottom: 4,
   },
-  inputError: {
-    borderColor: colors.error,
+  checkButton: {
+    marginTop: 8,
   },
-  errorText: {
-    fontSize: 12,
-    color: colors.error,
-    marginTop: spacing.xs,
+  buttonContent: {
+    paddingVertical: 6,
   },
-  primaryButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    padding: spacing.md,
+  divider: {
+    marginVertical: 8,
+    marginHorizontal: 16,
+  },
+  card: {
+    marginHorizontal: 16,
+    marginBottom: 8,
+  },
+  scoreContent: {
     alignItems: 'center',
+    paddingVertical: 12,
   },
-  primaryButtonText: {
-    color: colors.textOnPrimary,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  scoreCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: spacing.xl,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  scoreText: {
-    fontSize: 48,
-    fontWeight: 'bold',
-  },
-  ratingLabel: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: spacing.xs,
-  },
-  bulletRow: {
+  chipRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: spacing.sm,
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
   },
-  bulletIcon: {
-    fontSize: 16,
-    color: colors.success,
-    marginRight: spacing.sm,
-    marginTop: 2,
+  strengthChip: {
+    marginBottom: 4,
   },
-  bulletText: {
-    flex: 1,
-    fontSize: 15,
-    color: colors.textPrimary,
-  },
-  adviceText: {
-    fontSize: 14,
-    color: colors.textSecondary,
+  advice: {
     fontStyle: 'italic',
-    marginTop: spacing.sm,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 4,
   },
-  secondaryButton: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: 8,
-    padding: spacing.md,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    color: colors.primary,
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  breakdownCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-    marginTop: spacing.md,
-  },
-  breakdownRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.divider,
-  },
-  breakdownLabel: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  breakdownValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.primary,
-  },
-  saveButton: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: spacing.md,
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  saveButtonText: {
-    color: colors.textPrimary,
-    fontSize: 15,
-    fontWeight: '600',
+  saveSection: {
+    paddingHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 8,
   },
 });
 

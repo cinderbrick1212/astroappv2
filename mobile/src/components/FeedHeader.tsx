@@ -1,61 +1,66 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
+import { View, StyleSheet } from 'react-native';
+import { Text, Chip, useTheme } from 'react-native-paper';
 
 interface FeedHeaderProps {
   date: Date;
   userName?: string;
-  streak?: number;
+  streak: number;
 }
 
-const getGreeting = (): string => {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
-};
-
 const FeedHeader: React.FC<FeedHeaderProps> = ({ date, userName, streak }) => {
+  const theme = useTheme();
+
+  const dateStr = date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  const hour = date.getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.date}>
-        {date.toLocaleDateString('en-US', {
-          weekday: 'long',
-          month: 'long',
-          day: 'numeric',
-          year: 'numeric',
-        })}
-      </Text>
-      {userName ? (
-        <Text style={styles.greeting}>{getGreeting()}, {userName}</Text>
-      ) : null}
-      {streak > 0 ? (
-        <Text style={styles.streak}>🔥 {streak} day streak</Text>
-      ) : null}
+    <View style={[styles.container, { backgroundColor: theme.colors.primaryContainer }]}>
+      <View style={styles.row}>
+        <View style={styles.textBlock}>
+          <Text variant="titleMedium" style={{ color: theme.colors.onPrimaryContainer }}>
+            {greeting}{userName ? `, ${userName}` : ''}
+          </Text>
+          <Text variant="bodySmall" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.75, marginTop: 2 }}>
+            {dateStr}
+          </Text>
+        </View>
+        {streak > 0 && (
+          <Chip
+            icon="fire"
+            mode="flat"
+            style={{ backgroundColor: theme.colors.secondaryContainer }}
+            textStyle={{ color: theme.colors.onSecondaryContainer }}
+            accessibilityLabel={`${streak} day streak`}
+          >
+            {streak} day{streak !== 1 ? 's' : ''}
+          </Chip>
+        )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
-  date: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: spacing.sm,
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  greeting: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: spacing.sm,
-  },
-  streak: {
-    fontSize: 16,
-    color: colors.secondary,
+  textBlock: {
+    flex: 1,
+    marginRight: 12,
   },
 });
 

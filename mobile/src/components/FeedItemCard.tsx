@@ -1,58 +1,91 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
+import { StyleSheet } from 'react-native';
+import { Card, Text, Chip, useTheme } from 'react-native-paper';
 import { FeedItem } from '../types';
 
 interface FeedItemCardProps {
   item: FeedItem;
-  onPress?: () => void;
 }
 
-const FeedItemCard: React.FC<FeedItemCardProps> = ({ item, onPress }) => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.type}>{item.type.toUpperCase()}</Text>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.summary}>{item.summary}</Text>
-      {item.media && (
-        <Text style={styles.mediaPlaceholder}>[Image: {item.media.alternativeText}]</Text>
+const TYPE_ICONS: Record<FeedItem['type'], string> = {
+  horoscope: 'star-crescent',
+  tip:       'lightbulb-outline',
+  blog:      'book-open-variant',
+  remedy:    'flower-outline',
+};
+
+const TYPE_LABELS: Record<FeedItem['type'], string> = {
+  horoscope: 'Horoscope',
+  tip:       'Astro Tip',
+  blog:      'Blog',
+  remedy:    'Remedy',
+};
+
+const FeedItemCard: React.FC<FeedItemCardProps> = ({ item }) => {
+  const theme = useTheme();
+
+  const cardBg =
+    item.type === 'tip'
+      ? theme.colors.secondaryContainer
+      : item.type === 'remedy'
+      ? theme.colors.tertiaryContainer
+      : theme.colors.surface;
+
+  const isTonal = item.type === 'tip' || item.type === 'remedy';
+
+  const titleElement = (
+    <Card.Title
+      title={item.title}
+      titleVariant="titleSmall"
+      titleStyle={{ color: theme.colors.onSurface }}
+      subtitle={item.summary}
+      subtitleVariant="bodySmall"
+      subtitleStyle={{ color: theme.colors.onSurfaceVariant }}
+      subtitleNumberOfLines={2}
+      right={() => (
+        <Chip
+          icon={TYPE_ICONS[item.type]}
+          mode="flat"
+          style={[styles.typeChip, { backgroundColor: theme.colors.surfaceVariant }]}
+          textStyle={{ color: theme.colors.onSurfaceVariant, fontSize: 11 }}
+          compact
+        >
+          {TYPE_LABELS[item.type]}
+        </Chip>
       )}
-    </View>
+    />
+  );
+
+  if (isTonal) {
+    return (
+      <Card
+        mode="contained"
+        style={[styles.card, { backgroundColor: cardBg }]}
+        accessibilityLabel={item.title}
+      >
+        {titleElement}
+      </Card>
+    );
+  }
+
+  return (
+    <Card
+      mode="elevated"
+      elevation={1}
+      style={[styles.card, { backgroundColor: cardBg }]}
+      accessibilityLabel={item.title}
+    >
+      {titleElement}
+    </Card>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
+  card: {
+    marginBottom: 8,
   },
-  type: {
-    fontSize: 12,
-    color: colors.primary,
-    fontWeight: 'bold',
-    marginBottom: spacing.sm,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  summary: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 20,
-  },
-  mediaPlaceholder: {
-    fontSize: 12,
-    color: colors.textTertiary,
-    marginTop: spacing.sm,
-    fontStyle: 'italic',
+  typeChip: {
+    marginRight: 12,
   },
 });
 
