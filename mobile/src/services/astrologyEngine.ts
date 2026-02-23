@@ -132,8 +132,19 @@ const DEBILITATED: Record<string, number> = {
 
 function profileToDate(profile: UserProfile): Date {
   const [hours, minutes] = (profile.birth_time || '06:00').split(':').map(Number);
-  const date = new Date(profile.birth_date);
-  date.setUTCHours(hours || 6, minutes || 0, 0, 0);
+  const [y, m, d] = profile.birth_date.split('-').map(Number);
+
+  // Construct a UTC date using the local hours/minutes
+  const date = new Date(Date.UTC(y, m - 1, d, hours, minutes));
+
+  // Determine timezone offset in minutes (default to IST +5.5 if unknown)
+  let offsetMinutes = 330; // 5 hours 30 mins
+  if (profile.timezone === 'UTC') offsetMinutes = 0;
+  // Add other common offsets if necessary, but IST is primary for this app
+
+  // Convert Local birth time to UTC: UTC = Local - Offset
+  date.setUTCMinutes(date.getUTCMinutes() - offsetMinutes);
+
   return date;
 }
 
@@ -421,7 +432,7 @@ export const astrologyEngine = {
 
       // Combustion: planet within ~6° of Sun (except Moon)
       if (planet.planet !== 'Sun' && planet.planet !== 'Moon' &&
-          planet.planet !== 'Rahu' && planet.planet !== 'Ketu') {
+        planet.planet !== 'Rahu' && planet.planet !== 'Ketu') {
         const sunPlanet = chart.planets.find((p) => p.planet === 'Sun');
         if (sunPlanet) {
           let diff = Math.abs(planet.longitude - sunPlanet.longitude);
