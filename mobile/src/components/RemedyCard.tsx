@@ -1,7 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
+import { View, StyleSheet } from 'react-native';
+import { Card, Text, useTheme } from 'react-native-paper';
 
 // Seven planetary remedies indexed by day-of-week (0=Sun … 6=Sat)
 const REMEDIES = [
@@ -19,63 +18,47 @@ interface RemedyCardProps {
 }
 
 const RemedyCard: React.FC<RemedyCardProps> = ({ date }) => {
+  const theme = useTheme();
   const today = date ?? new Date();
-  const { planet, icon, remedy } = REMEDIES[today.getDay()];
+  const remedy = REMEDIES[today.getDay()];
 
   return (
-    <View style={styles.card}>
-      <View style={styles.header}>
-        <Text style={styles.icon}>{icon}</Text>
-        <View style={styles.meta}>
-          <Text style={styles.label}>REMEDY OF THE DAY</Text>
-          <Text style={styles.planet}>{planet}</Text>
+    <Card
+      mode="contained"
+      style={[styles.card, { backgroundColor: theme.colors.tertiaryContainer }]}
+      accessibilityLabel={`Remedy of the day: ${remedy.remedy}`}
+    >
+      <Card.Content style={styles.content}>
+        <Text style={styles.icon}>{remedy.icon ?? '🪔'}</Text>
+        <View style={{ flex: 1 }}>
+          <Text
+            variant="labelSmall"
+            style={{ color: theme.colors.onTertiaryContainer, letterSpacing: 1.2, marginBottom: 4 }}
+          >
+            REMEDY OF THE DAY
+          </Text>
+          <Text variant="bodySmall" style={{ color: theme.colors.onTertiaryContainer, lineHeight: 18 }}>
+            {remedy.remedy}
+          </Text>
         </View>
-      </View>
-      <Text style={styles.remedyText}>{remedy}</Text>
-    </View>
+      </Card.Content>
+    </Card>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    margin: spacing.md,
-    marginBottom: 0,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.secondary,
+    marginHorizontal: 16,
+    marginTop: 12,
   },
-  header: {
+  content: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
+    alignItems: 'flex-start',
+    gap: 12,
   },
   icon: {
-    fontSize: 28,
-    marginRight: spacing.md,
-  },
-  meta: {
-    flex: 1,
-  },
-  label: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: colors.secondary,
-    letterSpacing: 1,
-  },
-  planet: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  remedyText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 20,
-    fontStyle: 'italic',
+    fontSize: 26,
+    marginTop: 2,
   },
 });
 

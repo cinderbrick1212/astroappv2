@@ -21,9 +21,9 @@
 - [x] C03 — `frontend-rework/prompt-C03-login-screen.md`
 - [x] C04 — `frontend-rework/prompt-C04-onboarding-part-a.md`
 - [x] C05 — `frontend-rework/prompt-C05-onboarding-part-b.md`
-- [ ] C06 — `frontend-rework/prompt-C06-daily-feed-screen.md`
-- [ ] C07 — `frontend-rework/prompt-C07-feed-components.md`
-- [ ] C08 — `frontend-rework/prompt-C08-tools-screen.md`
+- [x] C06 — `frontend-rework/prompt-C06-daily-feed-screen.md`
+- [x] C07 — `frontend-rework/prompt-C07-feed-components.md`
+- [x] C08 — `frontend-rework/prompt-C08-tools-screen.md`
 - [ ] C09 — `frontend-rework/prompt-C09-home-screen.md`
 - [ ] C10 — `frontend-rework/prompt-C10-profile-part-a.md`
 - [ ] C11 — `frontend-rework/prompt-C11-profile-part-b.md`
