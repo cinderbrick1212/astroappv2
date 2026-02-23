@@ -27,6 +27,7 @@
     "@tanstack/react-query-persist-client": "^5.90.21",
     "axios": "^1.13.5",
     "expo": "~54.0.33",
+    "expo-build-properties": "~1.0.10",
     "expo-env": "^1.1.1",
     "expo-network": "^8.0.8",
     "expo-notifications": "^0.32.16",
