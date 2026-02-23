@@ -82,10 +82,10 @@ const COMPATIBLE_NAKSHATRAS: Record<string, string[]> = {
 };
 
 const PADA_DESCRIPTIONS = [
-  'Pada 1 — Focus on self, initiative, and identity. Aries navamsha influence.',
-  'Pada 2 — Focus on wealth, speech, and values. Taurus navamsha influence.',
-  'Pada 3 — Focus on communication, skills, and courage. Gemini navamsha influence.',
-  'Pada 4 — Focus on emotions, home, and inner security. Cancer navamsha influence.',
+  'Pada 1 — Emphasises self-expression, initiative, and the core identity of this nakshatra.',
+  'Pada 2 — Emphasises material security, speech, and practical application of nakshatra energy.',
+  'Pada 3 — Emphasises communication, learning, and intellectual curiosity within this nakshatra.',
+  'Pada 4 — Emphasises emotional depth, nurturing, and inner transformation of this nakshatra.',
 ];
 
 const NakshatraScreen: React.FC = () => {
