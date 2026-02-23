@@ -29,7 +29,7 @@ const RequestReportScreen: React.FC = () => {
     createRequest(
       {
         service_type: 'report',
-        user_notes: `Report type: ${reportType}. ${notes.trim()}`,
+        user_notes: notes.trim() ? `Report type: ${reportType}. ${notes.trim()}` : `Report type: ${reportType}`,
       },
       {
         onSuccess: () => {
