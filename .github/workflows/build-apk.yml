@@ -2,10 +2,9 @@ name: Build Android APK (Codespace)
 
 on:
   push:
-    branches: [main]
-    paths:
-      - "mobile/**"
-      - ".github/workflows/build-apk.yml"
+    tags:
+      - "build-*"
+      - "v*"
   workflow_dispatch:
     inputs:
       build_type:
