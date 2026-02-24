@@ -1,0 +1,13 @@
+# Auto-detect text files and normalize line endings to LF
+* text=auto
+
+# Shell scripts must always use LF
+*.sh text eol=lf
+
+# YAML/YML (GitHub Actions) must always use LF
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Keep Windows batch files with CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
