@@ -25,6 +25,9 @@ jobs:
     name: Build APK in 4-Core Codespace
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      REPO_NAME: ${{ github.event.repository.name }}
+      BUILD_TYPE: ${{ github.event.inputs.build_type || 'release' }}
 
     steps:
       - name: Generate timestamp
@@ -36,21 +39,22 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Creating 4-core codespace..."
+          echo "Creating 4-core codespace on ${{ github.ref_name }}..."
           CS_NAME=$(gh codespace create \
-            --repo ${{ github.repository }} \
-            --branch ${{ github.ref_name }} \
+            --repo "${{ github.repository }}" \
+            --branch "${{ github.ref_name }}" \
             --machine standardLinux \
             --status \
             --default-permissions \
             2>&1 | tail -1)
           echo "name=$CS_NAME" >> "$GITHUB_OUTPUT"
-          echo "Codespace created: $CS_NAME"
+          echo "Codespace name: $CS_NAME"
 
           echo "Waiting for codespace to be ready..."
-          for i in $(seq 1 30); do
-            STATUS=$(gh codespace list --json name,state -q ".[] | select(.name==\"$CS_NAME\") | .state")
-            echo "  Attempt $i: status=$STATUS"
+          for i in $(seq 1 60); do
+            STATUS=$(gh codespace list --json name,state \
+              -q ".[] | select(.name==\"$CS_NAME\") | .state")
+            echo "  [$i/60] state=$STATUS"
             if [ "$STATUS" = "Available" ]; then
               echo "Codespace is ready!"
               break
@@ -58,39 +62,17 @@ jobs:
             sleep 10
           done
 
-      - name: Run build in Codespace
+      - name: Build APK (prebuild has deps + android/ ready)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          CS_NAME="${{ steps.codespace.outputs.name }}"
-          BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
+          CS="${{ steps.codespace.outputs.name }}"
+          WORKDIR="/workspaces/${{ env.REPO_NAME }}/mobile"
 
-          echo "=== Installing dependencies ==="
-          gh codespace ssh -c "$CS_NAME" -- bash -c '
-            cd /workspaces/$(basename $GITHUB_REPOSITORY)/mobile
-            npm ci
-          '
-
-          echo "=== Running expo prebuild ==="
-          gh codespace ssh -c "$CS_NAME" -- bash -c '
-            cd /workspaces/$(basename $GITHUB_REPOSITORY)/mobile
-            npx expo prebuild --platform android --clean --no-install
-            chmod +x android/gradlew
-          '
-
-          echo "=== Configuring Gradle ==="
-          gh codespace ssh -c "$CS_NAME" -- bash -c '
-            mkdir -p ~/.gradle
-            echo "org.gradle.daemon=true" >> ~/.gradle/gradle.properties
-            echo "org.gradle.parallel=true" >> ~/.gradle/gradle.properties
-            echo "org.gradle.caching=true" >> ~/.gradle/gradle.properties
-            echo "org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError" >> ~/.gradle/gradle.properties
-          '
-
-          echo "=== Building $BUILD_TYPE APK ==="
-          gh codespace ssh -c "$CS_NAME" -- bash -c "
-            cd /workspaces/\$(basename \$GITHUB_REPOSITORY)/mobile/android
-            if [ \"$BUILD_TYPE\" = \"debug\" ]; then
+          echo "=== Building ${{ env.BUILD_TYPE }} APK ==="
+          gh codespace ssh -c "$CS" -- bash -lc "
+            cd ${WORKDIR}/android
+            if [ '${{ env.BUILD_TYPE }}' = 'debug' ]; then
               ./gradlew assembleDebug --build-cache --parallel
             else
               ./gradlew assembleRelease --build-cache --parallel
@@ -101,13 +83,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          CS_NAME="${{ steps.codespace.outputs.name }}"
-          BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
+          CS="${{ steps.codespace.outputs.name }}"
           TIMESTAMP="${{ steps.timestamp.outputs.value }}"
           OUTPUT_DIR="apk-output/${TIMESTAMP}"
           mkdir -p "$OUTPUT_DIR"
 
-          if [ "$BUILD_TYPE" = "debug" ]; then
+          if [ "${{ env.BUILD_TYPE }}" = "debug" ]; then
             REMOTE_APK="mobile/android/app/build/outputs/apk/debug/app-debug.apk"
             APK_NAME="astrowitt-debug-${TIMESTAMP}.apk"
           else
@@ -116,10 +97,12 @@ jobs:
           fi
 
           echo "Copying APK from codespace..."
-          gh codespace cp "remote:/workspaces/$(basename ${{ github.repository }})/${REMOTE_APK}" "./${OUTPUT_DIR}/${APK_NAME}" -c "$CS_NAME"
+          gh codespace cp \
+            "remote:/workspaces/${{ env.REPO_NAME }}/${REMOTE_APK}" \
+            "./${OUTPUT_DIR}/${APK_NAME}" \
+            -c "$CS"
 
           echo "APK_NAME=$APK_NAME" >> "$GITHUB_ENV"
-          echo "OUTPUT_DIR=$OUTPUT_DIR" >> "$GITHUB_ENV"
           ls -lh "$OUTPUT_DIR/$APK_NAME"
 
       - name: Delete Codespace
@@ -127,10 +110,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          CS_NAME="${{ steps.codespace.outputs.name }}"
-          if [ -n "$CS_NAME" ]; then
-            echo "Deleting codespace $CS_NAME..."
-            gh codespace delete -c "$CS_NAME" --force || true
+          CS="${{ steps.codespace.outputs.name }}"
+          if [ -n "$CS" ]; then
+            echo "Cleaning up codespace $CS..."
+            gh codespace delete -c "$CS" --force || true
           fi
 
       - name: Upload APK artifact
@@ -143,12 +126,12 @@ jobs:
 
       - name: Build summary
         run: |
-          echo "## APK Build Complete (4-Core Codespace)" >> $GITHUB_STEP_SUMMARY
+          echo "## APK Build Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| **Build Type** | ${{ github.event.inputs.build_type || 'release' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Machine** | 4-core Codespace (standardLinux) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Build Type** | ${{ env.BUILD_TYPE }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Machine** | 4-core Codespace (prebuild) |" >> $GITHUB_STEP_SUMMARY
           echo "| **Timestamp** | ${{ steps.timestamp.outputs.value }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **Artifact** | astrowitt-apk-${{ steps.timestamp.outputs.value }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **APK** | ${{ env.APK_NAME }} |" >> $GITHUB_STEP_SUMMARY
