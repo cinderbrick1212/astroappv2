@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK (Codespace)
 
 on:
   push:
@@ -17,110 +17,139 @@ on:
           - release
           - debug
 
-env:
-  NODE_VERSION: "20"
-  JAVA_VERSION: "17"
+permissions:
+  contents: read
+  codespaces: write
 
 jobs:
   build-apk:
-    name: Build Android APK
+    name: Build APK in 4-Core Codespace
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-
-    defaults:
-      run:
-        working-directory: mobile
+    timeout-minutes: 60
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Generate timestamp
         id: timestamp
         run: echo "value=$(date -u +'%Y-%m-%d_%H-%M-%S')" >> "$GITHUB_OUTPUT"
 
-      - name: Fix line endings
-        working-directory: .
+      - name: Create 4-core Codespace
+        id: codespace
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -d mobile/scripts ]; then
-            sudo apt-get -qq install -y dos2unix 2>/dev/null || true
-            find mobile/scripts -type f -name "*.sh" -exec dos2unix {} + 2>/dev/null || true
-          fi
+          echo "Creating 4-core codespace..."
+          CS_NAME=$(gh codespace create \
+            --repo ${{ github.repository }} \
+            --branch ${{ github.ref_name }} \
+            --machine standardLinux \
+            --status \
+            --default-permissions \
+            2>&1 | tail -1)
+          echo "name=$CS_NAME" >> "$GITHUB_OUTPUT"
+          echo "Codespace created: $CS_NAME"
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-          cache-dependency-path: mobile/package-lock.json
+          echo "Waiting for codespace to be ready..."
+          for i in $(seq 1 30); do
+            STATUS=$(gh codespace list --json name,state -q ".[] | select(.name==\"$CS_NAME\") | .state")
+            echo "  Attempt $i: status=$STATUS"
+            if [ "$STATUS" = "Available" ]; then
+              echo "Codespace is ready!"
+              break
+            fi
+            sleep 10
+          done
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: ${{ env.JAVA_VERSION }}
-          # NOTE: Do NOT set cache: "gradle" here — the android/ dir
-          # doesn't exist until expo prebuild generates it.
-
-      - name: Configure Gradle
+      - name: Run build in Codespace
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p ~/.gradle
-          echo "org.gradle.daemon=true" >> ~/.gradle/gradle.properties
-          echo "org.gradle.parallel=true" >> ~/.gradle/gradle.properties
-          echo "org.gradle.caching=true" >> ~/.gradle/gradle.properties
-          echo "org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError" >> ~/.gradle/gradle.properties
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Expo prebuild
-        run: npx expo prebuild --platform android --clean --no-install
-
-      - name: Make gradlew executable
-        run: chmod +x android/gradlew
-
-      - name: Build APK
-        run: |
+          CS_NAME="${{ steps.codespace.outputs.name }}"
           BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
-          cd android
-          if [ "$BUILD_TYPE" = "debug" ]; then
-            ./gradlew assembleDebug --build-cache --parallel --no-daemon
-          else
-            ./gradlew assembleRelease --build-cache --parallel --no-daemon
-          fi
 
-      - name: Collect APK
+          echo "=== Installing dependencies ==="
+          gh codespace ssh -c "$CS_NAME" -- bash -c '
+            cd /workspaces/$(basename $GITHUB_REPOSITORY)/mobile
+            npm ci
+          '
+
+          echo "=== Running expo prebuild ==="
+          gh codespace ssh -c "$CS_NAME" -- bash -c '
+            cd /workspaces/$(basename $GITHUB_REPOSITORY)/mobile
+            npx expo prebuild --platform android --clean --no-install
+            chmod +x android/gradlew
+          '
+
+          echo "=== Configuring Gradle ==="
+          gh codespace ssh -c "$CS_NAME" -- bash -c '
+            mkdir -p ~/.gradle
+            echo "org.gradle.daemon=true" >> ~/.gradle/gradle.properties
+            echo "org.gradle.parallel=true" >> ~/.gradle/gradle.properties
+            echo "org.gradle.caching=true" >> ~/.gradle/gradle.properties
+            echo "org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError" >> ~/.gradle/gradle.properties
+          '
+
+          echo "=== Building $BUILD_TYPE APK ==="
+          gh codespace ssh -c "$CS_NAME" -- bash -c "
+            cd /workspaces/\$(basename \$GITHUB_REPOSITORY)/mobile/android
+            if [ \"$BUILD_TYPE\" = \"debug\" ]; then
+              ./gradlew assembleDebug --build-cache --parallel
+            else
+              ./gradlew assembleRelease --build-cache --parallel
+            fi
+          "
+
+      - name: Extract APK from Codespace
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          CS_NAME="${{ steps.codespace.outputs.name }}"
           BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
           TIMESTAMP="${{ steps.timestamp.outputs.value }}"
           OUTPUT_DIR="apk-output/${TIMESTAMP}"
           mkdir -p "$OUTPUT_DIR"
+
           if [ "$BUILD_TYPE" = "debug" ]; then
-            APK_SRC="android/app/build/outputs/apk/debug/app-debug.apk"
+            REMOTE_APK="mobile/android/app/build/outputs/apk/debug/app-debug.apk"
             APK_NAME="astrowitt-debug-${TIMESTAMP}.apk"
           else
-            APK_SRC="android/app/build/outputs/apk/release/app-release.apk"
+            REMOTE_APK="mobile/android/app/build/outputs/apk/release/app-release.apk"
             APK_NAME="astrowitt-release-${TIMESTAMP}.apk"
           fi
-          cp "$APK_SRC" "$OUTPUT_DIR/$APK_NAME"
+
+          echo "Copying APK from codespace..."
+          gh codespace cp "remote:/workspaces/$(basename ${{ github.repository }})/${REMOTE_APK}" "./${OUTPUT_DIR}/${APK_NAME}" -c "$CS_NAME"
+
           echo "APK_NAME=$APK_NAME" >> "$GITHUB_ENV"
+          echo "OUTPUT_DIR=$OUTPUT_DIR" >> "$GITHUB_ENV"
           ls -lh "$OUTPUT_DIR/$APK_NAME"
+
+      - name: Delete Codespace
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CS_NAME="${{ steps.codespace.outputs.name }}"
+          if [ -n "$CS_NAME" ]; then
+            echo "Deleting codespace $CS_NAME..."
+            gh codespace delete -c "$CS_NAME" --force || true
+          fi
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: "astrowitt-apk-${{ steps.timestamp.outputs.value }}"
-          path: "mobile/apk-output/${{ steps.timestamp.outputs.value }}/"
+          path: "apk-output/${{ steps.timestamp.outputs.value }}/"
           retention-days: 30
           if-no-files-found: error
 
       - name: Build summary
         run: |
-          echo "## APK Build Complete" >> $GITHUB_STEP_SUMMARY
+          echo "## APK Build Complete (4-Core Codespace)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| **Build Type** | ${{ github.event.inputs.build_type || 'release' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Machine** | 4-core Codespace (standardLinux) |" >> $GITHUB_STEP_SUMMARY
           echo "| **Timestamp** | ${{ steps.timestamp.outputs.value }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **Artifact** | astrowitt-apk-${{ steps.timestamp.outputs.value }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **APK** | ${{ env.APK_NAME }} |" >> $GITHUB_STEP_SUMMARY
