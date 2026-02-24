@@ -42,8 +42,10 @@ jobs:
       - name: Fix line endings
         working-directory: .
         run: |
-          sudo apt-get -qq install -y dos2unix
-          find mobile/scripts -type f -name "*.sh" -exec dos2unix {} +
+          if [ -d mobile/scripts ]; then
+            sudo apt-get -qq install -y dos2unix 2>/dev/null || true
+            find mobile/scripts -type f -name "*.sh" -exec dos2unix {} + 2>/dev/null || true
+          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -57,7 +59,8 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
-          cache: "gradle"
+          # NOTE: Do NOT set cache: "gradle" here — the android/ dir
+          # doesn't exist until expo prebuild generates it.
 
       - name: Configure Gradle
         run: |
@@ -73,8 +76,8 @@ jobs:
       - name: Expo prebuild
         run: npx expo prebuild --platform android --clean --no-install
 
-      - name: Install CocoaPods-free Android deps
-        run: cd android && chmod +x gradlew
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
 
       - name: Build APK
         run: |
