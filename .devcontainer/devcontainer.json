@@ -5,12 +5,38 @@
         "ghcr.io/devcontainers/features/java:1": {
             "version": "17",
             "installGradle": "true"
-        }
+        },
+        "ghcr.io/devcontainers/features/github-cli:1": {}
     },
-    "postCreateCommand": "cd mobile && npm ci",
+    "hostRequirements": {
+        "cpus": 4,
+        "memory": "16gb",
+        "storage": "32gb"
+    },
+    "onCreateCommand": {
+        "install-deps": "cd mobile && npm ci",
+        "expo-prebuild": "cd mobile && npx expo prebuild --platform android --clean --no-install",
+        "fix-gradlew": "chmod +x mobile/android/gradlew",
+        "warm-gradle": "cd mobile/android && ./gradlew --no-daemon tasks --quiet || true"
+    },
+    "updateContentCommand": {
+        "reinstall-deps": "cd mobile && npm ci",
+        "re-prebuild": "cd mobile && npx expo prebuild --platform android --clean --no-install",
+        "fix-gradlew": "chmod +x mobile/android/gradlew"
+    },
+    "postCreateCommand": "echo '✅ AstroWitt build environment ready — run: cd mobile/android && ./gradlew assembleRelease'",
     "customizations": {
         "codespaces": {
             "machine": "standardLinux"
+        },
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
         }
     }
 }
