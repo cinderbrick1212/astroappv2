@@ -10,6 +10,7 @@ import { PhIcon } from '../components/PhIcon';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { panchangService } from '../services/panchang';
 import { horoscopeService } from '../services/horoscope';
 import { astrologyEngine } from '../services/astrologyEngine';
@@ -20,10 +21,10 @@ type Nav = NativeStackNavigationProp<AppStackParamList>;
 
 // ── Category accent colors ──────────────────────────────────────────────────
 const CATEGORY_ACCENTS = {
-  daily: '#42A5F5',  // Sky blue for daily/utility tools
-  personal: '#7B6FDD', // Indigo for personal charts
-  calendar: '#26C6A0', // Teal for calendar/timing
-  premium: '#FFC044', // Gold for premium services
+  daily: '#42A5F5',    // Sky blue
+  personal: '#7B6FDD', // Indigo
+  calendar: '#26C6A0', // Teal
+  premium: '#FFC044',  // Gold
 };
 
 const ToolsScreen: React.FC = () => {
@@ -33,6 +34,7 @@ const ToolsScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const isWide = width >= 768;
   const maxWidth = isWide ? 720 : '100%';
+  const insets = useSafeAreaInsets();
 
   const today = new Date();
   const panchang = panchangService.calculatePanchang(today, 28.6, 77.2);
@@ -49,67 +51,74 @@ const ToolsScreen: React.FC = () => {
 
   const lucky = horoscopeService.getLuckyFactors(nakshatra, today);
 
-  const renderSectionHeader = (title: string, accent: string) => (
+  const renderSectionHeader = (title: string, subtitle: string, accent: string) => (
     <View style={styles.sectionHeader}>
-      <View style={[styles.sectionAccent, { backgroundColor: accent }]} />
-      <Text variant="labelLarge" style={[styles.sectionTitle, { color: accent }]}>
-        {title.toUpperCase()}
-      </Text>
+      <View style={{ flex: 1 }}>
+        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
+          {title}
+        </Text>
+        <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: 2 }}>
+          {subtitle}
+        </Text>
+      </View>
     </View>
   );
 
-  const renderToolCard = (
-    tool: { icon: string; label: string; subtitle: string; screen: keyof AppStackParamList },
+  const renderGridToolCard = (
+    tool: { icon: string; label: string; screen: keyof AppStackParamList },
     accent: string,
   ) => (
     <Pressable
       key={tool.label}
       style={({ pressed }) => [
-        styles.toolPressable,
-        { transform: [{ scale: pressed ? 0.98 : 1 }] },
+        styles.gridToolItem,
+        {
+          backgroundColor: theme.dark
+            ? theme.colors.elevation.level2
+            : theme.colors.surface,
+          borderColor: pressed
+            ? accent + '50'
+            : theme.dark ? 'rgba(203,190,255,0.08)' : theme.colors.outlineVariant,
+          transform: [{ scale: pressed ? 0.97 : 1 }],
+        },
       ]}
       onPress={() => navigation.navigate(tool.screen as any)}
-      accessibilityLabel={`${tool.label} — ${tool.subtitle}`}
+      accessibilityLabel={tool.label}
     >
-      <Card
-        mode="elevated"
-        elevation={1}
-        style={[
-          styles.card,
-          {
-            borderLeftWidth: 3,
-            borderLeftColor: accent,
-          },
-        ]}
+      <LinearGradient
+        colors={[accent + '25', accent + '08']}
+        style={styles.gridIconWrap}
       >
-        <Card.Title
-          title={tool.label}
-          subtitle={tool.subtitle}
-          titleVariant="titleMedium"
-          titleStyle={{ fontWeight: '600' }}
-          subtitleStyle={{ color: theme.colors.onSurfaceVariant }}
-          left={props => (
-            <LinearGradient
-              colors={[accent + '25', accent + '08']}
-              style={styles.iconWrap}
-            >
-              <PhIcon name={tool.icon} size={24} color={accent} />
-            </LinearGradient>
-          )}
-          right={() => <PhIcon name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} />}
-        />
-      </Card>
+        <PhIcon name={tool.icon} size={28} color={accent} />
+      </LinearGradient>
+      <Text variant="labelMedium" style={{ color: theme.colors.onSurface, fontWeight: '600', marginTop: 10, textAlign: 'center' }} numberOfLines={2}>
+        {tool.label}
+      </Text>
     </Pressable>
   );
 
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
-      contentContainerStyle={[styles.content, isWide && { alignItems: 'center' }]}
+      contentContainerStyle={[
+        styles.content,
+        isWide && { alignItems: 'center' },
+        { paddingTop: Math.max(insets.top, 8), paddingBottom: Math.max(insets.bottom, 24) }
+      ]}
     >
-      <View style={{ maxWidth, width: '100%' }}>
-        {/* ── DAILY TOOLS ── */}
-        {renderSectionHeader('Daily Tools', CATEGORY_ACCENTS.daily)}
+      <View style={{ maxWidth, width: '100%', paddingHorizontal: 16 }}>
+
+        {/* ── DAILY INSIGHTS ── */}
+        <View style={{ marginTop: 20, marginBottom: 16 }}>
+          <Text variant="headlineMedium" style={{ fontWeight: '700', color: theme.colors.onBackground, letterSpacing: -0.5 }}>
+            Astro Hub
+          </Text>
+          <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}>
+            Your complete astrological toolkit
+          </Text>
+        </View>
+
+        {renderSectionHeader('Daily Insights', 'Cosmic factors for today', CATEGORY_ACCENTS.daily)}
 
         {/* Panchang Card */}
         <Pressable
@@ -123,7 +132,7 @@ const ToolsScreen: React.FC = () => {
           <Card
             mode="elevated"
             elevation={1}
-            style={[styles.card, { borderLeftWidth: 3, borderLeftColor: CATEGORY_ACCENTS.daily }]}
+            style={[styles.fullWidthCard, { borderLeftWidth: 3, borderLeftColor: CATEGORY_ACCENTS.daily }]}
           >
             <Card.Title
               title="Daily Panchang"
@@ -133,7 +142,7 @@ const ToolsScreen: React.FC = () => {
               left={props => (
                 <LinearGradient
                   colors={[CATEGORY_ACCENTS.daily + '25', CATEGORY_ACCENTS.daily + '08']}
-                  style={styles.iconWrap}
+                  style={styles.fullWidthIconWrap}
                 >
                   <PhIcon name="calendar-month" size={24} color={CATEGORY_ACCENTS.daily} />
                 </LinearGradient>
@@ -178,7 +187,7 @@ const ToolsScreen: React.FC = () => {
         </Pressable>
 
         {/* Lucky Factors Card */}
-        <Card mode="elevated" elevation={1} style={[styles.card, { borderLeftWidth: 3, borderLeftColor: CATEGORY_ACCENTS.daily }]} accessibilityLabel="Lucky factors for today">
+        <Card mode="elevated" elevation={1} style={[styles.fullWidthCard, { borderLeftWidth: 3, borderLeftColor: CATEGORY_ACCENTS.daily }]} accessibilityLabel="Lucky factors for today">
           <Card.Title
             title="Lucky Factors"
             subtitle="Your auspicious elements today"
@@ -187,7 +196,7 @@ const ToolsScreen: React.FC = () => {
             left={props => (
               <LinearGradient
                 colors={[CATEGORY_ACCENTS.daily + '25', CATEGORY_ACCENTS.daily + '08']}
-                style={styles.iconWrap}
+                style={styles.fullWidthIconWrap}
               >
                 <PhIcon name="clover" size={24} color={CATEGORY_ACCENTS.daily} />
               </LinearGradient>
@@ -209,40 +218,44 @@ const ToolsScreen: React.FC = () => {
         </Card>
 
         {/* ── PERSONAL TOOLS ── */}
-        {renderSectionHeader('Personal Tools', CATEGORY_ACCENTS.personal)}
+        {renderSectionHeader('Personal Analytics', 'Deep dive into your birth chart', CATEGORY_ACCENTS.personal)}
 
-        {[
-          { icon: 'star-david', label: 'Janma Kundli', subtitle: 'Full Vedic birth chart with yogas & remedies', screen: 'JanmaKundli' as const },
-          { icon: 'heart-multiple', label: 'Kundli Milan', subtitle: 'Ashtakoot compatibility (36 Guna)', screen: 'KundliMilan' as const },
-          { icon: 'orbit', label: 'Vimshottari Dasha', subtitle: 'Planetary period timeline', screen: 'Dasha' as const },
-          { icon: 'swap-horizontal', label: 'Gochar — Transits', subtitle: 'Current transits & Sade Sati', screen: 'Gochar' as const },
-          { icon: 'calendar-star', label: 'Varshaphal', subtitle: 'Annual solar return chart', screen: 'Varshaphal' as const },
-          { icon: 'chart-pie', label: 'Varga Charts', subtitle: 'Navamsa & divisional charts', screen: 'VargaCharts' as const },
-          { icon: 'star-four-points', label: 'Nakshatra Vishesh', subtitle: 'Deep nakshatra analysis', screen: 'NakshatraVishesh' as const },
-          { icon: 'grid', label: 'Ashtakavarga', subtitle: 'Planetary strength grid', screen: 'Ashtakavarga' as const },
-          { icon: 'shield-sun', label: 'Graha Shanti', subtitle: 'Remedies for afflicted planets', screen: 'GrahaShanti' as const },
-          { icon: 'zodiac-aries', label: 'Dainik Rashifal', subtitle: 'Daily Vedic horoscope', screen: 'DainikRashifal' as const },
-        ].map(tool => renderToolCard(tool, CATEGORY_ACCENTS.personal))}
+        <View style={styles.toolGrid}>
+          {[
+            { icon: 'star-david', label: 'Janma Kundli', screen: 'JanmaKundli' as const },
+            { icon: 'heart-multiple', label: 'Kundli Milan', screen: 'KundliMilan' as const },
+            { icon: 'orbit', label: 'Dasha Timeline', screen: 'Dasha' as const },
+            { icon: 'swap-horizontal', label: 'Transits (Gochar)', screen: 'Gochar' as const },
+            { icon: 'calendar-star', label: 'Varshaphal', screen: 'Varshaphal' as const },
+            { icon: 'chart-pie', label: 'Varga Charts', screen: 'VargaCharts' as const },
+            { icon: 'star-four-points', label: 'Nakshatras', screen: 'NakshatraVishesh' as const },
+            { icon: 'grid', label: 'Ashtakavarga', screen: 'Ashtakavarga' as const },
+            { icon: 'shield-sun', label: 'Remedies', screen: 'GrahaShanti' as const },
+            { icon: 'zodiac-aries', label: 'Rashifal', screen: 'DainikRashifal' as const },
+          ].map(tool => renderGridToolCard(tool, CATEGORY_ACCENTS.personal))}
+        </View>
 
         {/* ── CALENDAR & TIMING TOOLS ── */}
-        {renderSectionHeader('Calendar & Timing', CATEGORY_ACCENTS.calendar)}
+        {renderSectionHeader('Timing & Events', 'Auspicious times and celestial body movements', CATEGORY_ACCENTS.calendar)}
 
-        {[
-          { icon: 'calendar-text', label: 'Panchang Vishesh', subtitle: 'Extended daily Panchang', screen: 'PanchangVishesh' as const },
-          { icon: 'clock-check', label: 'Muhurta', subtitle: 'Auspicious timing calculator', screen: 'Muhurta' as const },
-          { icon: 'moon-waning-crescent', label: 'Tithi & Chandra', subtitle: 'Moon phase & lunar calendar', screen: 'TithiChandra' as const },
-          { icon: 'weather-night', label: 'Grahan — Eclipses', subtitle: 'Eclipse calendar & impact', screen: 'Grahan' as const },
-          { icon: 'clock-outline', label: 'Hora', subtitle: 'Vedic planetary hours', screen: 'Hora' as const },
-          { icon: 'help-circle', label: 'Prashna — Horary', subtitle: 'Ask a question to the stars', screen: 'Prashna' as const },
-        ].map(tool => renderToolCard(tool, CATEGORY_ACCENTS.calendar))}
+        <View style={styles.toolGrid}>
+          {[
+            { icon: 'calendar-text', label: 'Panchang Ext.', screen: 'PanchangVishesh' as const },
+            { icon: 'clock-check', label: 'Muhurta', screen: 'Muhurta' as const },
+            { icon: 'moon-waning-crescent', label: 'Moon Phases', screen: 'TithiChandra' as const },
+            { icon: 'weather-night', label: 'Eclipses', screen: 'Grahan' as const },
+            { icon: 'clock-outline', label: 'Planetary Hours', screen: 'Hora' as const },
+            { icon: 'help-circle', label: 'Prashna', screen: 'Prashna' as const },
+          ].map(tool => renderGridToolCard(tool, CATEGORY_ACCENTS.calendar))}
+        </View>
 
         {/* ── PREMIUM SERVICES ── */}
-        {renderSectionHeader('Premium Services', CATEGORY_ACCENTS.premium)}
+        {renderSectionHeader('Premium Services', 'Expert consultations and reports', CATEGORY_ACCENTS.premium)}
 
         {[
-          { icon: 'help-circle-outline', label: 'Ask a Question', subtitle: 'Get a personalized answer from an astrologer', price: '₹49', screen: 'AskQuestion' as const },
-          { icon: 'phone-in-talk-outline', label: 'Book a Call', subtitle: 'Live consultation with an astrologer', price: '₹999', screen: 'BookCall' as const },
-          { icon: 'file-chart-outline', label: 'Request a Report', subtitle: 'Detailed PDF report from an astrologer', price: '₹299', screen: 'RequestReport' as const },
+          { icon: 'help-circle-outline', label: 'Ask a Question', subtitle: 'Get a personalized answer', price: '₹49', screen: 'AskQuestion' as const },
+          { icon: 'phone-in-talk-outline', label: 'Book a Call', subtitle: 'Live 30m consultation', price: '₹999', screen: 'BookCall' as const },
+          { icon: 'file-chart-outline', label: 'Request a Report', subtitle: 'Detailed 25-page PDF', price: '₹299', screen: 'RequestReport' as const },
         ].map(service => (
           <Pressable
             key={service.label}
@@ -256,7 +269,7 @@ const ToolsScreen: React.FC = () => {
             <Card
               mode="elevated"
               elevation={1}
-              style={[styles.card, { borderLeftWidth: 3, borderLeftColor: CATEGORY_ACCENTS.premium }]}
+              style={[styles.fullWidthCard, { borderLeftWidth: 3, borderLeftColor: CATEGORY_ACCENTS.premium }]}
             >
               <Card.Title
                 title={service.label}
@@ -267,7 +280,7 @@ const ToolsScreen: React.FC = () => {
                 left={props => (
                   <LinearGradient
                     colors={[CATEGORY_ACCENTS.premium + '25', CATEGORY_ACCENTS.premium + '08']}
-                    style={styles.iconWrap}
+                    style={styles.fullWidthIconWrap}
                   >
                     <PhIcon name={service.icon} size={24} color={CATEGORY_ACCENTS.premium} />
                   </LinearGradient>
@@ -298,42 +311,59 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 0,
-    paddingTop: Platform.OS === 'web' ? 8 : 0,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 16,
-    marginTop: 20,
-    marginBottom: 10,
+    marginTop: 24,
+    marginBottom: 16,
     gap: 8,
-  },
-  sectionAccent: {
-    width: 3,
-    height: 16,
-    borderRadius: 2,
   },
   sectionTitle: {
     fontWeight: '700',
-    letterSpacing: 1.2,
-    fontSize: 12,
+    letterSpacing: -0.2,
   },
-  card: {
-    marginHorizontal: 16,
+  toolGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    width: '100%',
     marginBottom: 8,
-    borderRadius: 18,
   },
-  toolPressable: {
+  gridToolItem: {
+    width: '48%',
+    flexGrow: 1,
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
     ...Platform.select({
-      web: { cursor: 'pointer' as any, transition: 'transform 0.12s ease' as any } as any,
+      web: { cursor: 'pointer' as any, transition: 'transform 0.15s ease' as any },
     }),
   },
-  iconWrap: {
+  gridIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fullWidthCard: {
+    marginBottom: 10,
+    borderRadius: 18,
+  },
+  fullWidthIconWrap: {
     width: 44,
     height: 44,
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  toolPressable: {
+    ...Platform.select({
+      web: { cursor: 'pointer' as any, transition: 'transform 0.12s ease' as any } as any,
+    }),
   },
   panchangChips: {
     flexDirection: 'row',

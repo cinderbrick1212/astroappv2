@@ -1,5 +1,9 @@
 import React from 'react';
-import { useColorScheme, ActivityIndicator, View } from 'react-native';
+import { useColorScheme, ActivityIndicator, View, LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  'Invalid prop `index` supplied to `React.Fragment`',
+]);
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import {

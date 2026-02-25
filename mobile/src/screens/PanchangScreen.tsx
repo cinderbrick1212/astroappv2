@@ -11,10 +11,12 @@ import {
 import { PhIcon } from '../components/PhIcon';
 import { panchangService, PanchangData } from '../services/panchang';
 import { useUserProfile } from '../hooks/useUserProfile';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const PanchangScreen: React.FC = () => {
   const theme = useTheme();
   const { profile } = useUserProfile();
+  const insets = useSafeAreaInsets();
   const today = new Date();
 
   const lat = profile?.latitude ?? 28.6;
@@ -29,7 +31,10 @@ const PanchangScreen: React.FC = () => {
   });
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={{ padding: 16, paddingBottom: Math.max(insets.bottom, 24) }}
+    >
 
       {/* Date hero */}
       <Card
@@ -84,13 +89,13 @@ const PanchangScreen: React.FC = () => {
       </View>
 
       {/* Panchang Elements */}
-      <List.Subheader style={{ color: theme.colors.primary }}>Panchang Elements</List.Subheader>
+      <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.primary }]}>Panchang Elements</Text>
       <Card mode="outlined" style={styles.card}>
         {[
-          { label: 'Tithi',    value: panchang.tithi,    icon: 'moon-waning-crescent' },
-          { label: 'Nakshatra',value: panchang.nakshatra, icon: 'star-four-points' },
-          { label: 'Yoga',     value: panchang.yoga,     icon: 'sun-wireless-outline' },
-          { label: 'Karana',   value: panchang.karana,   icon: 'rotate-360' },
+          { label: 'Tithi', value: panchang.tithi, icon: 'moon-waning-crescent' },
+          { label: 'Nakshatra', value: panchang.nakshatra, icon: 'star-four-points' },
+          { label: 'Yoga', value: panchang.yoga, icon: 'sun-wireless-outline' },
+          { label: 'Karana', value: panchang.karana, icon: 'rotate-360' },
         ].map((item, i, arr) => (
           <React.Fragment key={item.label}>
             <List.Item
@@ -107,7 +112,7 @@ const PanchangScreen: React.FC = () => {
       </Card>
 
       {/* Sun Timings */}
-      <List.Subheader style={{ color: theme.colors.primary }}>Sun Timings</List.Subheader>
+      <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.primary }]}>Sun Timings</Text>
       <View style={styles.timingsRow}>
         <Card
           mode="elevated"
@@ -144,7 +149,7 @@ const PanchangScreen: React.FC = () => {
       </View>
 
       {/* Rahu Kaal */}
-      <List.Subheader style={{ color: theme.colors.error }}>Rahu Kaal</List.Subheader>
+      <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.error }]}>Rahu Kaal</Text>
       <Card
         mode="outlined"
         style={[styles.card, { borderColor: theme.colors.error }]}
@@ -160,7 +165,7 @@ const PanchangScreen: React.FC = () => {
       </Card>
 
       {/* Auspicious Muhurats */}
-      <List.Subheader style={{ color: theme.colors.primary }}>Auspicious Muhurats</List.Subheader>
+      <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.primary }]}>Auspicious Muhurats</Text>
       <Card mode="outlined" style={styles.card}>
         {panchang.muhurat.map((m, i, arr) => (
           <React.Fragment key={m.activity}>
@@ -177,7 +182,7 @@ const PanchangScreen: React.FC = () => {
         ))}
       </Card>
 
-      <View style={{ height: 24 }} />
+      <View style={{ height: 8 }} />
     </ScrollView>
   );
 };
@@ -187,7 +192,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   heroCard: {
-    margin: 16,
     marginBottom: 0,
   },
   heroContent: {
@@ -197,17 +201,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    padding: 16,
-    paddingBottom: 8,
+    paddingVertical: 16,
   },
   card: {
-    marginHorizontal: 16,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontWeight: '700',
     marginBottom: 8,
+    marginTop: 8,
+    marginLeft: 4,
+    letterSpacing: -0.2,
   },
   timingsRow: {
     flexDirection: 'row',
-    marginHorizontal: 16,
-    marginBottom: 8,
+    marginBottom: 12,
+    marginTop: 8,
   },
   timingCard: {
     marginBottom: 0,

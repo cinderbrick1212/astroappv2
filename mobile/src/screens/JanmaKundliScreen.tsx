@@ -14,6 +14,7 @@ import {
   Dialog,
   Portal,
 } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PhIcon } from '../components/PhIcon';
 import { useUserProfile } from '../hooks/useUserProfile';
 import {
@@ -31,7 +32,8 @@ import { toJulianDay } from '../services/engine/ephemeris';
 import { getAllGrahaPositions } from '../services/engine/ephemeris';
 import { getVedicLagna } from '../services/engine/houses';
 import { analytics } from '../services/analytics';
-import { getRemedyContent, getGrahaContent } from '../data';
+import { getRemedyContent } from '../data';
+import { LagnaChart } from '../components/LagnaChart';
 
 const getGrahaRemedy = (grahaName: string): string => {
   const remedy = getRemedyContent(grahaName.toLowerCase());
@@ -77,7 +79,6 @@ const PlanetDetailDialog: React.FC<PlanetDetailDialogProps> = ({ planet, visible
   );
 };
 
-import { LagnaChart } from '../components/LagnaChart';
 
 // ── Main Screen ──────────────────────────────────────────────────────────────
 
@@ -86,6 +87,7 @@ const JanmaKundliScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const isWide = width >= 768;
   const { profile, isLoading } = useUserProfile();
+  const insets = useSafeAreaInsets();
 
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetPosition | null>(null);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -189,7 +191,10 @@ const JanmaKundliScreen: React.FC = () => {
   // ── Success state ──────────────────────────────────────────────────────────
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={{ padding: 16, paddingBottom: Math.max(insets.bottom, 24) }}
+    >
       <View style={isWide ? styles.twoColumn : undefined}>
         {/* Left / top column */}
         <View style={isWide ? styles.column : undefined}>
@@ -198,7 +203,7 @@ const JanmaKundliScreen: React.FC = () => {
           <LagnaChart chartData={chart} />
 
           {/* Key Placements */}
-          <List.Subheader style={{ color: theme.colors.primary }}>Astrological Profile</List.Subheader>
+          <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.primary }]}>Astrological Profile</Text>
           <View style={styles.placementsGrid}>
             <Card mode="contained" style={[styles.placementCard, { backgroundColor: theme.colors.primaryContainer }]}>
               <Card.Content style={styles.placementCardContent}>
@@ -236,7 +241,7 @@ const JanmaKundliScreen: React.FC = () => {
           {/* Current Dasha */}
           {dasha && (
             <>
-              <List.Subheader style={{ color: theme.colors.primary }}>Current Mahadasha</List.Subheader>
+              <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.primary }]}>Current Mahadasha</Text>
               <Card mode="outlined" style={styles.card}>
                 <Card.Title
                   title={`${dasha.currentMahadasha.lord} Mahadasha`}
@@ -258,7 +263,7 @@ const JanmaKundliScreen: React.FC = () => {
                 </Card.Content>
               </Card>
 
-              <List.Subheader style={{ color: theme.colors.primary }}>Current Antardasha</List.Subheader>
+              <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.primary }]}>Current Antardasha</Text>
               <Card mode="outlined" style={styles.card}>
                 <Card.Title
                   title={`${dasha.currentAntardasha.antarLord} Antardasha`}
@@ -273,7 +278,7 @@ const JanmaKundliScreen: React.FC = () => {
           {/* Detected Yogas */}
           {yogas.length > 0 && (
             <>
-              <List.Subheader style={{ color: theme.colors.primary }}>Yogas & Doshas</List.Subheader>
+              <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.primary }]}>Yogas & Doshas</Text>
               <View style={styles.chipRow}>
                 {yogas.map(yoga => (
                   <Chip
@@ -314,7 +319,7 @@ const JanmaKundliScreen: React.FC = () => {
           {/* Planet Positions DataTable */}
           {chart.planets.length > 0 && (
             <>
-              <List.Subheader style={{ color: theme.colors.primary }}>Planet Positions</List.Subheader>
+              <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.primary }]}>Planet Positions</Text>
               <Card mode="outlined" style={styles.card}>
                 <DataTable>
                   <DataTable.Header>
@@ -359,7 +364,7 @@ const JanmaKundliScreen: React.FC = () => {
           {/* Remedy Cards for Afflicted Grahas */}
           {afflicted.length > 0 && (
             <>
-              <List.Subheader style={{ color: theme.colors.primary }}>Remedies</List.Subheader>
+              <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.primary }]}>Remedies</Text>
               {afflicted.map((a, i) => (
                 <Card
                   key={`${a.graha}-${i}`}
@@ -375,12 +380,12 @@ const JanmaKundliScreen: React.FC = () => {
                     subtitleNumberOfLines={3}
                     left={props => (
                       <PhIcon name={a.severity === 'high' ? 'alert-circle' : 'alert'} size={24} color={
-                          a.severity === 'high'
-                            ? theme.colors.error
-                            : a.severity === 'medium'
-                              ? theme.colors.tertiary
-                              : theme.colors.onSurfaceVariant
-                        } />
+                        a.severity === 'high'
+                          ? theme.colors.error
+                          : a.severity === 'medium'
+                            ? theme.colors.tertiary
+                            : theme.colors.onSurfaceVariant
+                      } />
                     )}
                   />
                   <Card.Content>
@@ -432,7 +437,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    paddingHorizontal: 16,
     paddingBottom: 8,
   },
   placementChip: {
@@ -442,7 +446,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    paddingHorizontal: 16,
     marginBottom: 8,
     justifyContent: 'space-between',
   },
@@ -457,8 +460,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   card: {
-    marginHorizontal: 16,
-    marginBottom: 8,
+    marginBottom: 12,
   },
   twoColumn: {
     flexDirection: 'row',
@@ -468,7 +470,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bottomPad: {
-    height: 24,
+    height: 8,
+  },
+  sectionTitle: {
+    fontWeight: '700',
+    marginBottom: 8,
+    marginTop: 8,
+    marginLeft: 4,
+    letterSpacing: -0.2,
   },
 });
 
