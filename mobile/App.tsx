@@ -12,6 +12,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { registerTranslation, en } from 'react-native-paper-dates';
 import RootNavigator from './src/navigation/RootNavigator';
@@ -68,15 +69,17 @@ export default function App() {
   }
 
   return (
-    <PaperProvider theme={theme}>
-      <PersistQueryClientProvider
-        client={queryClient}
-        persistOptions={{ persister: asyncStoragePersister }}
-      >
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
-      </PersistQueryClientProvider>
-    </PaperProvider>
+    <SafeAreaProvider style={{ flex: 1 }}>
+      <PaperProvider theme={theme}>
+        <PersistQueryClientProvider
+          client={queryClient}
+          persistOptions={{ persister: asyncStoragePersister }}
+        >
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </PersistQueryClientProvider>
+      </PaperProvider>
+    </SafeAreaProvider>
   );
 }

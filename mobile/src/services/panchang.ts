@@ -5,6 +5,7 @@
 
 import { astrologyEngine, calcSunLongitude, calcMoonLongitude, toJulianDay, tropicalToVedic } from './astrologyEngine';
 import { TITHIS, PANCHANG_YOGAS, KARANAS } from '../data';
+import { SearchRiseSet, Observer, MakeTime, Body } from 'astronomy-engine';
 
 export interface PanchangData {
   tithi: string;
@@ -37,28 +38,34 @@ const fmtTime = (minutesPastMidnight: number): string => {
   return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
 };
 
-/** Approximate sunrise/sunset in minutes-past-midnight for a latitude */
+/** Accurate sunrise/sunset in minutes-past-midnight for a latitude/longitude */
 const calcSunriseSunset = (
-  jd: number,
-  latitude: number
+  date: Date,
+  latitude: number,
+  longitude: number
 ): { sunriseMin: number; sunsetMin: number } => {
-  // Hour angle at sunrise: cos(H) = -tan(lat) * tan(declination)
-  const T = (jd - 2451545.0) / 36525;
-  const sunLon = (280.46646 + 36000.76983 * T) * (Math.PI / 180);
-  const obliquity = (23.439 - 0.00013 * T) * (Math.PI / 180);
-  const declination = Math.asin(Math.sin(obliquity) * Math.sin(sunLon));
-  const latRad = latitude * (Math.PI / 180);
-  const cosH = -Math.tan(latRad) * Math.tan(declination);
+  const observer = new Observer(latitude, longitude, 0);
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
 
-  if (cosH >= 1) return { sunriseMin: 0, sunsetMin: 0 }; // polar night
-  if (cosH <= -1) return { sunriseMin: 0, sunsetMin: 1440 }; // midnight sun
+  const astroStart = MakeTime(startOfDay);
+  const sunriseEvent = SearchRiseSet(Body.Sun, observer, +1, astroStart, 1);
+  const sunsetEvent = SearchRiseSet(Body.Sun, observer, -1, astroStart, 1);
 
-  const H = (Math.acos(cosH) * 180) / Math.PI; // degrees
-  const transitMin = 720; // noon
-  const halfDayMin = (H / 15) * 60; // convert degrees to minutes
+  if (!sunriseEvent || !sunsetEvent) {
+    // Polar regions
+    return { sunriseMin: 0, sunsetMin: 1440 }; // Approximate fallback
+  }
+
+  const srDate = sunriseEvent.date;
+  const ssDate = sunsetEvent.date;
+
+  const sunriseMin = srDate.getHours() * 60 + srDate.getMinutes();
+  const sunsetMin = ssDate.getHours() * 60 + ssDate.getMinutes();
+
   return {
-    sunriseMin: Math.round(transitMin - halfDayMin),
-    sunsetMin: Math.round(transitMin + halfDayMin),
+    sunriseMin,
+    sunsetMin,
   };
 };
 
@@ -91,7 +98,7 @@ export const panchangService = {
     const karana = KARANAS[karanaIndex]?.name || 'Unknown';
 
     // Sunrise / Sunset
-    const { sunriseMin, sunsetMin } = calcSunriseSunset(jd, latitude);
+    const { sunriseMin, sunsetMin } = calcSunriseSunset(date, latitude, longitude);
     const sunrise = fmtTime(sunriseMin);
     const sunset = fmtTime(sunsetMin);
 

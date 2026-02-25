@@ -4,6 +4,7 @@
  */
 
 // ── Types ────────────────────────────────────────────────────────────────────
+import { SearchRiseSet, Observer, MakeTime, Body } from 'astronomy-engine';
 
 export interface SunriseSunset {
   sunriseMin: number;
@@ -68,14 +69,14 @@ interface ActivityTable {
 }
 
 const ACTIVITY_TABLES: Record<MuhurtaActivity, ActivityTable> = {
-  marriage:   { bestNakshatras: [3, 6, 7, 12, 21], bestDays: [1, 3, 4, 5], avoidNakshatras: [0, 17, 18] },
-  business:   { bestNakshatras: [7],               bestDays: [3, 4, 5],    avoidNakshatras: [17] },
-  property:   { bestNakshatras: [3, 7, 12],        bestDays: [1, 3, 5],    avoidNakshatras: [18] },
-  travel:     { bestNakshatras: [3, 4, 6, 12, 21], bestDays: [1, 3, 4],    avoidNakshatras: [0, 17] },
-  surgery:    { bestNakshatras: [0, 2, 11, 12],    bestDays: [2, 6],       avoidNakshatras: [7, 14] },
-  naming:     { bestNakshatras: [6, 7, 3, 12],     bestDays: [1, 3, 4],    avoidNakshatras: [17] },
-  education:  { bestNakshatras: [4, 7, 12, 21],    bestDays: [3],          avoidNakshatras: [18] },
-  job:        { bestNakshatras: [7, 12, 20],        bestDays: [0, 4],       avoidNakshatras: [17] },
+  marriage: { bestNakshatras: [3, 6, 7, 12, 21], bestDays: [1, 3, 4, 5], avoidNakshatras: [0, 17, 18] },
+  business: { bestNakshatras: [7], bestDays: [3, 4, 5], avoidNakshatras: [17] },
+  property: { bestNakshatras: [3, 7, 12], bestDays: [1, 3, 5], avoidNakshatras: [18] },
+  travel: { bestNakshatras: [3, 4, 6, 12, 21], bestDays: [1, 3, 4], avoidNakshatras: [0, 17] },
+  surgery: { bestNakshatras: [0, 2, 11, 12], bestDays: [2, 6], avoidNakshatras: [7, 14] },
+  naming: { bestNakshatras: [6, 7, 3, 12], bestDays: [1, 3, 4], avoidNakshatras: [17] },
+  education: { bestNakshatras: [4, 7, 12, 21], bestDays: [3], avoidNakshatras: [18] },
+  job: { bestNakshatras: [7, 12, 20], bestDays: [0, 4], avoidNakshatras: [17] },
 };
 
 // ── Helper ───────────────────────────────────────────────────────────────────
@@ -92,33 +93,31 @@ export function formatMinutes(minutesPastMidnight: number): string {
 
 // ── Functions ────────────────────────────────────────────────────────────────
 
-/** Approximate sunrise/sunset in minutes past midnight for a latitude */
-export function getSunriseSunset(jd: number, latDeg: number): SunriseSunset {
-  const T = (jd - 2451545.0) / 36525;
-  const sunLon = (280.46646 + 36000.76983 * T) * (Math.PI / 180);
-  const obliquity = (23.439 - 0.00013 * T) * (Math.PI / 180);
-  const declination = Math.asin(Math.sin(obliquity) * Math.sin(sunLon));
-  const latRad = latDeg * (Math.PI / 180);
-  const cosH = -Math.tan(latRad) * Math.tan(declination);
+/** Accurate sunrise/sunset in minutes past midnight for a latitude and longitude */
+export function getSunriseSunset(date: Date, latDeg: number, lngDeg: number): SunriseSunset {
+  const observer = new Observer(latDeg, lngDeg, 0);
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
 
-  let sunriseMin: number;
-  let sunsetMin: number;
+  const astroStart = MakeTime(startOfDay);
+  const sunriseEvent = SearchRiseSet(Body.Sun, observer, +1, astroStart, 1);
+  const sunsetEvent = SearchRiseSet(Body.Sun, observer, -1, astroStart, 1);
 
-  if (cosH >= 1) {
-    // Polar night
-    sunriseMin = 0;
-    sunsetMin = 0;
-  } else if (cosH <= -1) {
-    // Midnight sun
-    sunriseMin = 0;
-    sunsetMin = 1440;
-  } else {
-    const H = (Math.acos(cosH) * 180) / Math.PI;
-    const halfDayMin = (H / 15) * 60;
-    sunriseMin = Math.round(720 - halfDayMin);
-    sunsetMin = Math.round(720 + halfDayMin);
+  if (!sunriseEvent || !sunsetEvent) {
+    return {
+      sunriseMin: 0,
+      sunsetMin: 1440,
+      sunriseFmt: 'N/A',
+      sunsetFmt: 'N/A',
+      dayLengthMin: 1440,
+    };
   }
 
+  const srDate = sunriseEvent.date;
+  const ssDate = sunsetEvent.date;
+
+  const sunriseMin = Math.round(srDate.getHours() * 60 + srDate.getMinutes() + srDate.getSeconds() / 60);
+  const sunsetMin = Math.round(ssDate.getHours() * 60 + ssDate.getMinutes() + ssDate.getSeconds() / 60);
   const dayLengthMin = sunsetMin - sunriseMin;
 
   return {
@@ -263,9 +262,9 @@ export function scoreMuhurta(
 
   const quality: MuhurtaScore['quality'] =
     score >= 8 ? 'excellent' :
-    score >= 6 ? 'good' :
-    score >= 4 ? 'acceptable' :
-    'avoid';
+      score >= 6 ? 'good' :
+        score >= 4 ? 'acceptable' :
+          'avoid';
 
   return { activity, score, quality, reasons };
 }

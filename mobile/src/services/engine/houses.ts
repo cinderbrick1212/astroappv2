@@ -5,6 +5,7 @@
  */
 
 import { norm, getLahiriAyanamsa, GrahaPosition } from './ephemeris';
+import { SiderealTime, e_tilt, MakeTime } from 'astronomy-engine';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -24,21 +25,19 @@ export interface HouseData {
 
 // ── Functions ────────────────────────────────────────────────────────────────
 
-/** Greenwich Mean Sidereal Time in degrees (Meeus Ch. 12) */
+/** Greenwich Apparent Sidereal Time in degrees using Astronomy Engine */
 export function calcGMST(jd: number): number {
-  const T = (jd - 2451545.0) / 36525;
-  const gmst =
-    280.46061837 +
-    360.98564736629 * (jd - 2451545.0) +
-    0.000387933 * T * T -
-    (T * T * T) / 38710000;
-  return norm(gmst);
+  const astroTime = MakeTime(jd - 2451545.0);
+  // astronomy-engine SiderealTime returns GAST in hours (0-24)
+  return norm(SiderealTime(astroTime) * 15);
 }
 
 /** Tropical Ascendant via Local Sidereal Time */
 export function calcAscendant(jd: number, latDeg: number, lngDeg: number): number {
-  const T = (jd - 2451545.0) / 36525;
-  const obliquity = (23.4393 - 0.013 * T) * (Math.PI / 180);
+  const astroTime = MakeTime(jd - 2451545.0);
+  const tilt = e_tilt(astroTime);
+  const obliquity = tilt.tobl * (Math.PI / 180); // true obliquity
+
   const gmst = calcGMST(jd);
   const lst = norm(gmst + lngDeg);
   const lstRad = lst * (Math.PI / 180);
