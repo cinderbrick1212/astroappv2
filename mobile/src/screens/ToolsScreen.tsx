@@ -84,6 +84,7 @@ const ToolsScreen: React.FC = () => {
       ]}
       onPress={() => navigation.navigate(tool.screen as any)}
       accessibilityLabel={tool.label}
+      android_ripple={{ color: accent + '30' }}
     >
       <LinearGradient
         colors={[accent + '25', accent + '08']}
@@ -128,6 +129,7 @@ const ToolsScreen: React.FC = () => {
           ]}
           onPress={() => navigation.navigate('Panchang')}
           accessibilityLabel="Daily Panchang — tap for details"
+          android_ripple={{ color: CATEGORY_ACCENTS.daily + '30' }}
         >
           <Card
             mode="elevated"
@@ -265,6 +267,7 @@ const ToolsScreen: React.FC = () => {
             ]}
             onPress={() => navigation.navigate(service.screen)}
             accessibilityLabel={`${service.label} — ${service.price}`}
+            android_ripple={{ color: CATEGORY_ACCENTS.premium + '30' }}
           >
             <Card
               mode="elevated"

@@ -48,7 +48,7 @@ function AppContent() {
   return (
     <>
       <RootNavigator />
-      <StatusBar style="auto" />
+      <StatusBar style="auto" translucent backgroundColor="transparent" />
     </>
   );
 }

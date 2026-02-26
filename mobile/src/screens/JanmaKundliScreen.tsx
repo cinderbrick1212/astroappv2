@@ -333,6 +333,7 @@ const JanmaKundliScreen: React.FC = () => {
                       key={p.planet}
                       onPress={() => openPlanetDialog(p)}
                       accessibilityLabel={`${p.planet} in ${p.sign}, house ${p.house}`}
+                      android_ripple={{ color: theme.colors.primary + '20' }}
                     >
                       <DataTable.Cell>
                         <Text variant="bodySmall" style={{ color: theme.colors.primary, fontWeight: '600' }}>

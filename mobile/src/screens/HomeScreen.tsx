@@ -274,6 +274,7 @@ const HomeScreen: React.FC = () => {
               ]}
               onPress={() => navigation.navigate(tool.screen as any)}
               accessibilityLabel={`${tool.label} — ${tool.description}`}
+              android_ripple={{ color: tool.accent + '30', borderless: false }}
             >
               <LinearGradient
                 colors={[tool.accent + '25', tool.accent + '08']}
@@ -297,43 +298,45 @@ const HomeScreen: React.FC = () => {
         </Text>
         <View style={{ maxWidth, width: '100%' }}>
           {SERVICES.map(service => (
-            <Card
+            <Pressable
               key={service.label}
-              mode="elevated"
-              elevation={1}
-              style={[
-                styles.serviceCard,
-                {
-                  borderLeftWidth: 3,
-                  borderLeftColor: service.accent,
-                },
-              ]}
               onPress={() => navigation.navigate(service.screen)}
-              accessibilityLabel={`${service.label}, ${service.price}`}
+              style={({ pressed }) => [{ opacity: pressed ? 0.9 : 1 }]}
+              android_ripple={{ color: service.accent + '30' }}
             >
-              <Card.Title
-                title={service.label}
-                subtitle={service.description}
-                subtitleStyle={{ color: theme.colors.onSurfaceVariant }}
-                titleVariant="titleMedium"
-                titleStyle={{ fontWeight: '600' }}
-                left={props => (
-                  <LinearGradient
-                    colors={[service.accent + '25', service.accent + '08']}
-                    style={styles.serviceIconWrap}
-                  >
-                    <PhIcon name={service.icon} size={24} color={service.accent} />
-                  </LinearGradient>
-                )}
-                right={() => (
-                  <View style={[styles.priceBadge, { backgroundColor: theme.dark ? 'rgba(94,66,0,0.5)' : theme.colors.secondaryContainer }]}>
-                    <Text variant="labelMedium" style={{ color: theme.dark ? '#FFC044' : theme.colors.onSecondaryContainer, fontWeight: '700' }}>
-                      {service.price}
-                    </Text>
-                  </View>
-                )}
-              />
-            </Card>
+              <Card
+                mode="elevated"
+                elevation={1}
+                style={[
+                  styles.serviceCard,
+                  { borderLeftWidth: 3, borderLeftColor: service.accent },
+                ]}
+                accessibilityLabel={`${service.label}, ${service.price}`}
+              >
+                <Card.Title
+                  title={service.label}
+                  subtitle={service.description}
+                  subtitleStyle={{ color: theme.colors.onSurfaceVariant }}
+                  titleVariant="titleMedium"
+                  titleStyle={{ fontWeight: '600' }}
+                  left={props => (
+                    <LinearGradient
+                      colors={[service.accent + '25', service.accent + '08']}
+                      style={styles.serviceIconWrap}
+                    >
+                      <PhIcon name={service.icon} size={24} color={service.accent} />
+                    </LinearGradient>
+                  )}
+                  right={() => (
+                    <View style={[styles.priceBadge, { backgroundColor: theme.dark ? 'rgba(94,66,0,0.5)' : theme.colors.secondaryContainer }]}>
+                      <Text variant="labelMedium" style={{ color: theme.dark ? '#FFC044' : theme.colors.onSecondaryContainer, fontWeight: '700' }}>
+                        {service.price}
+                      </Text>
+                    </View>
+                  )}
+                />
+              </Card>
+            </Pressable>
           ))}
         </View>
 

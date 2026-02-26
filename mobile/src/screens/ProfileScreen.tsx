@@ -14,10 +14,12 @@ import {
   useTheme,
   Portal,
   Modal,
-  Surface,
+  TouchableRipple,
 } from 'react-native-paper';
+import { Surface } from 'react-native-paper';
 import { PhIcon } from '../components/PhIcon';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useUserProfile } from '../hooks/useUserProfile';
@@ -48,6 +50,7 @@ const ProfileScreen: React.FC = () => {
   const { user, signOut } = useAuth();
   const { profile, isUpdating, updateProfile } = useUserProfile();
   const { t, i18n } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const [editVisible, setEditVisible] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
@@ -149,7 +152,13 @@ const ProfileScreen: React.FC = () => {
 
   return (
     <>
-      <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: Math.max(insets.top, 16), paddingBottom: Math.max(insets.bottom, 24) }
+        ]}
+      >
 
         {/* ── Profile Header ── */}
         <LinearGradient
@@ -276,6 +285,7 @@ const ProfileScreen: React.FC = () => {
             left={props => <PhIcon name="translate" size={24} color={theme.colors.primary} style={styles.listIcon} />}
             right={props => <PhIcon name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} style={styles.listIconRight} />}
             onPress={handleLanguageToggle}
+            rippleColor={theme.colors.primary + '20'}
             titleStyle={styles.listTitle}
           />
           <Divider style={styles.divider} />
@@ -298,6 +308,8 @@ const ProfileScreen: React.FC = () => {
             description="South Indian"
             left={props => <PhIcon name="chart-box-outline" size={24} color={theme.colors.primary} style={styles.listIcon} />}
             right={props => <PhIcon name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} style={styles.listIconRight} />}
+            onPress={() => { }}
+            rippleColor={theme.colors.primary + '20'}
             titleStyle={styles.listTitle}
           />
         </Surface>
@@ -311,6 +323,8 @@ const ProfileScreen: React.FC = () => {
             title="Privacy Policy"
             left={props => <PhIcon name="lock-outline" size={22} color={theme.colors.onSurfaceVariant} style={styles.listIcon} />}
             right={props => <PhIcon name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} style={styles.listIconRight} />}
+            onPress={() => { }}
+            rippleColor={theme.colors.primary + '20'}
             titleStyle={styles.listTitleInfo}
           />
           <Divider style={styles.divider} />
@@ -318,6 +332,8 @@ const ProfileScreen: React.FC = () => {
             title="Terms of Service"
             left={props => <PhIcon name="file-document-outline" size={22} color={theme.colors.onSurfaceVariant} style={styles.listIcon} />}
             right={props => <PhIcon name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} style={styles.listIconRight} />}
+            onPress={() => { }}
+            rippleColor={theme.colors.primary + '20'}
             titleStyle={styles.listTitleInfo}
           />
           <Divider style={styles.divider} />
@@ -325,6 +341,8 @@ const ProfileScreen: React.FC = () => {
             title="Rate the App"
             left={props => <PhIcon name="star-outline" size={22} color={theme.colors.onSurfaceVariant} style={styles.listIcon} />}
             right={props => <PhIcon name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} style={styles.listIconRight} />}
+            onPress={() => { }}
+            rippleColor={theme.colors.primary + '20'}
             titleStyle={styles.listTitleInfo}
           />
           <Divider style={styles.divider} />
@@ -332,6 +350,8 @@ const ProfileScreen: React.FC = () => {
             title="Version"
             description="2.1.0"
             left={props => <PhIcon name="information-outline" size={22} color={theme.colors.onSurfaceVariant} style={styles.listIcon} />}
+            onPress={() => { }}
+            rippleColor={theme.colors.primary + '20'}
             titleStyle={styles.listTitleInfo}
           />
         </Surface>
@@ -422,7 +442,7 @@ const ProfileScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  content: { padding: 16, paddingTop: Platform.OS === 'web' ? 24 : 16 },
+  content: { paddingHorizontal: 16 },
   heroSurface: {
     borderRadius: 24,
     padding: 24,
