@@ -5,8 +5,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "firebase/auth": ["./node_modules/@firebase/auth/dist/rn/index.rn.d.ts"],
-      "@firebase/auth": ["./node_modules/@firebase/auth/dist/rn/index.rn.d.ts"]
+      "firebase/auth": ["./types/firebase-auth-shim.d.ts"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
