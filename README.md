@@ -4,6 +4,17 @@ A modern **Vedic / Jyotish astrology** application built on React Native (Expo) 
 
 > **Tradition:** Vedic / Jyotish — all calculations use the sidereal zodiac (Lahiri ayanamsa) and Whole Sign houses by default. Western tropical mode is available as an optional toggle on select screens.
 
+## Screenshots & Demo
+
+> 📸 Screenshots and a demo video are located in [`docs/screenshots/`](docs/screenshots/README.md).
+> See that file for instructions on capturing and placing your own demo assets.
+
+<!-- Uncomment and update paths once screenshots are available:
+| Home | Kundli | Dasha | Panchang |
+|------|--------|-------|----------|
+| ![Home](docs/screenshots/home.png) | ![Kundli](docs/screenshots/kundli.png) | ![Dasha](docs/screenshots/dasha.png) | ![Panchang](docs/screenshots/panchang.png) |
+-->
+
 ## Project Overview
 
 This is a complete Jyotish application platform consisting of:
