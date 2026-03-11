@@ -4,7 +4,8 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "firebase/auth": ["./types/firebase-auth-shim.d.ts"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
