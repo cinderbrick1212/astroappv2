@@ -14,7 +14,7 @@ This guide walks you through deploying the Strapi backend to Google Cloud Platfo
 ### 1.1 Select the GCP Project
 
 ```bash
-gcloud config set project astroinsights-487814
+gcloud config set project your-gcp-project-id
 ```
 
 ### 1.2 Enable Required APIs
@@ -36,18 +36,18 @@ DB_PASSWORD=$(openssl rand -base64 32)
 echo "DB_PASSWORD=$DB_PASSWORD"
 
 # Create PostgreSQL instance
-gcloud sql instances create astroapp-db \
+gcloud sql instances create your-sql-instance-name \
   --database-version=POSTGRES_18 \
   --tier=db-f1-micro \
   --region=asia-south1 \
   --root-password="$DB_PASSWORD"
 
 # Create database
-gcloud sql databases create strapi --instance=astroapp-db
+gcloud sql databases create strapi --instance=your-sql-instance-name
 
 # Create user
 gcloud sql users create strapi \
-  --instance=astroapp-db \
+  --instance=your-sql-instance-name \
   --password="$DB_PASSWORD"
 ```
 
@@ -55,7 +55,7 @@ gcloud sql users create strapi \
 
 ```bash
 # Create bucket for media uploads with Uniform Bucket-Level Access (no public access)
-gsutil mb -l asia-south1 --uniform-bucket-level-access gs://astroapp-media
+gsutil mb -l asia-south1 --uniform-bucket-level-access gs://your-gcs-bucket-name
 ```
 
 > **Public access is prevented.** The bucket uses Uniform Bucket-Level Access so all
@@ -67,10 +67,10 @@ gsutil mb -l asia-south1 --uniform-bucket-level-access gs://astroapp-media
 > (`roles/storage.objectAdmin`) role on the bucket so it can read, write, and sign URLs:
 >
 > ```bash
-> PROJECT_NUMBER=$(gcloud projects describe astroinsights-487814 --format="value(projectNumber)")
+> PROJECT_NUMBER=$(gcloud projects describe your-gcp-project-id --format="value(projectNumber)")
 > gsutil iam ch \
 >   serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com:roles/storage.objectAdmin \
->   gs://astroapp-media
+>   gs://your-gcs-bucket-name
 > ```
 
 ## Step 2: Set Up Secrets
@@ -114,7 +114,7 @@ echo -n "$RAZORPAY_WEBHOOK_SECRET" | gcloud secrets create razorpay-webhook-secr
 ### 2.2 Grant Cloud Run Access to Secrets
 
 ```bash
-PROJECT_NUMBER=$(gcloud projects describe astroinsights-487814 --format="value(projectNumber)")
+PROJECT_NUMBER=$(gcloud projects describe your-gcp-project-id --format="value(projectNumber)")
 SA="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 ROLE="roles/secretmanager.secretAccessor"
 
@@ -144,18 +144,18 @@ done
 cd backend
 
 # Build the image
-gcloud builds submit --tag gcr.io/astroinsights-487814/strapi-backend
+gcloud builds submit --tag gcr.io/your-gcp-project-id/strapi-backend
 ```
 
 ### 3.2 Deploy to Cloud Run
 
 ```bash
 # Get Cloud SQL connection name
-INSTANCE_CONNECTION_NAME=$(gcloud sql instances describe astroapp-db --format="value(connectionName)")
+INSTANCE_CONNECTION_NAME=$(gcloud sql instances describe your-sql-instance-name --format="value(connectionName)")
 
 # Deploy to Cloud Run
 gcloud run deploy strapi-backend \
-  --image gcr.io/astroinsights-487814/strapi-backend \
+  --image gcr.io/your-gcp-project-id/strapi-backend \
   --platform managed \
   --region asia-south1 \
   --allow-unauthenticated \
@@ -168,10 +168,12 @@ gcloud run deploy strapi-backend \
   --set-env-vars "DATABASE_HOST=/cloudsql/${INSTANCE_CONNECTION_NAME}" \
   --set-env-vars "DATABASE_NAME=strapi" \
   --set-env-vars "DATABASE_USERNAME=strapi" \
-  --set-env-vars "GCS_BUCKET_NAME=astroapp-media" \
-  --set-env-vars "GCS_PUBLIC_FILES=true" \
+  --set-env-vars "GCS_BUCKET_NAME=your-gcs-bucket-name" \
+  --set-env-vars "GCS_PUBLIC_FILES=false" \
   --set-env-vars "HOST=0.0.0.0" \
   --set-env-vars "PORT=8080" \
+  --set-env-vars "URL=https://your-service-name.asia-south1.run.app" \
+  --set-env-vars "IS_PROXIED=true" \
   --set-secrets "APP_KEYS=app-keys:latest" \
   --set-secrets "ADMIN_JWT_SECRET=admin-jwt-secret:latest" \
   --set-secrets "JWT_SECRET=jwt-secret:latest" \
@@ -208,8 +210,10 @@ Use the ready-made file at [backend/cloudbuild.yaml](backend/cloudbuild.yaml). U
 
 ```yaml
 substitutions:
-  _INSTANCE_CONNECTION_NAME: "astroinsights-487814:asia-south1:astroapp-db"
-  _GCS_BUCKET_NAME: "astroapp-media"
+  _INSTANCE_CONNECTION_NAME: "your-gcp-project-id:asia-south1:your-sql-instance-name"
+  _GCS_BUCKET_NAME: "your-gcs-bucket-name"
+  _SERVICE_URL: "https://your-service-name.asia-south1.run.app"
+  _FIREBASE_PROJECT_ID: "your-firebase-project-id"
 ```
 
 ### 5.2 Connect GitHub Repository
@@ -228,7 +232,7 @@ If you want a single command deploy without setting up a trigger:
 
 ```bash
 gcloud builds submit --config backend/cloudbuild.yaml \
-  --substitutions _INSTANCE_CONNECTION_NAME="astroinsights-487814:asia-south1:astroapp-db",_GCS_BUCKET_NAME="astroapp-media"
+  --substitutions _INSTANCE_CONNECTION_NAME="your-gcp-project-id:asia-south1:your-sql-instance-name",_GCS_BUCKET_NAME="your-gcs-bucket-name",_SERVICE_URL="https://your-service-name.asia-south1.run.app",_FIREBASE_PROJECT_ID="your-firebase-project-id"
 ```
 
 ## Step 6: Post-Deployment
@@ -249,7 +253,7 @@ echo "Save this password now: $ADMIN_PASSWORD"
 echo -n "$ADMIN_PASSWORD" | gcloud secrets create strapi-admin-password --data-file=-
 
 # Grant the Cloud Run service account access to the new secret
-PROJECT_NUMBER=$(gcloud projects describe astroinsights-487814 \
+PROJECT_NUMBER=$(gcloud projects describe your-gcp-project-id \
   --format="value(projectNumber)")
 SA="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 gcloud secrets add-iam-policy-binding strapi-admin-password \
@@ -257,11 +261,11 @@ gcloud secrets add-iam-policy-binding strapi-admin-password \
   --role="roles/secretmanager.secretAccessor"
 
 # ── Step 2: Create the one-off Cloud Run Job ──
-INSTANCE_CONNECTION_NAME=$(gcloud sql instances describe astroapp-db \
+INSTANCE_CONNECTION_NAME=$(gcloud sql instances describe your-sql-instance-name \
   --format="value(connectionName)")
 
 gcloud run jobs create strapi-create-admin \
-  --image gcr.io/astroinsights-487814/strapi-backend \
+  --image gcr.io/your-gcp-project-id/strapi-backend \
   --region asia-south1 \
   --add-cloudsql-instances "$INSTANCE_CONNECTION_NAME" \
   --set-env-vars "DATABASE_CLIENT=postgres,DATABASE_HOST=/cloudsql/${INSTANCE_CONNECTION_NAME},DATABASE_NAME=strapi,DATABASE_USERNAME=strapi,HOST=0.0.0.0,PORT=8080,ADMIN_EMAIL=${ADMIN_EMAIL}" \
@@ -369,7 +373,7 @@ Consider using Cloud Armor for DDoS protection and WAF rules.
 gcloud run services logs read strapi-backend --region asia-south1
 
 # View Cloud SQL logs
-gcloud sql operations list --instance=astroapp-db
+gcloud sql operations list --instance=your-sql-instance-name
 ```
 
 ### Set Up Alerts
@@ -387,10 +391,10 @@ gcloud sql operations list --instance=astroapp-db
 
 ```bash
 # Manual backup
-gcloud sql backups create --instance=astroapp-db
+gcloud sql backups create --instance=your-sql-instance-name
 
 # Configure automated backups
-gcloud sql instances patch astroapp-db \
+gcloud sql instances patch your-sql-instance-name \
   --backup-start-time=03:00
 ```
 
@@ -398,11 +402,11 @@ gcloud sql instances patch astroapp-db \
 
 ```bash
 # List backups
-gcloud sql backups list --instance=astroapp-db
+gcloud sql backups list --instance=your-sql-instance-name
 
 # Restore
 gcloud sql backups restore BACKUP_ID \
-  --backup-instance=astroapp-db \
+  --backup-instance=your-sql-instance-name \
   --backup-id=BACKUP_ID
 ```
 
@@ -419,7 +423,7 @@ gcloud sql backups restore BACKUP_ID \
 
 ```bash
 # Test Cloud SQL connection
-gcloud sql connect astroapp-db --user=strapi
+gcloud sql connect your-sql-instance-name --user=strapi
 ```
 
 ### View Service Details
@@ -431,8 +435,8 @@ gcloud run services describe strapi-backend --region asia-south1
 ### Rebuild and Redeploy
 
 ```bash
-gcloud builds submit --tag gcr.io/astroinsights-487814/strapi-backend
-gcloud run deploy strapi-backend --image gcr.io/astroinsights-487814/strapi-backend --region asia-south1
+gcloud builds submit --tag gcr.io/your-gcp-project-id/strapi-backend
+gcloud run deploy strapi-backend --image gcr.io/your-gcp-project-id/strapi-backend --region asia-south1
 ```
 
 ## Environment Variables Reference
@@ -451,7 +455,7 @@ gcloud run deploy strapi-backend --image gcr.io/astroinsights-487814/strapi-back
 | DATABASE_NAME | Database name | strapi |
 | DATABASE_USERNAME | Database user | strapi |
 | DATABASE_PASSWORD | Database password | password123 |
-| GCS_BUCKET_NAME | Storage bucket | astroapp-media |
+| GCS_BUCKET_NAME | Storage bucket | your-gcs-bucket-name |
 | FIREBASE_SERVICE_ACCOUNT_KEY | Firebase credentials | {"type":"service_account",...} |
 | RAZORPAY_KEY_ID | Razorpay key ID | rzp_test_xxx |
 | RAZORPAY_KEY_SECRET | Razorpay key secret | secret |
