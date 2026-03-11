@@ -169,9 +169,11 @@ gcloud run deploy strapi-backend \
   --set-env-vars "DATABASE_NAME=strapi" \
   --set-env-vars "DATABASE_USERNAME=strapi" \
   --set-env-vars "GCS_BUCKET_NAME=your-gcs-bucket-name" \
-  --set-env-vars "GCS_PUBLIC_FILES=true" \
+  --set-env-vars "GCS_PUBLIC_FILES=false" \
   --set-env-vars "HOST=0.0.0.0" \
   --set-env-vars "PORT=8080" \
+  --set-env-vars "URL=https://your-service-name.asia-south1.run.app" \
+  --set-env-vars "IS_PROXIED=true" \
   --set-secrets "APP_KEYS=app-keys:latest" \
   --set-secrets "ADMIN_JWT_SECRET=admin-jwt-secret:latest" \
   --set-secrets "JWT_SECRET=jwt-secret:latest" \
@@ -210,6 +212,8 @@ Use the ready-made file at [backend/cloudbuild.yaml](backend/cloudbuild.yaml). U
 substitutions:
   _INSTANCE_CONNECTION_NAME: "your-gcp-project-id:asia-south1:your-sql-instance-name"
   _GCS_BUCKET_NAME: "your-gcs-bucket-name"
+  _SERVICE_URL: "https://your-service-name.asia-south1.run.app"
+  _FIREBASE_PROJECT_ID: "your-firebase-project-id"
 ```
 
 ### 5.2 Connect GitHub Repository
@@ -228,7 +232,7 @@ If you want a single command deploy without setting up a trigger:
 
 ```bash
 gcloud builds submit --config backend/cloudbuild.yaml \
-  --substitutions _INSTANCE_CONNECTION_NAME="your-gcp-project-id:asia-south1:your-sql-instance-name",_GCS_BUCKET_NAME="your-gcs-bucket-name"
+  --substitutions _INSTANCE_CONNECTION_NAME="your-gcp-project-id:asia-south1:your-sql-instance-name",_GCS_BUCKET_NAME="your-gcs-bucket-name",_SERVICE_URL="https://your-service-name.asia-south1.run.app",_FIREBASE_PROJECT_ID="your-firebase-project-id"
 ```
 
 ## Step 6: Post-Deployment
