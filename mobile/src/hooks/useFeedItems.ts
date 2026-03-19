@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '../api';
 import { FeedItem } from '../types';
+import { queryKeys } from '../utils/queryKeys';
 
 export const useFeedItems = () => {
   const { data: feedItems, isLoading, error, refetch } = useQuery<FeedItem[]>({
-    queryKey: ['feedItems'],
+    queryKey: queryKeys.feedItems(),
     queryFn: async () => {
       const response = await api.get('/feed-items', {
         params: {
