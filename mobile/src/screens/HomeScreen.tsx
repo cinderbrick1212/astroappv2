@@ -89,28 +89,45 @@ const HomeScreen: React.FC = () => {
     analytics.screenView('Home');
   }, []);
 
-  const today = new Date();
+  const today = React.useMemo(() => new Date(), []);
   const dayOfWeek = today.getDay();
-  const focus = FOCUS_AREAS.find(f => f.day === dayOfWeek) || FOCUS_AREAS[0];
-  const userName = user?.username || user?.email?.split('@')[0] || 'Explorer';
+  const focus = React.useMemo(
+    () => FOCUS_AREAS.find(f => f.day === dayOfWeek) || FOCUS_AREAS[0],
+    [dayOfWeek]
+  );
+  const userName = React.useMemo(
+    () => user?.username || user?.email?.split('@')[0] || 'Explorer',
+    [user?.email, user?.username]
+  );
 
-  const rashi = profile?.birth_date
-    ? horoscopeService.getRashiFromBirthDate(new Date(profile.birth_date))
-    : astrologyEngine.getSunSign(new Date());
+  const rashi = React.useMemo(
+    () =>
+      profile?.birth_date
+        ? horoscopeService.getRashiFromBirthDate(new Date(profile.birth_date))
+        : astrologyEngine.getSunSign(new Date()),
+    [profile?.birth_date]
+  );
 
-  const horoscope = horoscopeService.getDailyHoroscope(rashi, today);
+  const horoscope = React.useMemo(
+    () => horoscopeService.getDailyHoroscope(rashi, today),
+    [rashi, today]
+  );
 
-  const dateStr = today.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  });
+  const dateStr = React.useMemo(
+    () =>
+      today.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+      }),
+    [today]
+  );
 
-  const onRefresh = async () => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     await refetch();
     setRefreshing(false);
-  };
+  }, [refetch]);
 
   const maxWidth = isWide ? 720 : '100%';
 
@@ -152,9 +169,24 @@ const HomeScreen: React.FC = () => {
                 {dateStr}
               </Text>
             </View>
-            <View style={styles.streakBadge}>
+            <View
+              style={[
+                styles.streakBadge,
+                {
+                  backgroundColor: theme.colors.secondaryContainer,
+                },
+              ]}
+            >
               <Text style={{ fontSize: 18 }}>🔥</Text>
-              <Text style={{ color: '#FFFFFF', fontWeight: 'bold', marginLeft: 4 }}>{streak} day{streak !== 1 ? 's' : ''}</Text>
+              <Text
+                style={{
+                  color: theme.colors.onSecondaryContainer,
+                  fontWeight: 'bold',
+                  marginLeft: 4,
+                }}
+              >
+                {streak} day{streak !== 1 ? 's' : ''}
+              </Text>
             </View>
           </View>
         </LinearGradient>
@@ -166,7 +198,7 @@ const HomeScreen: React.FC = () => {
             {
               backgroundColor: theme.dark ? theme.colors.elevation.level2 : theme.colors.surface,
               maxWidth,
-              borderColor: theme.dark ? 'rgba(203,190,255,0.12)' : 'rgba(91,79,196,0.08)',
+              borderColor: theme.colors.outlineVariant,
               borderWidth: 1,
             },
           ]}
