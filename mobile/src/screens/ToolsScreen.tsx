@@ -18,6 +18,9 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import { AppStackParamList } from '../types';
 
 type Nav = NativeStackNavigationProp<AppStackParamList>;
+type ScreensWithoutParams = {
+  [K in keyof AppStackParamList]: AppStackParamList[K] extends undefined ? K : never;
+}[keyof AppStackParamList];
 
 // ── Category accent colors ──────────────────────────────────────────────────
 const CATEGORY_ACCENTS = {
@@ -36,10 +39,11 @@ const ToolsScreen: React.FC = () => {
   const maxWidth = isWide ? 720 : '100%';
   const insets = useSafeAreaInsets();
 
-  const today = React.useMemo(() => new Date(), []);
+  const today = new Date();
+  const dayKey = today.toDateString();
   const panchang = React.useMemo(
     () => panchangService.calculatePanchang(today, 28.6, 77.2),
-    [today]
+    [dayKey]
   );
 
   const nakshatra = React.useMemo(() => {
@@ -54,11 +58,11 @@ const ToolsScreen: React.FC = () => {
 
   const lucky = React.useMemo(
     () => horoscopeService.getLuckyFactors(nakshatra, today),
-    [nakshatra, today]
+    [nakshatra, dayKey]
   );
 
   const handleNavigate = React.useCallback(
-    (screen: keyof AppStackParamList) => navigation.navigate(screen as never),
+    (screen: ScreensWithoutParams) => navigation.navigate(screen),
     [navigation]
   );
 
@@ -80,7 +84,7 @@ const ToolsScreen: React.FC = () => {
 
   const renderGridToolCard = React.useCallback(
     (
-      tool: { icon: string; label: string; screen: keyof AppStackParamList },
+      tool: { icon: string; label: string; screen: ScreensWithoutParams },
       accent: string,
     ) => (
       <Pressable

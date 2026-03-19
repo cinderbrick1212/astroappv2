@@ -89,11 +89,11 @@ const HomeScreen: React.FC = () => {
     analytics.screenView('Home');
   }, []);
 
-  const today = React.useMemo(() => new Date(), []);
-  const dayOfWeek = today.getDay();
+  const today = new Date();
+  const dayKey = today.toDateString();
   const focus = React.useMemo(
-    () => FOCUS_AREAS.find(f => f.day === dayOfWeek) || FOCUS_AREAS[0],
-    [dayOfWeek]
+    () => FOCUS_AREAS.find(f => f.day === today.getDay()) || FOCUS_AREAS[0],
+    [dayKey]
   );
   const userName = React.useMemo(
     () => user?.username || user?.email?.split('@')[0] || 'Explorer',
@@ -105,12 +105,12 @@ const HomeScreen: React.FC = () => {
       profile?.birth_date
         ? horoscopeService.getRashiFromBirthDate(new Date(profile.birth_date))
         : astrologyEngine.getSunSign(new Date()),
-    [profile?.birth_date]
+    [profile?.birth_date, dayKey]
   );
 
   const horoscope = React.useMemo(
     () => horoscopeService.getDailyHoroscope(rashi, today),
-    [rashi, today]
+    [rashi, dayKey]
   );
 
   const dateStr = React.useMemo(
@@ -120,7 +120,7 @@ const HomeScreen: React.FC = () => {
         month: 'long',
         day: 'numeric',
       }),
-    [today]
+    [dayKey]
   );
 
   const onRefresh = React.useCallback(async () => {
@@ -169,25 +169,27 @@ const HomeScreen: React.FC = () => {
                 {dateStr}
               </Text>
             </View>
-            <View
-              style={[
-                styles.streakBadge,
-                {
-                  backgroundColor: theme.colors.secondaryContainer,
-                },
-              ]}
-            >
-              <Text style={{ fontSize: 18 }}>🔥</Text>
-              <Text
-                style={{
-                  color: theme.colors.onSecondaryContainer,
-                  fontWeight: 'bold',
-                  marginLeft: 4,
-                }}
+            {streak > 0 && (
+              <View
+                style={[
+                  styles.streakBadge,
+                  {
+                    backgroundColor: theme.colors.secondaryContainer,
+                  },
+                ]}
               >
-                {streak} day{streak !== 1 ? 's' : ''}
-              </Text>
-            </View>
+                <Text style={{ fontSize: 18 }}>🔥</Text>
+                <Text
+                  style={{
+                    color: theme.colors.onSecondaryContainer,
+                    fontWeight: 'bold',
+                    marginLeft: 4,
+                  }}
+                >
+                  {streak} day{streak !== 1 ? 's' : ''}
+                </Text>
+              </View>
+            )}
           </View>
         </LinearGradient>
 

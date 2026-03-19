@@ -2,9 +2,9 @@ import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
 let firebaseApp;
-const logger = (global as any).strapi?.log;
 
 export const initializeFirebase = () => {
+  const logger = (global as any).strapi?.log;
   if (getApps().length === 0) {
     const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
     const nodeEnv = process.env.NODE_ENV || 'development';
@@ -39,6 +39,7 @@ export const initializeFirebase = () => {
 };
 
 export const verifyFirebaseToken = async (idToken: string) => {
+  const logger = (global as any).strapi?.log;
   try {
     const decodedToken = await getAuth().verifyIdToken(idToken);
     return decodedToken;
