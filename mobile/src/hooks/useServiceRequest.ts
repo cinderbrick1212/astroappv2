@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api';
 import { ServiceRequest } from '../types';
+import { queryKeys } from '../utils/queryKeys';
 
 export const useServiceRequest = () => {
   const queryClient = useQueryClient();
@@ -14,7 +15,7 @@ export const useServiceRequest = () => {
       return response.data.data as ServiceRequest;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['serviceRequests'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.serviceRequests() });
     },
   });
 

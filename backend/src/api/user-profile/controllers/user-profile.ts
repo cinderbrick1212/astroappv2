@@ -58,7 +58,7 @@ export default ({ strapi }) => ({
         message: existingProfile ? 'Profile updated successfully' : 'Profile created successfully',
       };
     } catch (error) {
-      console.error('Error creating/updating profile:', error);
+      strapi.log.error('Error creating/updating profile:', error);
       ctx.throw(500, 'Failed to save profile');
     }
   },
@@ -83,7 +83,7 @@ export default ({ strapi }) => ({
         data: profile,
       };
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      strapi.log.error('Error fetching profile:', error);
       ctx.throw(500, 'Failed to fetch profile');
     }
   },

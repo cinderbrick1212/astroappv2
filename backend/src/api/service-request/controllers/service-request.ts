@@ -41,7 +41,7 @@ export default ({ strapi }) => ({
           serviceRequest
         );
       } catch (notifyError) {
-        console.error('Notification error (non-fatal):', notifyError);
+        strapi.log.warn('Notification error (non-fatal):', notifyError);
       }
 
       ctx.body = {
@@ -49,7 +49,7 @@ export default ({ strapi }) => ({
         message: 'Service request created successfully',
       };
     } catch (error) {
-      console.error('Error creating service request:', error);
+      strapi.log.error('Error creating service request:', error);
       ctx.throw(500, 'Failed to create service request');
     }
   },
@@ -73,7 +73,7 @@ export default ({ strapi }) => ({
 
       ctx.body = { data: serviceRequest };
     } catch (error) {
-      console.error('Error fetching service request:', error);
+      strapi.log.error('Error fetching service request:', error);
       ctx.throw(500, 'Failed to fetch service request');
     }
   },
@@ -95,7 +95,7 @@ export default ({ strapi }) => ({
         data: requests,
       };
     } catch (error) {
-      console.error('Error fetching service requests:', error);
+      strapi.log.error('Error fetching service requests:', error);
       ctx.throw(500, 'Failed to fetch service requests');
     }
   },
@@ -139,7 +139,7 @@ export default ({ strapi }) => ({
             serviceRequest
           );
         } catch (notifyError) {
-          console.error('Notification error (non-fatal):', notifyError);
+          strapi.log.warn('Notification error (non-fatal):', notifyError);
         }
       }
 
@@ -148,7 +148,7 @@ export default ({ strapi }) => ({
         message: 'Service request updated successfully',
       };
     } catch (error) {
-      console.error('Error updating service request:', error);
+      strapi.log.error('Error updating service request:', error);
       ctx.throw(500, 'Failed to update service request');
     }
   },

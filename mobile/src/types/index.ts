@@ -116,10 +116,9 @@ export type AppStackParamList = {
 };
 
 export type MainTabParamList = {
-  Feed: undefined;
-  Tools: undefined;
-  Home: undefined;
-  Profile: undefined;
+  home: undefined;
+  tools: undefined;
+  profile: undefined;
 };
 
 /** @deprecated Use AppStackParamList for modal screens */

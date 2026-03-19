@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import api from '../api';
 import { BlogPost } from '../types';
+import { queryKeys } from '../utils/queryKeys';
 
 export const useBlogPosts = (category?: string) => {
   const {
@@ -11,7 +12,7 @@ export const useBlogPosts = (category?: string) => {
     hasNextPage,
     refetch,
   } = useInfiniteQuery<BlogPost[]>({
-    queryKey: ['blogPosts', category],
+    queryKey: queryKeys.blogPosts(category),
     queryFn: async ({ pageParam = 1 }) => {
       const response = await api.get('/blog-posts', {
         params: {

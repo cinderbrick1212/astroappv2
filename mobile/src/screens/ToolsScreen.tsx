@@ -18,6 +18,9 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import { AppStackParamList } from '../types';
 
 type Nav = NativeStackNavigationProp<AppStackParamList>;
+type ScreensWithoutParams = {
+  [K in keyof AppStackParamList]: AppStackParamList[K] extends undefined ? K : never;
+}[keyof AppStackParamList];
 
 // ── Category accent colors ──────────────────────────────────────────────────
 const CATEGORY_ACCENTS = {
@@ -37,7 +40,11 @@ const ToolsScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
 
   const today = new Date();
-  const panchang = panchangService.calculatePanchang(today, 28.6, 77.2);
+  const dayKey = today.toDateString();
+  const panchang = React.useMemo(
+    () => panchangService.calculatePanchang(today, 28.6, 77.2),
+    [dayKey]
+  );
 
   const nakshatra = React.useMemo(() => {
     if (!profile?.birth_date) return 'Pushya';
@@ -49,53 +56,67 @@ const ToolsScreen: React.FC = () => {
     return astrologyEngine.getNakshatra(moonVedic);
   }, [profile?.birth_date]);
 
-  const lucky = horoscopeService.getLuckyFactors(nakshatra, today);
-
-  const renderSectionHeader = (title: string, subtitle: string, accent: string) => (
-    <View style={styles.sectionHeader}>
-      <View style={{ flex: 1 }}>
-        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
-          {title}
-        </Text>
-        <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: 2 }}>
-          {subtitle}
-        </Text>
-      </View>
-    </View>
+  const lucky = React.useMemo(
+    () => horoscopeService.getLuckyFactors(nakshatra, today),
+    [nakshatra, dayKey]
   );
 
-  const renderGridToolCard = (
-    tool: { icon: string; label: string; screen: keyof AppStackParamList },
-    accent: string,
-  ) => (
-    <Pressable
-      key={tool.label}
-      style={({ pressed }) => [
-        styles.gridToolItem,
-        {
-          backgroundColor: theme.dark
-            ? theme.colors.elevation.level2
-            : theme.colors.surface,
-          borderColor: pressed
-            ? accent + '50'
-            : theme.dark ? 'rgba(203,190,255,0.08)' : theme.colors.outlineVariant,
-          transform: [{ scale: pressed ? 0.97 : 1 }],
-        },
-      ]}
-      onPress={() => navigation.navigate(tool.screen as any)}
-      accessibilityLabel={tool.label}
-      android_ripple={{ color: accent + '30' }}
-    >
-      <LinearGradient
-        colors={[accent + '25', accent + '08']}
-        style={styles.gridIconWrap}
+  const handleNavigate = React.useCallback(
+    (screen: ScreensWithoutParams) => navigation.navigate(screen),
+    [navigation]
+  );
+
+  const renderSectionHeader = React.useCallback(
+    (title: string, subtitle: string) => (
+      <View style={styles.sectionHeader}>
+        <View style={{ flex: 1 }}>
+          <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
+            {title}
+          </Text>
+          <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: 2 }}>
+            {subtitle}
+          </Text>
+        </View>
+      </View>
+    ),
+    [theme.colors.onBackground, theme.colors.onSurfaceVariant]
+  );
+
+  const renderGridToolCard = React.useCallback(
+    (
+      tool: { icon: string; label: string; screen: ScreensWithoutParams },
+      accent: string,
+    ) => (
+      <Pressable
+        key={tool.label}
+        style={({ pressed }) => [
+          styles.gridToolItem,
+          {
+            backgroundColor: theme.dark
+              ? theme.colors.elevation.level2
+              : theme.colors.surface,
+            borderColor: pressed
+              ? accent + '50'
+              : theme.dark ? 'rgba(203,190,255,0.08)' : theme.colors.outlineVariant,
+            transform: [{ scale: pressed ? 0.97 : 1 }],
+          },
+        ]}
+        onPress={() => handleNavigate(tool.screen)}
+        accessibilityLabel={tool.label}
+        android_ripple={{ color: accent + '30' }}
       >
-        <PhIcon name={tool.icon} size={28} color={accent} />
-      </LinearGradient>
-      <Text variant="labelMedium" style={{ color: theme.colors.onSurface, fontWeight: '600', marginTop: 10, textAlign: 'center' }} numberOfLines={2}>
-        {tool.label}
-      </Text>
-    </Pressable>
+        <LinearGradient
+          colors={[accent + '25', accent + '08']}
+          style={styles.gridIconWrap}
+        >
+          <PhIcon name={tool.icon} size={28} color={accent} />
+        </LinearGradient>
+        <Text variant="labelMedium" style={{ color: theme.colors.onSurface, fontWeight: '600', marginTop: 10, textAlign: 'center' }} numberOfLines={2}>
+          {tool.label}
+        </Text>
+      </Pressable>
+    ),
+    [handleNavigate, theme.colors.elevation.level2, theme.colors.onSurface, theme.colors.outlineVariant, theme.colors.surface, theme.dark]
   );
 
   return (
@@ -119,7 +140,7 @@ const ToolsScreen: React.FC = () => {
           </Text>
         </View>
 
-        {renderSectionHeader('Daily Insights', 'Cosmic factors for today', CATEGORY_ACCENTS.daily)}
+        {renderSectionHeader('Daily Insights', 'Cosmic factors for today')}
 
         {/* Panchang Card */}
         <Pressable
@@ -220,7 +241,7 @@ const ToolsScreen: React.FC = () => {
         </Card>
 
         {/* ── PERSONAL TOOLS ── */}
-        {renderSectionHeader('Personal Analytics', 'Deep dive into your birth chart', CATEGORY_ACCENTS.personal)}
+        {renderSectionHeader('Personal Analytics', 'Deep dive into your birth chart')}
 
         <View style={styles.toolGrid}>
           {[
@@ -238,7 +259,7 @@ const ToolsScreen: React.FC = () => {
         </View>
 
         {/* ── CALENDAR & TIMING TOOLS ── */}
-        {renderSectionHeader('Timing & Events', 'Auspicious times and celestial body movements', CATEGORY_ACCENTS.calendar)}
+        {renderSectionHeader('Timing & Events', 'Auspicious times and celestial body movements')}
 
         <View style={styles.toolGrid}>
           {[
@@ -252,7 +273,7 @@ const ToolsScreen: React.FC = () => {
         </View>
 
         {/* ── PREMIUM SERVICES ── */}
-        {renderSectionHeader('Premium Services', 'Expert consultations and reports', CATEGORY_ACCENTS.premium)}
+        {renderSectionHeader('Premium Services', 'Expert consultations and reports')}
 
         {[
           { icon: 'help-circle-outline', label: 'Ask a Question', subtitle: 'Get a personalized answer', price: '₹49', screen: 'AskQuestion' as const },

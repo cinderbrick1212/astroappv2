@@ -4,6 +4,7 @@ import api from '../api';
 import { UserProfile } from '../types';
 import { storage } from '../utils/storage';
 import { useAuth } from './useAuth';
+import { queryKeys } from '../utils/queryKeys';
 
 /**
  * Local-first user profile hook.
@@ -119,7 +120,7 @@ export const useUserProfile = () => {
             }
           }
 
-          queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+          queryClient.invalidateQueries({ queryKey: queryKeys.userProfile(user?.id?.toString()) });
           callbacks?.onSuccess?.();
         } catch (err) {
           setError(err);

@@ -23,11 +23,11 @@ async function bootstrapRoles(strapi: Core.Strapi) {
           'Manages astrology content (feed items, blog posts) and responds to service requests.',
         code: 'astrologer',
       });
-      console.log('Strapi admin role "Astrologer" created successfully');
+      strapi.log.info('Strapi admin role "Astrologer" created successfully');
     }
   } catch (error) {
     // Non-fatal: the role can be created manually via the admin panel.
-    console.error('Failed to bootstrap Astrologer role (non-fatal):', error);
+    strapi.log.error('Failed to bootstrap Astrologer role (non-fatal):', error);
   }
 }
 
@@ -50,7 +50,7 @@ async function bootstrapPermissions(strapi: Core.Strapi) {
     ]);
 
     if (!publicRole || !authenticatedRole) {
-      console.warn('users-permissions roles not found — skipping permission bootstrap');
+      strapi.log.warn('users-permissions roles not found — skipping permission bootstrap');
       return;
     }
 
@@ -90,10 +90,10 @@ async function bootstrapPermissions(strapi: Core.Strapi) {
     await enablePermissions(strapi, publicRole.id, publicActions);
     await enablePermissions(strapi, authenticatedRole.id, authenticatedActions);
 
-    console.log('users-permissions role permissions configured successfully');
+    strapi.log.info('users-permissions role permissions configured successfully');
   } catch (error) {
     // Non-fatal: permissions can be configured manually via the admin panel.
-    console.error('Failed to bootstrap users-permissions (non-fatal):', error);
+    strapi.log.error('Failed to bootstrap users-permissions (non-fatal):', error);
   }
 }
 

@@ -1,6 +1,10 @@
-// Notification service for sending emails and WhatsApp messages
+import type { Core } from '@strapi/strapi';
 
-export default ({ strapi }) => ({
+// Notification service for sending emails and WhatsApp messages
+export default ({ strapi }: { strapi: Core.Strapi }) => {
+  const logger = strapi.log;
+
+  return {
   /**
    * Send email notification via SendGrid (when SENDGRID_API_KEY is set) or log.
    */
@@ -14,7 +18,7 @@ export default ({ strapi }) => ({
         try {
           sgMail = require('@sendgrid/mail');
         } catch {
-          console.warn('SendGrid package not installed. Run: npm install @sendgrid/mail');
+          logger.warn('SendGrid package not installed. Run: npm install @sendgrid/mail');
           return { success: false, error: 'SendGrid package not installed' };
         }
         sgMail.setApiKey(apiKey);
@@ -25,16 +29,16 @@ export default ({ strapi }) => ({
           text,
           html: html || text,
         });
-        console.log(`📧 Email sent to ${to}: ${subject}`);
+        logger.info(`📧 Email sent to ${to}: ${subject}`);
         return { success: true };
       } catch (err) {
-        console.error('SendGrid email error:', err);
+        logger.error('SendGrid email error:', err);
         return { success: false, error: err };
       }
     }
 
     // Fallback: log (dev / staging without email configured)
-    console.log('📧 Email notification (no provider):', { to, subject, text });
+    logger.info('📧 Email notification (no provider):', { to, subject, text });
     return { success: true, message: 'Email logged (no provider configured)' };
   },
 
@@ -53,7 +57,7 @@ export default ({ strapi }) => ({
         try {
           twilio = require('twilio');
         } catch {
-          console.warn('Twilio package not installed. Run: npm install twilio');
+          logger.warn('Twilio package not installed. Run: npm install twilio');
           return { success: false, error: 'Twilio package not installed' };
         }
         const client = twilio(accountSid, authToken);
@@ -62,16 +66,16 @@ export default ({ strapi }) => ({
           to: `whatsapp:${to}`,
           body: message,
         });
-        console.log(`📱 WhatsApp sent to ${to}`);
+        logger.info(`📱 WhatsApp sent to ${to}`);
         return { success: true };
       } catch (err) {
-        console.error('Twilio WhatsApp error:', err);
+        logger.error('Twilio WhatsApp error:', err);
         return { success: false, error: err };
       }
     }
 
     // Fallback: log
-    console.log('📱 WhatsApp notification (no provider):', { to, message });
+    logger.info('📱 WhatsApp notification (no provider):', { to, message });
     return { success: true, message: 'WhatsApp logged (no provider configured)' };
   },
 
@@ -108,4 +112,5 @@ export default ({ strapi }) => ({
     if (user.email) await this.sendEmail(user.email, subject, message);
     if (user.phone) await this.sendWhatsApp(user.phone, message);
   },
-});
+  };
+};
