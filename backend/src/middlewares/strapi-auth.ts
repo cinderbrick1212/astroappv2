@@ -78,7 +78,7 @@ export default (config, { strapi }: { strapi: Core.Strapi }) => {
 
       await next();
     } catch (error) {
-      console.error('Strapi auth error:', error);
+      strapi.log.error('Strapi auth error:', error);
       return ctx.unauthorized('Invalid authentication token');
     }
   };

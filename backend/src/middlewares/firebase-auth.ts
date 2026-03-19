@@ -60,7 +60,7 @@ export default (config, { strapi }: { strapi: Core.Strapi }) => {
 
       await next();
     } catch (error) {
-      console.error('Firebase auth error:', error);
+      strapi.log.error('Firebase auth error:', error);
       return ctx.unauthorized('Invalid authentication token');
     }
   };

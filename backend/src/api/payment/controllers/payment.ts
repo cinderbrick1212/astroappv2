@@ -49,7 +49,7 @@ export default ({ strapi }) => ({
         paymentId: payment.id,
       };
     } catch (error) {
-      console.error('Error creating order:', error);
+      strapi.log.error('Error creating order:', error);
       ctx.throw(500, 'Failed to create payment order');
     }
   },
@@ -115,14 +115,12 @@ export default ({ strapi }) => ({
         });
       }
 
-      // TODO: Send notification emails/WhatsApp to user and astrologers
-
       ctx.body = {
         success: true,
         message: 'Payment verified successfully',
       };
     } catch (error) {
-      console.error('Error verifying payment:', error);
+      strapi.log.error('Error verifying payment:', error);
       ctx.throw(500, 'Failed to verify payment');
     }
   },
@@ -185,7 +183,7 @@ export default ({ strapi }) => ({
 
       ctx.body = { received: true };
     } catch (error) {
-      console.error('Webhook error:', error);
+      strapi.log.error('Webhook error:', error);
       ctx.throw(500, 'Webhook processing failed');
     }
   },

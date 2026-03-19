@@ -26,7 +26,7 @@ export default ({ strapi }) => ({
         data: fullUser,
       };
     } catch (error) {
-      console.error('Error fetching user:', error);
+      strapi.log.error('Error fetching user:', error);
       ctx.throw(500, 'Failed to fetch user data');
     }
   },
@@ -53,7 +53,7 @@ export default ({ strapi }) => ({
         message: 'User updated successfully',
       };
     } catch (error) {
-      console.error('Error updating user:', error);
+      strapi.log.error('Error updating user:', error);
       ctx.throw(500, 'Failed to update user');
     }
   },
@@ -78,7 +78,7 @@ export default ({ strapi }) => ({
 
       ctx.body = { message: 'Push token updated successfully' };
     } catch (error) {
-      console.error('Error updating push token:', error);
+      strapi.log.error('Error updating push token:', error);
       ctx.throw(500, 'Failed to update push token');
     }
   },

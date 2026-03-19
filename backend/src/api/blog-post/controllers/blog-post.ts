@@ -40,7 +40,7 @@ export default ({ strapi }) => ({
         },
       };
     } catch (error) {
-      console.error('Error fetching blog posts:', error);
+      strapi.log.error('Error fetching blog posts:', error);
       ctx.throw(500, 'Failed to fetch blog posts');
     }
   },
@@ -60,7 +60,7 @@ export default ({ strapi }) => ({
 
       ctx.body = { data: post };
     } catch (error) {
-      console.error('Error fetching blog post:', error);
+      strapi.log.error('Error fetching blog post:', error);
       ctx.throw(500, 'Failed to fetch blog post');
     }
   },

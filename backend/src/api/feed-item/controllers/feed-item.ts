@@ -37,7 +37,7 @@ export default ({ strapi }) => ({
         },
       };
     } catch (error) {
-      console.error('Error fetching feed items:', error);
+      strapi.log.error('Error fetching feed items:', error);
       ctx.throw(500, 'Failed to fetch feed items');
     }
   },
@@ -57,7 +57,7 @@ export default ({ strapi }) => ({
 
       ctx.body = { data: item };
     } catch (error) {
-      console.error('Error fetching feed item:', error);
+      strapi.log.error('Error fetching feed item:', error);
       ctx.throw(500, 'Failed to fetch feed item');
     }
   },

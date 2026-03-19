@@ -2,6 +2,7 @@ import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
 let firebaseApp;
+const logger = (global as any).strapi?.log;
 
 export const initializeFirebase = () => {
   if (getApps().length === 0) {
@@ -14,9 +15,9 @@ export const initializeFirebase = () => {
         firebaseApp = initializeApp({
           credential: cert(serviceAccount),
         });
-        console.log('Firebase Admin SDK initialized with service account credentials');
+        logger?.info('Firebase Admin SDK initialized with service account credentials');
       } catch (error) {
-        console.error('Error parsing Firebase service account:', error);
+        logger?.error('Error parsing Firebase service account:', error);
         throw error;
       }
     } else if (nodeEnv === 'production') {
@@ -27,7 +28,7 @@ export const initializeFirebase = () => {
       );
     } else {
       // In development, allow running without Firebase for testing
-      console.warn(
+      logger?.warn(
         'FIREBASE_SERVICE_ACCOUNT_KEY not set. Running in development mode without Firebase authentication. ' +
         'Set FIREBASE_SERVICE_ACCOUNT_KEY to enable Firebase auth.'
       );
@@ -42,7 +43,7 @@ export const verifyFirebaseToken = async (idToken: string) => {
     const decodedToken = await getAuth().verifyIdToken(idToken);
     return decodedToken;
   } catch (error) {
-    console.error('Error verifying Firebase token:', error);
+    logger?.error('Error verifying Firebase token:', error);
     throw error;
   }
 };
