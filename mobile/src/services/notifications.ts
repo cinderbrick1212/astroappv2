@@ -15,33 +15,34 @@ ExpoNotifications.setNotificationHandler({
 export const notifications = {
   /** Request permission and store the Expo push token. */
   async registerForPushNotifications(): Promise<string | null> {
-    // Push notifications are not supported on emulators without credentials
-    if (Platform.OS === 'android') {
-      await ExpoNotifications.setNotificationChannelAsync('default', {
-        name: 'Default',
-        importance: ExpoNotifications.AndroidImportance.DEFAULT,
-      });
-    }
-
-    const { status: existingStatus } = await ExpoNotifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-
-    if (existingStatus !== 'granted') {
-      const { status } = await ExpoNotifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-
-    if (finalStatus !== 'granted') {
-      return null;
-    }
-
     try {
+      // Push notifications are not supported on emulators without credentials
+      if (Platform.OS === 'android') {
+        await ExpoNotifications.setNotificationChannelAsync('default', {
+          name: 'Default',
+          importance: ExpoNotifications.AndroidImportance.DEFAULT,
+        });
+      }
+
+      const { status: existingStatus } = await ExpoNotifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== 'granted') {
+        const { status } = await ExpoNotifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== 'granted') {
+        return null;
+      }
+
       const tokenData = await ExpoNotifications.getExpoPushTokenAsync();
       const token = tokenData.data;
       await storage.set(storage.keys.PUSH_TOKEN, token);
       return token;
-    } catch {
-      // Token retrieval can fail in simulators or Expo Go without project ID
+    } catch (error) {
+      // Handle missing permissions or environments where push is unsupported
+      console.warn('Push registration failed; continuing without notifications.', error);
       return null;
     }
   },
