@@ -17,8 +17,12 @@ APK_OUTPUT_DIR="${MOBILE_DIR}/apk-output"
 
 cd "${MOBILE_DIR}"
 
-echo "▶ Running expo prebuild --platform android --clean …"
-npx expo prebuild --platform android --clean
+# Allow callers to skip expo prebuild when the android/ project has already
+# been generated (e.g. the CI workflow runs it before setup-java for caching).
+if [ "${SKIP_PREBUILD:-false}" != "true" ]; then
+  echo "▶ Running expo prebuild --platform android --clean …"
+  npx expo prebuild --platform android --clean
+fi
 
 echo "▶ Building ${VARIANT} APK with Gradle …"
 cd android
